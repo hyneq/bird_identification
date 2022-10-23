@@ -23,9 +23,8 @@ def predict(img_path):
 
     predictions = model.predict(image)
     scores = tf.nn.softmax(predictions[0])
-    scores = scores.numpy()
 
-    return classes[np.argmax(scores)]
+    return (classes[np.argmax(scores)], np.max(scores)*100)
 
 
 def load_classes(classes_path):
@@ -34,5 +33,5 @@ def load_classes(classes_path):
         return {int(row[0]): row[1] for row in reader}
 
 if __name__ == "__main__":
-    out = predict(sys.argv[1])
-    print(out)
+    (class_name, confidence) = predict(sys.argv[1])
+    print("{} ({}% confidence)".format(class_name, confidence.round(3)))
