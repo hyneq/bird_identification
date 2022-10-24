@@ -35,8 +35,12 @@ def load_model(config_path, weights_path, labels_path):
 def detect_objects(image, network, layer_names_output, labels):
     if type(image) == str:
         image = cv2.imread(image)
+
+    height, width = image.shape[0:2]
     
     probability_minimum = 0.5
+
+    threshold = 0.3
 
     # blob from image
     blob = cv2.dnn.blobFromImage(image, 1 / 255.0, (416, 416),
@@ -45,6 +49,12 @@ def detect_objects(image, network, layer_names_output, labels):
     network.setInput(blob)
 
     output = network.forward(layer_names_output)
+
+    # Preparing lists for detected bounding boxes,
+    # obtained confidences and class's number
+    bounding_boxes = []
+    confidences = []
+    class_numbers = []
 
     # Going through all output layers after feed forward pass
     for result in output:
@@ -58,8 +68,38 @@ def detect_objects(image, network, layer_names_output, labels):
             confidence_current = scores[class_current]
 
             if confidence_current > probability_minimum:
-                print(labels[class_current], confidence_current)
+                #print(labels[class_current], confidence_current)
+
+                box_current = detected_objects[0:4] * np.array([width, height, width, height])
+
+                # Now, from YOLO data format, we can get top left corner coordinates
+                # that are x_min and y_min
+                x_center, y_center, box_width, box_height = box_current
+                x_min = int(x_center - (box_width / 2))
+                y_min = int(y_center - (box_height / 2))
+
+                # Adding results into prepared lists
+                bounding_boxes.append([x_min, y_min,
+                                       int(box_width), int(box_height)])
+                confidences.append(float(confidence_current))
+                class_numbers.append(class_current)
+
+
+    # Implementing non-maximum suppression of given bounding boxes
+    # With this technique we exclude some of bounding boxes if their
+    # corresponding confidences are low or there is another
+    # bounding box for this region with higher confidence
+
+    filtered = cv2.dnn.NMSBoxes(bounding_boxes, confidences,
+                            probability_minimum, threshold)
+    
+    results = [(labels[class_numbers[i]], bounding_boxes[i], confidences[i]) for i in filtered]
+
+    return results
         
 if __name__ == "__main__":
     model = load_model(config_path, weights_path, labels_path)
-    detect_objects(sys.argv[1], *model)
+    results = detect_objects(sys.argv[1], *model)
+
+    for result in results:
+        print("{} at {} with {} % confidence".format(result[0], result[1], round(result[2],2)))
