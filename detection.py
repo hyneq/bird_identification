@@ -102,4 +102,4 @@ if __name__ == "__main__":
     results = detect_objects(sys.argv[1], *model)
 
     for result in results:
-        print("{} at {} with {} % confidence".format(result[0], result[1], round(result[2],2)))
+        print("{} at {} with {} % confidence".format(result[0], result[1], round(result[2]*100,2)))
