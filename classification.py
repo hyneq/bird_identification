@@ -6,6 +6,7 @@ import csv
 import tensorflow as tf
 from tensorflow import keras
 import numpy as np
+#import PIL
 
 model_path = os.path.join(os.path.dirname(__file__),"models","BIRDS_450","BIRDS-450-(200 X 200)-99.28.h5")
 classes_path = os.path.join(os.path.dirname(__file__),"models","BIRDS_450","classes.csv")
@@ -17,12 +18,17 @@ def predict(img_path):
 
     model = keras.models.load_model(model_path)
 
-    image = keras.preprocessing.image.load_img(img_path, target_size=(200,200))
-    image = keras.preprocessing.image.img_to_array(image)
-    image = np.expand_dims(image,0)
+    image = keras.utils.image.load_img(img_path, target_size=(200,200))
+    blob = keras.preprocessing.image.img_to_array(image)
+    blob = np.expand_dims(blob,0)
 
-    predictions = model.predict(image)
-    scores = tf.nn.softmax(predictions[0])
+    # image = PIL.Image.open(img_path)
+    # image = image.resize((200,200))
+    # blob = np.asarray(image)
+    # blob = np.expand_dims(blob, axis=0)
+
+    predictions = model.predict(blob)
+    scores = predictions[0]
 
     return (classes[np.argmax(scores)], np.max(scores)*100)
 
