@@ -2,7 +2,8 @@
 
 # This code is heavily based on https://medium.com/analytics-vidhya/object-detection-using-yolov3-d48100de2ebb
 
-import os, sys
+import os, sys, glob
+from dataclasses import dataclass
 
 import cv2
 import numpy as np
@@ -13,7 +14,27 @@ config_path = os.path.join(model_path, "yolov3.cfg")
 weights_path = os.path.join(model_path, "yolov3.weights")
 labels_path = os.path.join(model_path, "coco.names")
 
-def load_model(config_path, weights_path, labels_path):
+@dataclass()
+class Model:
+    network: any
+    layer_names_output: any
+    labels: any
+
+@dataclass()
+class BoundingBox:
+    x: int
+    y: int
+    width: int
+    height: int
+
+@dataclass()
+class Result:
+    label: str
+    bounding_box: BoundingBox
+    confidence: any
+
+
+def load_model(config_path=config_path, weights_path=weights_path, labels_path=labels_path):
     with open(labels_path) as f:
         # Getting labels reading every line
         # and putting them into the list
@@ -29,10 +50,14 @@ def load_model(config_path, weights_path, labels_path):
     layers_names_output = \
         [layers_names_all[i - 1] for i in network.getUnconnectedOutLayers()]
     
-    return (network, layers_names_output, labels)
+    return Model(network, layers_names_output, labels)
 
 
-def detect_objects(image, network, layer_names_output, labels):
+def detect_objects(image, model=None):
+    if model is None:
+        model = load_model()
+
+
     if type(image) == str:
         image = cv2.imread(image)
 
@@ -46,9 +71,9 @@ def detect_objects(image, network, layer_names_output, labels):
     blob = cv2.dnn.blobFromImage(image, 1 / 255.0, (416, 416),
                                  swapRB=True, crop=False)
     
-    network.setInput(blob)
+    model.network.setInput(blob)
 
-    output = network.forward(layer_names_output)
+    output = model.network.forward(model.layer_names_output)
 
     # Preparing lists for detected bounding boxes,
     # obtained confidences and class's number
@@ -93,13 +118,47 @@ def detect_objects(image, network, layer_names_output, labels):
     filtered = cv2.dnn.NMSBoxes(bounding_boxes, confidences,
                             probability_minimum, threshold)
     
-    results = [(labels[class_numbers[i]], bounding_boxes[i], confidences[i]) for i in filtered]
+    results = [Result(model.labels[class_numbers[i]], BoundingBox(*bounding_boxes[i]), confidences[i]) for i in filtered]
 
     return results
-        
-if __name__ == "__main__":
-    model = load_model(config_path, weights_path, labels_path)
-    results = detect_objects(sys.argv[1], *model)
 
-    for result in results:
-        print("{} at {} with {} % confidence".format(result[0], result[1], round(result[2]*100,2)))
+def extract_detected(images, label, model=None, save_path=None, i=None, i_placeholder="$i", i_padding=5):
+    if type(images) is str:
+        images = list(glob.glob(images))
+
+    if model is None:
+        model = load_model()
+
+    if not i: 
+        try:
+            i = max(glob.glob(save_path.replace(i_placeholder, "[0-9]"*i_padding)))
+        except ValueError:
+            i = 0
+    
+    extracted_images = []
+
+    for image in images:
+        if type(image) == str:
+            image = cv2.imread(image)
+        
+        results_all = detect_objects(image, model=model)
+        for result in results_all:
+            if result.label == label:
+                box = result.bounding_box
+                extracted_image = image[box.x:box.x+box.width,box.y:box.y+box.height]
+                extracted_images.append(extracted_image)
+
+                if save_path:
+                    cv2.imwrite(save_path.replace(i_placeholder, str(i).zfill(i_padding)), extracted_image)
+
+    return extracted_images
+    
+
+if __name__ == "__main__":
+    if sys.argv[0].endswith("detection_extract.py"):
+        extract_detected(sys.argv[1], sys.argv[2], save_path=sys.argv[3])
+    else:
+        results = detect_objects(sys.argv[1])
+
+        for result in results:
+            print("{} at {} with {} % confidence".format(result.label, result.bounding_box, round(result.confidence*100,2)))
