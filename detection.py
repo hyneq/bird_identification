@@ -122,9 +122,9 @@ def detect_objects(image, model=None):
 
     return results
 
-def extract_detected(images, label, box_expand=[0.1, 0.1], model=None, save_path=None, i=None, i_placeholder="$i", i_padding=5):
+def extract_detected(images, label, box_expand=[0.1, 0.1], model=None, save_path=None, i=None, i_placeholder="$i", i_padding=5, return_array=False, verbose=True):
     if type(images) is str:
-        images = list(glob.glob(images))
+        images = list(sorted(glob.glob(images)))
     elif type(images[0]) is str:
         images_globbed = []
         for image in images:
@@ -144,7 +144,10 @@ def extract_detected(images, label, box_expand=[0.1, 0.1], model=None, save_path
 
     for image in images:
         if type(image) == str:
-            image = cv2.imread(image)
+            im_path = image
+            image = cv2.imread(im_path)
+        else:
+            im_path = None
         
         results = detect_objects(image, model=model)
         for result in results:
@@ -162,13 +165,22 @@ def extract_detected(images, label, box_expand=[0.1, 0.1], model=None, save_path
                 y = slice(y_start, y_end)
 
                 extracted_image = image[y, x]
-                extracted_images.append(extracted_image)
+
+                if verbose:
+                    print("Extracted image from {} at {}".format(im_path, box))
+
+                if return_array:
+                    extracted_images.append(extracted_image)
 
                 if save_path:
-                    cv2.imwrite(save_path.replace(i_placeholder, str(i).zfill(i_padding)), extracted_image)
+                    extracted_image_path = save_path.replace(i_placeholder, str(i).zfill(i_padding))
+                    if verbose:
+                        print("Saving image from {} at {} to {}".format(im_path, box, extracted_image_path))
+                    cv2.imwrite(extracted_image_path, extracted_image)
                     i += 1
 
-    return extracted_images
+    if return_array:
+        return extracted_images
 
 def get_i(path,i_placeholder="$i", i_padding=5):
     try:
