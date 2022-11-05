@@ -2,7 +2,7 @@
 
 # This code is heavily based on https://medium.com/analytics-vidhya/object-detection-using-yolov3-d48100de2ebb
 
-import os, sys, glob
+import os, sys, glob, re
 from dataclasses import dataclass
 
 import cv2
@@ -122,18 +122,23 @@ def detect_objects(image, model=None):
 
     return results
 
-def extract_detected(images, label, model=None, save_path=None, i=None, i_placeholder="$i", i_padding=5):
+def extract_detected(images, label, box_expand=[0.1, 0.1], model=None, save_path=None, i=None, i_placeholder="$i", i_padding=5):
     if type(images) is str:
         images = list(glob.glob(images))
+    elif type(images[0]) is str:
+        images_globbed = []
+        for image in images:
+            if type(image) is str:
+                images_globbed += list(glob.glob(images))
+        
+        images = images_globbed
+            
 
     if model is None:
         model = load_model()
 
-    if not i: 
-        try:
-            i = max(glob.glob(save_path.replace(i_placeholder, "[0-9]"*i_padding)))
-        except ValueError:
-            i = 0
+    if save_path and not i: 
+        i = get_i(save_path)
     
     extracted_images = []
 
@@ -141,18 +146,37 @@ def extract_detected(images, label, model=None, save_path=None, i=None, i_placeh
         if type(image) == str:
             image = cv2.imread(image)
         
-        results_all = detect_objects(image, model=model)
-        for result in results_all:
+        results = detect_objects(image, model=model)
+        for result in results:
             if result.label == label:
                 box = result.bounding_box
-                extracted_image = image[box.x:box.x+box.width,box.y:box.y+box.height]
+
+                x_expand = int(box.width*box_expand[0])
+                x_start = max(box.x-x_expand,0)
+                x_end = min(box.x+box.width+x_expand, image.shape[1])
+                x = slice(x_start, x_end)
+
+                y_expand = int(box.height*box_expand[1])
+                y_start = max(box.y-y_expand,0)
+                y_end = min(box.y+box.height+y_expand, image.shape[0])
+                y = slice(y_start, y_end)
+
+                extracted_image = image[y, x]
                 extracted_images.append(extracted_image)
 
                 if save_path:
                     cv2.imwrite(save_path.replace(i_placeholder, str(i).zfill(i_padding)), extracted_image)
+                    i += 1
 
     return extracted_images
-    
+
+def get_i(path,i_placeholder="$i", i_padding=5):
+    try:
+        max_path = max(glob.glob(path.replace(i_placeholder, "[0-9]"*i_padding)))
+        search_pattern = "^{}$".format(path.replace(i_placeholder, "({})".format("[0-9]"*i_padding)))
+        return int(re.findall(search_pattern, max_path)[0]) + 1
+    except ValueError:
+        return 0
 
 if __name__ == "__main__":
     if sys.argv[0].endswith("detection_extract.py"):
