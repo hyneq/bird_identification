@@ -200,8 +200,8 @@ def main():
         epilog="Most of the code is based on https://keras.io/examples/vision/image_classification_efficientnet_fine_tuning/"
     )
     parser.add_argument("model_name", help="name of the model")
-    parser.add_argument("dataset_path", help="directory containing the training data, grouped in subdirectories by class names")
     parser.add_argument("class_name_path", help="CSV file containing class names")
+    parser.add_argument("dataset_path", help="directory containing the training data, grouped in subdirectories by class names")
     parser.add_argument("save_path", help="save path of the model")
     parser.add_argument("--epochs-top", type=int, default=25, help="number of epochs for training the top layer")
     parser.add_argument("--epochs-ft", type=int, default=10, help="number of epochs for fine-tuning the EfficienNet layers")
