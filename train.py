@@ -122,7 +122,7 @@ def build_and_train_model(
 
     # Build model based on EfficientNetB0
 
-    model = build_model(len(dataset.class_names),img_augmentation=img_augmentation)
+    model = build_model(model_name, len(dataset.class_names),img_augmentation=img_augmentation)
 
 
     # Train the top model on our dataset
@@ -132,7 +132,9 @@ def build_and_train_model(
     if plot_hist: plot_history(hist_top)
 
 
-    # Fine-tune the unfrozen model
+    # Unfreeze and fine-tune the model
+
+    unfreeze_model(model)
 
     hist_ft = model.fit(ds_train, epochs=epochs_ft, validation_data=ds_test, verbose=verbose)
 
@@ -173,18 +175,32 @@ def plot_history(hist):
 def main():
     parser = argparse.ArgumentParser(
         prog="Transfer-learning EfficientNetB0",
-        description="Creates an EfficientNetB0-based model with ImageNet weights and fine-tunes it on a custom dataset"
+        description="Creates an EfficientNetB0-based model with ImageNet weights and fine-tunes it on a custom dataset",
         epilog="Most of the code is based on https://keras.io/examples/vision/image_classification_efficientnet_fine_tuning/"
     )
     parser.add_argument("model_name", help="name of the model")
-    parser.add_argument("model_path", help="save path of the model")
-    parser.add_argument("dataset_dir", help="directory containing the training data, grouped in subdirectories by class names")
-    parser.add_argument("--epochs-top", help="number of epochs for training the top layer")
-    parser.add_argument("--epochs-ft", help="number of epochs for fine-tuning the EfficienNet layers")
-    parser.add_argument("-v", "--verbose", action='count', type=int, choices=[0,1,2], help="the level of output verbosity")
-    parser.add_argument("-d", "--plot-data", action='store_true', help="plot first 9 images from the dataset")
-    parser.add_argument("-a", "--plot-augmentation", action='store_true', help="plot first 9 variations of first augumented image")
-    parser.add_argument("-t", "--plot-history", action='store_true', help="plot a chart of training history")
+    parser.add_argument("dataset_path", help="directory containing the training data, grouped in subdirectories by class names")
+    parser.add_argument("save_path", help="save path of the model")
+    parser.add_argument("--epochs-top", type=int, default=25, help="number of epochs for training the top layer")
+    parser.add_argument("--epochs-ft", type=int, default=10, help="number of epochs for fine-tuning the EfficienNet layers")
+    parser.add_argument("-v", "--verbose", action='count', help="the level of output verbosity")
+    parser.add_argument("-d", "--show-data", action='store_true', help="show first 9 images from the dataset")
+    parser.add_argument("-a", "--show-augmentation", action='store_true', help="show first 9 variations of first augumented image")
+    parser.add_argument("-t", "--plot-history", action='store_true', help="plot charts of training history")
+
+    args=parser.parse_args()
+
+    build_and_train_model(
+        args.model_name,
+        dataset_path=args.dataset_path,
+        save_path=args.save_path,
+        epochs_top=args.epochs_top,
+        epochs_ft=args.epochs_ft,
+        verbose=args.verbose,
+        show_data=args.show_data,
+        show_augm=args.show_augmentation,
+        plot_hist=args.plot_history
+    )
 
 if __name__ == "__main__":
     main()
