@@ -201,6 +201,7 @@ def main():
     )
     parser.add_argument("model_name", help="name of the model")
     parser.add_argument("dataset_path", help="directory containing the training data, grouped in subdirectories by class names")
+    parser.add_argument("class_name_path", help="CSV file containing class names")
     parser.add_argument("save_path", help="save path of the model")
     parser.add_argument("--epochs-top", type=int, default=25, help="number of epochs for training the top layer")
     parser.add_argument("--epochs-ft", type=int, default=10, help="number of epochs for fine-tuning the EfficienNet layers")
@@ -214,6 +215,7 @@ def main():
     build_and_train_model(
         args.model_name,
         dataset_path=args.dataset_path,
+        class_names_path=args.class_names_path,
         save_path=args.save_path,
         epochs_top=args.epochs_top,
         epochs_ft=args.epochs_ft,
