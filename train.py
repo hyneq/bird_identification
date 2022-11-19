@@ -107,7 +107,7 @@ def build_and_train_model(
         print("Dataset contains {} classes".format(len(dataset.class_names)))
 
     
-    if show_data: show_dataset()
+    if show_data: show_dataset(ds)
     
     (ds_train, ds_test) = dataset
 
@@ -117,6 +117,9 @@ def build_and_train_model(
     if img_augmentation is None:
         img_augmentation = get_img_augmentation()
     
+    if verbose:
+        print("Created image augmentation layer")
+    
     if show_augm: show_augmentation(img_augmentation, ds_train)
 
 
@@ -124,8 +127,14 @@ def build_and_train_model(
 
     model = build_model(model_name, len(dataset.class_names),img_augmentation=img_augmentation)
 
+    if verbose:
+        print("Built an EfficientNetB0 model with ImageNet weights, with inner layers frozen")
+
 
     # Train the top model on our dataset
+
+    if verbose:
+        print("Training top layers with higher learning rate")
 
     hist_top = model.fit(ds_train, epochs=epochs_top, validation_data=ds_test, verbose=verbose)
 
@@ -133,6 +142,9 @@ def build_and_train_model(
 
 
     # Unfreeze and fine-tune the model
+
+    if verbose:
+        print("Unfreezing model and fine-tuning top 20 internal layers")
 
     unfreeze_model(model)
 
@@ -142,8 +154,12 @@ def build_and_train_model(
 
 
     # Save the model to the specified path
+    
     if save_path:
         model.save(save_path)
+    
+    if verbose:
+        print("Saved model to {}".format(save_path))
 
 
 def show_dataset(ds):
