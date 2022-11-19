@@ -6,8 +6,32 @@ import tensorflow as tf
 from tensorflow import keras
 from keras import layers
 from keras.models import Sequential
+from keras.applications import EfficientNetB0
+import matplotlib as plt
 
-def img_augumentation(rotation_factor=0.15, height_factor=0.1, width_factor=0.1, contrast_factor=0.1):
+import argparse
+
+from classification import load_classes
+
+IMG_SIZE = 224 # for EfficientNetB0
+
+def get_class_name(dataset, i):
+    return dataset.class_names[i]
+
+# based on https://keras.io/api/data_loading/
+def get_dataset_from_directory(path, validation_split=0.4, class_names=None):
+    return keras.utils.image_dataset_from_directory(
+        directory=path,
+        labels='inferred',
+        label_mode='categorical',
+        batch_size=32,
+        image_size=(IMG_SIZE, IMG_SIZE),
+        validation_split=validation_split,
+        subset="both",
+        class_names=class_names
+    )
+
+def get_img_augmentation(rotation_factor=0.15, height_factor=0.1, width_factor=0.1, contrast_factor=0.1):
     return Sequential(
         [
             layers.RandomRotation(factor=rotation_factor),
@@ -15,6 +39,138 @@ def img_augumentation(rotation_factor=0.15, height_factor=0.1, width_factor=0.1,
             layers.RandomFlip(),
             layers.RandomContrast(factor=contrast_factor)
         ],
-        name="img_augumentation"
+        name="img_augmentation"
     )
 
+def build_model(model_name, num_classes, img_augmentation=None):
+    if img_augmentation is None: img_augmentation = get_img_augmentation()
+
+    inputs = layers.Input(shape=(IMG_SIZE, IMG_SIZE, 3))
+    x = img_augmentation(inputs)
+    model = EfficientNetB0(include_top=False, input_tensor=x, weights="imagenet")
+
+    # Freeze the pretrained weights
+    model.trainable = False
+    
+    # Rebuild top
+    x = layers.GlobalAveragePooling2D(name="avg_pool")(model.output)
+    x = layers.BatchNormalization()(x)
+
+    top_dropout_rate = 0.2
+    x = layers.Dropout(top_dropout_rate, name="top_dropout")(x)
+    outputs = layers.Dense(num_classes, activation="softmax", name="pred")(x)
+
+    # Compile
+    model = tf.keras.Model(inputs, outputs, name=model_name)
+    optimizer = tf.keras.optimizers.Adam(learning_rate=1e-2)
+    model.compile(
+        optimizer=optimizer, loss="categorical_crossentropy", metrics=["accuracy"]
+    )
+
+    return model
+
+def unfreeze_model(model):
+    # We unfreeze the top 20 layers while leaving BatchNorm layers frozen
+    for layer in model.layers[-20:]:
+        if not isinstance(layer, layers.BatchNormalization):
+            layer.trainable = True
+
+    optimizer = tf.keras.optimizers.Adam(learning_rate=1e-4)
+    model.compile(
+        optimizer=optimizer, loss="categorical_crossentropy", metrics=["accuracy"]
+    )
+
+def build_and_train_model(
+        model_name,
+        dataset_path=None,
+        dataset=None,
+        save_path=None,
+        epochs_top=25,
+        epochs_ft=10,
+        img_augmentation=None,
+        verbose=2,
+        show_data=True,
+        show_augm=True,
+        plot_hist=True
+    ):
+
+    # Prepare dataset
+
+    if dataset_path is None and dataset is None:
+        raise ValueError("No dataset path nor given, cannot continue")
+
+    if dataset is None:
+        dataset = get_dataset_from_directory(dataset_path)
+        if verbose: print("Loaded dataset from {}".format(dataset_path))
+    
+    if verbose:
+        print("Dataset contains {} classes".format(len(dataset.class_names)))
+
+    
+    if show_data: show_dataset()
+    
+    (ds_train, ds_test) = dataset
+
+
+    # Prepare image augmentation
+
+    if img_augmentation is None:
+        img_augmentation = get_img_augmentation()
+    
+    if show_augm: show_augmentation(img_augmentation, ds_train)
+
+
+    # Build model based on EfficientNetB0
+
+    model = build_model(len(dataset.class_names),img_augmentation=img_augmentation)
+
+
+    # Train the top model on our dataset
+
+    hist_top = model.fit(ds_train, epochs=epochs_top, validation_data=ds_test, verbose=verbose)
+
+    if plot_hist: plot_history(hist_top)
+
+
+    # Fine-tune the unfrozen model
+
+    hist_ft = model.fit(ds_train, epochs=epochs_ft, validation_data=ds_test, verbose=verbose)
+
+    if plot_hist: plot_history(hist_ft)
+
+
+def show_dataset(ds):
+    for i, (image, label) in enumerate(ds.take(9)):
+        ax = plt.subplot(3, 3, i + 1)
+        plt.imshow(image.numpy().astype("uint8"))
+        plt.title("{}".format(get_class_name(ds, label)))
+        plt.axis("off")
+
+def show_augmentation(img_augmentation, ds):
+    for image, label in ds.take(1):
+        for i in range(9):
+            ax = plt.subplot(3, 3, i + 1)
+            aug_img = img_augmentation(tf.expand_dims(image, axis=0))
+            plt.imshow(aug_img[0].numpy().astype("uint8"))
+            plt.title("{}".format(get_class_name(ds, label)))
+            plt.axis("off")
+
+def plot_history(hist):
+    plt.plot(hist.history["accuracy"])
+    plt.plot(hist.history["val_accuracy"])
+    plt.title("model accuracy")
+    plt.ylabel("accuracy")
+    plt.xlabel("epoch")
+    plt.legend(["train", "validation"], loc="upper left")
+    plt.show()
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("model_name", help="directory ")
+    parser.add_argument("model_path", nargs='?')
+    parser.add_argument("dataset_dir", help="directory containing the training data, grouped in subdirectories by class names")
+    parser.add_argument("-v", "--verbose", help="the level of output verbosity", action='count', type=int, choices=[0,1,2])
+    parser.add_argument("-d", "--plot-data", action='store_true', help="plot first 9 images from the dataset")
+    parser.add_argument("-a", "--plot-augmentation", action='store_true', help="plot first 9 variations of first augumented image")
+    parser.add_argument("-t", "--plot-history", action='store_true', help="plot a chart of training history")
