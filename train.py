@@ -82,6 +82,8 @@ def unfreeze_model(model):
 
 def build_and_train_model(
         model_name,
+        class_names_path=None,
+        class_names=None,
         dataset_path=None,
         dataset=None,
         save_path=None,
@@ -94,6 +96,10 @@ def build_and_train_model(
         plot_hist=False
     ):
 
+    # Prepare class names
+    if not class_names and class_names_path:
+        class_names = list(load_classes().values())
+
     # Prepare dataset
 
     if dataset_path is None and dataset is None:
@@ -105,11 +111,10 @@ def build_and_train_model(
     
     if verbose:
         print("Dataset contains {} classes".format(len(dataset.class_names)))
-
-    
-    if show_data: show_dataset(ds)
     
     (ds_train, ds_test) = dataset
+
+    if show_data: show_dataset(ds_train)
 
 
     # Prepare image augmentation
