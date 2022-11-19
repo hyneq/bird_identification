@@ -26,6 +26,7 @@ def get_dataset_from_directory(path, validation_split=0.4, class_names=None):
         label_mode='categorical',
         batch_size=32,
         image_size=(IMG_SIZE, IMG_SIZE),
+        shuffle=False,
         validation_split=validation_split,
         subset="both",
         class_names=class_names
