@@ -97,8 +97,8 @@ def build_and_train_model(
     ):
 
     # Prepare class names
-    if not class_names and class_names_path:
-        class_names = list(load_classes().values())
+    if (not class_names) and class_names_path:
+        class_names = list(load_classes(class_names_path).values())
 
     # Prepare dataset
 
