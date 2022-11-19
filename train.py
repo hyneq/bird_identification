@@ -110,10 +110,10 @@ def build_and_train_model(
         dataset = get_dataset_from_directory(dataset_path)
         if verbose: print("Loaded dataset from {}".format(dataset_path))
     
-    if verbose:
-        print("Dataset contains {} classes".format(len(dataset.class_names)))
-    
     (ds_train, ds_test) = dataset
+
+    if verbose:
+        print("Dataset contains {} classes".format(len(ds_train.class_names)))
 
     if show_data: show_dataset(ds_train)
 
