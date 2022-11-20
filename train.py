@@ -26,24 +26,26 @@ class Dataset:
 
 # based on https://keras.io/api/data_loading/
 def get_dataset_from_directory(path, validation_split=0.4, class_names=None, batch_size=BATCH_SIZE, seed=SEED, prefetch=True):
-    dataset = keras.utils.image_dataset_from_directory(
-        directory=path,
-        labels='inferred',
-        batch_size=batch_size,
-        seed=seed,
-        image_size=(IMG_SIZE, IMG_SIZE),
-        validation_split=validation_split,
-        subset="both",
-        class_names=class_names
-    )
+    kwargs = {
+        'directory': path,
+        'labels': 'inferred',
+        'batch_size': batch_size,
+        'seed': seed,
+        'image_size': (IMG_SIZE, IMG_SIZE),
+        'validation_split': validation_split,
+        'class_names': class_names
+    }
 
-    class_names = dataset[0].class_names
+    ds_train = keras.utils.image_dataset_from_directory(subset='training', **kwargs)
+    ds_test = keras.utils.image_dataset_from_directory(subset='validation', **kwargs)
+
+    class_names = ds_train.class_names
 
     if prefetch:
-        for i in range(2):
-            dataset[i] = dataset[i].prefetch(tf.data.AUTOTUNE)
+        ds_train = ds_train.prefetch(tf.data.AUTOTUNE)
+        ds_test = ds_train.prefetch(tf.data.AUTOTUNE)
 
-    return Dataset(dataset[0], dataset[1], class_names)
+    return Dataset(ds_train, ds_test, class_names)
 
 def get_img_augmentation(rotation_factor=0.15, height_factor=0.1, width_factor=0.1, contrast_factor=0.1):
     return Sequential(
@@ -78,7 +80,7 @@ def build_model(model_name, num_classes, img_augmentation=None):
     model = tf.keras.Model(inputs, outputs, name=model_name)
     optimizer = tf.keras.optimizers.Adam(learning_rate=1e-2)
     model.compile(
-        optimizer=optimizer, loss="categorical_crossentropy", metrics=["accuracy"]
+        optimizer=optimizer, metrics=["accuracy"]
     )
 
     return model
@@ -91,7 +93,7 @@ def unfreeze_model(model):
 
     optimizer = tf.keras.optimizers.Adam(learning_rate=1e-4)
     model.compile(
-        optimizer=optimizer, loss="categorical_crossentropy", metrics=["accuracy"]
+        optimizer=optimizer, metrics=["accuracy"]
     )
 
 def build_and_train_model(
@@ -113,8 +115,8 @@ def build_and_train_model(
 
     # Prepare strategy
 
-    if strategy is None:
-        strategy = tf.distribute.MirroredStrategy()
+    #if strategy is None:
+    #    strategy = tf.distribute.MirroredStrategy()
 
 
     # Prepare class names
@@ -147,14 +149,13 @@ def build_and_train_model(
         print("Created image augmentation layer")
     
     if show_augm:
-        with strategy.scope():
-            show_augmentation(img_augmentation, dataset)
+        #with strategy.scope():
+        show_augmentation(img_augmentation, dataset)
 
 
     # Build model based on EfficientNetB0
 
-    with strategy.scope():
-        model = build_model(model_name, len(class_names),img_augmentation=img_augmentation)
+    model = build_model(model_name, len(class_names),img_augmentation=img_augmentation)
 
     if verbose:
         print("Built an EfficientNetB0 model with ImageNet weights, with inner layers frozen")
