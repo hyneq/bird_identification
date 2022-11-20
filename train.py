@@ -80,7 +80,7 @@ def build_model(model_name, num_classes, img_augmentation=None):
     model = tf.keras.Model(inputs, outputs, name=model_name)
     optimizer = tf.keras.optimizers.Adam(learning_rate=1e-2)
     model.compile(
-        optimizer=optimizer, metrics=["accuracy"]
+        optimizer=optimizer, loss="sparse_categorical_crossentropy", metrics=["accuracy"]
     )
 
     return model
@@ -93,7 +93,7 @@ def unfreeze_model(model):
 
     optimizer = tf.keras.optimizers.Adam(learning_rate=1e-4)
     model.compile(
-        optimizer=optimizer, metrics=["accuracy"]
+        optimizer=optimizer, loss="sparse_categorical_crossentropy", metrics=["accuracy"]
     )
 
 def build_and_train_model(
