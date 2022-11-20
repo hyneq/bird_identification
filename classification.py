@@ -2,14 +2,24 @@
 
 import os,sys
 import csv
+from dataclasses import dataclass
 
 import tensorflow as tf
 from tensorflow import keras
 import numpy as np
 #import PIL
 
-model_path = os.path.join(os.path.dirname(__file__),"models","BIRDS_450","BIRDS-450-(200 X 200)-99.28.h5")
-classes_path = os.path.join(os.path.dirname(__file__),"models","BIRDS_450","classes.csv")
+@dataclass()
+class Model:
+    model: any
+    class_names: list
+
+class Result:
+    class_name: str
+    confidence: float
+
+model_path = os.path.join(os.path.dirname(__file__),"models","jizbirds","jizbirds.h5")
+classes_path = os.path.join(os.path.dirname(__file__),"models","jizbirds","classes.csv")
 
 # based on the code from https://prasanshasatpathy.medium.com/deploying-image-classification-model-using-the-saved-model-in-the-format-of-tflite-file-and-h5-file-92bcaf299181
 def predict(img_path):
