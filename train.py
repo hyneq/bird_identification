@@ -2,35 +2,48 @@
 
 # This code is heavily based on https://keras.io/examples/vision/image_classification_efficientnet_fine_tuning/
 
+import argparse
+from dataclasses import dataclass
+
 import tensorflow as tf
 from tensorflow import keras
 from keras import layers
 from keras.models import Sequential
 from keras.applications import EfficientNetB0
-import matplotlib as plt
-
-import argparse
+import matplotlib.pyplot as plt
 
 from classification import load_classes
 
+SEED = 13579
 IMG_SIZE = 224 # for EfficientNetB0
+BATCH_SIZE = 32
 
-def get_class_name(dataset, i):
-    return dataset.class_names[i]
+@dataclass()
+class Dataset:
+    ds_train: any
+    ds_test: any
+    class_names: any
 
 # based on https://keras.io/api/data_loading/
-def get_dataset_from_directory(path, validation_split=0.4, class_names=None):
-    return keras.utils.image_dataset_from_directory(
+def get_dataset_from_directory(path, validation_split=0.4, class_names=None, batch_size=BATCH_SIZE, seed=SEED, prefetch=True):
+    dataset = keras.utils.image_dataset_from_directory(
         directory=path,
         labels='inferred',
-        label_mode='categorical',
-        batch_size=32,
+        batch_size=batch_size,
+        seed=seed,
         image_size=(IMG_SIZE, IMG_SIZE),
-        shuffle=False,
         validation_split=validation_split,
         subset="both",
         class_names=class_names
     )
+
+    class_names = dataset[0].class_names
+
+    if prefetch:
+        for i in range(2):
+            dataset[i] = dataset[i].prefetch(tf.data.AUTOTUNE)
+
+    return Dataset(dataset[0], dataset[1], class_names)
 
 def get_img_augmentation(rotation_factor=0.15, height_factor=0.1, width_factor=0.1, contrast_factor=0.1):
     return Sequential(
@@ -88,6 +101,7 @@ def build_and_train_model(
         dataset_path=None,
         dataset=None,
         save_path=None,
+        strategy=None,
         epochs_top=25,
         epochs_ft=10,
         img_augmentation=None,
@@ -97,25 +111,31 @@ def build_and_train_model(
         plot_hist=False
     ):
 
+    # Prepare strategy
+
+    if strategy is None:
+        strategy = tf.distribute.MirroredStrategy()
+
+
     # Prepare class names
+
     if (not class_names) and class_names_path:
         class_names = list(load_classes(class_names_path).values())
+
 
     # Prepare dataset
 
     if dataset_path is None and dataset is None:
-        raise ValueError("No dataset path nor given, cannot continue")
+        raise ValueError("No dataset path nor dataset given, cannot continue")
 
     if dataset is None:
         dataset = get_dataset_from_directory(dataset_path)
         if verbose: print("Loaded dataset from {}".format(dataset_path))
-    
-    (ds_train, ds_test) = dataset
 
     if verbose:
-        print("Dataset contains {} classes".format(len(ds_train.class_names)))
+        print("Dataset contains {} classes".format(len(dataset.class_names)))
 
-    if show_data: show_dataset(ds_train)
+    if show_data: show_dataset(dataset)
 
 
     # Prepare image augmentation
@@ -126,23 +146,26 @@ def build_and_train_model(
     if verbose:
         print("Created image augmentation layer")
     
-    if show_augm: show_augmentation(img_augmentation, ds_train)
+    if show_augm:
+        with strategy.scope():
+            show_augmentation(img_augmentation, dataset)
 
 
     # Build model based on EfficientNetB0
 
-    model = build_model(model_name, len(dataset.class_names),img_augmentation=img_augmentation)
+    with strategy.scope():
+        model = build_model(model_name, len(class_names),img_augmentation=img_augmentation)
 
     if verbose:
         print("Built an EfficientNetB0 model with ImageNet weights, with inner layers frozen")
 
 
-    # Train the top model on our dataset
+    # Train the top layer on our dataset
 
     if verbose:
-        print("Training top layers with higher learning rate")
+        print("Training top layers with larger learning rate")
 
-    hist_top = model.fit(ds_train, epochs=epochs_top, validation_data=ds_test, verbose=verbose)
+    hist_top = model.fit(dataset.ds_train, epochs=epochs_top, validation_data=dataset.ds_test, verbose=verbose)
 
     if plot_hist: plot_history(hist_top)
 
@@ -150,11 +173,11 @@ def build_and_train_model(
     # Unfreeze and fine-tune the model
 
     if verbose:
-        print("Unfreezing model and fine-tuning top 20 internal layers")
+        print("Unfreezing model and fine-tuning top 20 internal layers with smaller learning rate")
 
     unfreeze_model(model)
 
-    hist_ft = model.fit(ds_train, epochs=epochs_ft, validation_data=ds_test, verbose=verbose)
+    hist_ft = model.fit(dataset.ds_train, epochs=epochs_ft, validation_data=dataset.ds_test, verbose=verbose)
 
     if plot_hist: plot_history(hist_ft)
 
@@ -168,20 +191,22 @@ def build_and_train_model(
         print("Saved model to {}".format(save_path))
 
 
+# based on https://www.tensorflow.org/tutorials/load_data/images
 def show_dataset(ds):
-    for i, (image, label) in enumerate(ds.take(9)):
-        ax = plt.subplot(3, 3, i + 1)
-        plt.imshow(image.numpy().astype("uint8"))
-        plt.title("{}".format(get_class_name(ds, label)))
-        plt.axis("off")
-
-def show_augmentation(img_augmentation, ds):
-    for image, label in ds.take(1):
+    for images, labels in ds.ds_train.take(1):
         for i in range(9):
             ax = plt.subplot(3, 3, i + 1)
-            aug_img = img_augmentation(tf.expand_dims(image, axis=0))
+            plt.imshow(images[i].numpy().astype("uint8"))
+            plt.title(ds.class_names[labels[i]])
+            plt.axis("off")
+
+def show_augmentation(img_augmentation, ds):
+    for image, label in ds.ds_train.take(1):
+        for i in range(9):
+            ax = plt.subplot(3, 3, i + 1)
+            aug_img = img_augmentation(image)
             plt.imshow(aug_img[0].numpy().astype("uint8"))
-            plt.title("{}".format(get_class_name(ds, label)))
+            plt.title("{}".format(ds.class_names[1]))
             plt.axis("off")
 
 def plot_history(hist):
