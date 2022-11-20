@@ -28,7 +28,7 @@ def predict(img_path):
 
     model = keras.models.load_model(model_path)
 
-    image = keras.utils.load_img(img_path, target_size=(200,200))
+    image = keras.utils.load_img(img_path, target_size=(224,224))
     blob = keras.utils.img_to_array(image)
     blob = np.expand_dims(blob,0)
 
