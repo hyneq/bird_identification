@@ -9,6 +9,6 @@ dataset_path=$project_root/images/jizbirds
 save_path=$model_dir/$model_name.h5
 log=$project_root/logs/train_jizbirds-$(date -Iminutes)
 
-TF_CPP_MIN_LOG_LEVEL=3
+TF_CPP_MIN_LOG_LEVEL=2
 
 python3 -u $project_root/train.py -vv -d -a -t $model_name $class_names_path $dataset_path $save_path | tee $log
