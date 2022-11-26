@@ -108,7 +108,7 @@ def build_and_train_model(
         epochs_top=25,
         epochs_ft=10,
         img_augmentation=None,
-        verbose=2,
+        verbose=True,
         show_data=False,
         show_augm=False,
         plot_hist=False
@@ -233,12 +233,14 @@ def main():
     parser.add_argument("save_path", help="save path of the model")
     parser.add_argument("--epochs-top", type=int, default=25, help="number of epochs for training the top layer")
     parser.add_argument("--epochs-ft", type=int, default=10, help="number of epochs for fine-tuning the EfficienNet layers")
-    parser.add_argument("-v", "--verbose", action='count', help="the level of output verbosity")
+    parser.add_argument("--log-level", type=str, default="error", choices=["fatal","error","warn","info","debug"], help="TensorFlow log level")
     parser.add_argument("-d", "--show-data", action='store_true', help="show first 9 images from the dataset")
     parser.add_argument("-a", "--show-augmentation", action='store_true', help="show first 9 variations of first augumented image")
     parser.add_argument("-t", "--plot-history", action='store_true', help="plot charts of training history")
 
     args=parser.parse_args()
+
+    tf.compat.v1.logging.set_verbosity(args.log_level.upper())
 
     build_and_train_model(
         args.model_name,
@@ -247,7 +249,6 @@ def main():
         save_path=args.save_path,
         epochs_top=args.epochs_top,
         epochs_ft=args.epochs_ft,
-        verbose=args.verbose,
         show_data=args.show_data,
         show_augm=args.show_augmentation,
         plot_hist=args.plot_history
