@@ -2,6 +2,7 @@
 
 # This code is heavily based on https://keras.io/examples/vision/image_classification_efficientnet_fine_tuning/
 
+import os
 import argparse
 from dataclasses import dataclass
 
@@ -166,7 +167,7 @@ def build_and_train_model(
     if verbose:
         print("Training top layers with larger learning rate")
 
-    hist_top = model.fit(dataset.ds_train, epochs=epochs_top, validation_data=dataset.ds_test, verbose=verbose)
+    hist_top = model.fit(dataset.ds_train, epochs=epochs_top, validation_data=dataset.ds_test, verbose=2)
 
     if plot_hist: plot_history(hist_top)
 
@@ -178,7 +179,7 @@ def build_and_train_model(
 
     unfreeze_model(model)
 
-    hist_ft = model.fit(dataset.ds_train, epochs=epochs_ft, validation_data=dataset.ds_test, verbose=verbose)
+    hist_ft = model.fit(dataset.ds_train, epochs=epochs_ft, validation_data=dataset.ds_test, verbose=2)
 
     if plot_hist: plot_history(hist_ft)
 
