@@ -1,6 +1,6 @@
 .DS_Store
 
 models/*
-!models/jizbirds
+!models/czbirds
 images
 logs
