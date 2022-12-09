@@ -51,10 +51,6 @@ class ClassificationProcessor:
 
     def __init__(self, output):
         self.output = output
-    
-    @abstractmethod
-    def get_classes(self):
-        pass
 
     def get_results(self, classes) -> list:
         return [Result(class_, self.scores[class_]) for class_ in classes]
