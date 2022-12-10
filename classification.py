@@ -131,23 +131,18 @@ class FileImageClassifier(ImageClassifier):
         return super().classify(open_image(im_path))
 
 def get_image_classifier(
-        classes: Optional[Union[list[str],list[int], str, int]]=None,
-        mode: ClassificationMode=None,
-        min_confidence: Optional[Union[float,int]]=None,
         model_config: ClassificationModelConfig=DEFAULT_MODEL_CONFIG,
         model: Optional[ClassificationModel]=None,
         classifier: type[ImageClassifier]=ImageClassifier,
         acp: Optional[ACP]= None,
+        **acp_kwargs,
     ) -> ImageClassifier:
-    
-    if type(min_confidence) is int:
-        min_confidence = min_confidence/100
     
     if not model:
         model = classifier.load_model(model_config)
 
     if not acp:
-        acp = get_acp(mode=mode, min_confidence=min_confidence, classes=classes, class_names=model.class_names)
+        acp = get_acp(class_names=model.class_names, **acp_kwargs)
     
     return classifier(model=model, acp=acp)
 
