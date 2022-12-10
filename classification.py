@@ -139,12 +139,6 @@ def get_image_classifier(
         classifier: type[ImageClassifier]=ImageClassifier,
         acp: Optional[ACP]= None,
     ) -> ImageClassifier:
-
-    if not mode:
-        if classes:
-            mode = ClassificationMode.FIXED
-        else:
-            mode = ClassificationMode.MAX
     
     if type(min_confidence) is int:
         min_confidence = min_confidence/100

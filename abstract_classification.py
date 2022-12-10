@@ -71,11 +71,18 @@ class ClassRequiredForModeException(ValueError):
         super().__init__("Class must be specified for classification mode '{}'".format(mode.description))
 
 def get_acp(
-        mode: ClassificationMode, 
+        mode: Optional[ClassificationMode]=None, 
         min_confidence: Optional[float]=None,
-        classes: Optional[Union[list[int],list[str]]]=None,
+        classes: Optional[Union[list[int],list[str], str, int]]=None,
         class_names: Optional[list[str]]=None
     ):
+
+    if not mode:
+        if classes:
+            mode = ClassificationMode.FIXED
+        else:
+            mode = ClassificationMode.MAX
+
     if mode.classes_needed:
         if not classes:
             raise ClassRequiredForModeException(mode)
