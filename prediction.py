@@ -7,13 +7,15 @@ import numpy as np
 
 from abstract_classification import AbstractClassificationProcessor as ACP, get_acp
 
+TPredictionModelInput = TypeVar("TPredictionModelInput")
+TPredictionModelOutput = TypeVar("TPredictionModelOutput")
+TPredictionResult = TypeVar("TPredictionResult")
+
 @dataclass()
 class PredictionModelConfig:
     classes_path: str
 
 TPredictionModelConfig = TypeVar("TPredictionModelConfig", bound=PredictionModelConfig)
-TPredictionModelInput = TypeVar("TPredictionModelInput")
-TPredictionModelOutput = TypeVar("TPredictionModelOutput")
 
 class PredictionModel(ABC, Generic[TPredictionModelConfig, TPredictionModelInput, TPredictionModelOutput]):
 
@@ -35,20 +37,19 @@ class PredictionModel(ABC, Generic[TPredictionModelConfig, TPredictionModelInput
 
 TPredictionModel = TypeVar("TPredictionModel", bound=PredictionModel)
 
-
-class PredictionProcessor(ABC):
+class PredictionProcessor(ABC, Generic[TPredictionModelOutput, TPredictionResult]):
     __slots__: tuple
 
-    output: np.ndarray
+    output: TPredictionModelOutput
 
-    def __init__(self, output):
+    def __init__(self, output: TPredictionModelOutput):
         self.output = output
     
     @abstractmethod
-    def process(self):
+    def process(self) -> TPredictionResult:
         pass
 
-class PredictionProcessorWithACP(PredictionProcessor):
+class PredictionProcessorWithACP(PredictionProcessor[TPredictionModelOutput, TPredictionResult]):
     __slots__: tuple
 
     acp: ACP
@@ -63,7 +64,7 @@ class PredictionProcessorWithACP(PredictionProcessor):
 
 TPredictionProcessor = TypeVar("TPredictionProcessor", bound=PredictionProcessor)
 
-class Predictor(Generic[TPredictionModel, TPredictionModelConfig, TPredictionProcessor, TPredictionModelInput]):
+class Predictor(Generic[TPredictionModel, TPredictionModelConfig, TPredictionProcessor, TPredictionModelInput, TPredictionModelOutput]):
 
     model_cls: type[TPredictionModel]
     
@@ -85,52 +86,7 @@ class Predictor(Generic[TPredictionModel, TPredictionModelConfig, TPredictionPro
     def load_model(cls, cfg: TPredictionModelConfig) -> TPredictionModel:
         return cls.model_cls(cfg)
 
-    def predict(self, input: TPredictionModelInput):
-        output = self.model.predict(input)
+    def predict(self, input: TPredictionModelInput) -> TPredictionModelOutput:
+        output: TPredictionModelOutput = self.model.predict(input)
 
-        return self.prediction_processor(output).process()
-
-
-class PredictorWithACP(Predictor[TPredictionModel, TPredictionModelConfig, TPredictionProcessor, TPredictionModelInput]):
-
-    acp: ACP
-
-    def __init__(self,
-            acp: ACP,
-            *args,
-            **kwargs
-        ):
-
-        super().__init__(*args, **kwargs)
-
-        self.prediction_processor = self.prediction_processor.with_acp(acp)
-
-
-def get_predictor_factory(
-        name: str,
-        predictor: type[PredictorWithACP],
-        model_cls: type[PredictionModel],
-        model_cfg_cls: type[PredictionModelConfig],
-        DEFAULT_MODEL_CONFIG: PredictionModelConfig,
-        acp_cls: type[ACP] = ACP
-    ):
-
-    def get_predictor(
-            model_config: model_cfg_cls=DEFAULT_MODEL_CONFIG,
-            model: Optional[model_cls]=None,
-            predictor: type[predictor]=predictor,
-            acp: Optional[acp_cls]= None,
-            **acp_kwargs,
-        ):
-
-        if not model:
-            model = predictor.load_model(model_config)
-
-        if not acp:
-            acp: acp_cls = get_acp(class_names=model.class_names, **acp_kwargs)
-        
-        return predictor(model=model, acp=acp)
-    
-    get_predictor.__name__ = name
-
-    return get_predictor
+        return self.predciction_processor(output).process()
