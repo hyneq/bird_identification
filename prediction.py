@@ -5,7 +5,7 @@ from dataclasses import dataclass
 import csv
 import numpy as np
 
-from abstract_classification import AbstractClassificationProcessor as ACP, get_acp
+from abstract_classification import AbstractClassificationProcessor as ACP, get_acp, DEFAULT_ACP
 
 TPredictionModelInput = TypeVar("TPredictionModelInput")
 TPredictionModelOutput = TypeVar("TPredictionModelOutput")
@@ -63,6 +63,7 @@ class PredictionProcessorWithACP(PredictionProcessor[TPredictionModelOutput, TPr
         return cls_copy
 
 TPredictionProcessor = TypeVar("TPredictionProcessor", bound=PredictionProcessor)
+TPredictionProcessorWithACP = TypeVar("TPredictionProcessorWithACP", bound=PredictionProcessorWithACP)
 
 class Predictor(Generic[TPredictionModel, TPredictionModelConfig, TPredictionProcessor, TPredictionModelInput, TPredictionModelOutput]):
 
@@ -70,11 +71,11 @@ class Predictor(Generic[TPredictionModel, TPredictionModelConfig, TPredictionPro
     
     model: TPredictionModel
 
-    predciction_processor: type[TPredictionProcessor]
+    prediction_processor: type[TPredictionProcessor]
 
     def __init__(self,
             model: Optional[TPredictionModel]=None,
-            model_cfg: Optional[TPredictionModelConfig]=None
+            model_cfg: Optional[TPredictionModelConfig]=None,
         ):
 
         if not model:
@@ -86,7 +87,52 @@ class Predictor(Generic[TPredictionModel, TPredictionModelConfig, TPredictionPro
     def load_model(cls, cfg: TPredictionModelConfig) -> TPredictionModel:
         return cls.model_cls(cfg)
 
-    def predict(self, input: TPredictionModelInput) -> TPredictionModelOutput:
+    def predict(self, input: TPredictionModelInput) -> TPredictionResult:
         output: TPredictionModelOutput = self.model.predict(input)
 
-        return self.predciction_processor(output).process()
+        return self.prediction_processor(output).process()
+
+class PredictorWithACP(Predictor[TPredictionModel, TPredictionModelConfig, TPredictionProcessorWithACP, TPredictionModelInput, TPredictionModelOutput]):
+
+    def __init__(self,
+            acp: Optional[ACP]=None,
+            *args, **kwargs
+        ):
+
+        if not acp:
+            acp = DEFAULT_ACP
+            
+        
+        self.prediction_processor = self.prediction_processor.with_acp(acp)
+
+        super().__init__(*args, **kwargs)
+            
+    
+def get_predictor_factory(
+        name: str,
+        predictor: type[PredictorWithACP[TPredictionModel, TPredictionModelConfig, TPredictionProcessorWithACP, TPredictionModelInput, TPredictionModelOutput]],
+        model_cls: type[TPredictionModel],
+        model_cfg_cls: type[TPredictionModelConfig],
+        DEFAULT_MODEL_CONFIG: TPredictionModelConfig,
+        acp_cls: type[ACP] = ACP
+    ):
+
+    def get_predictor(
+            model_config: model_cfg_cls=DEFAULT_MODEL_CONFIG,
+            model: Optional[model_cls]=None,
+            predictor: type[predictor]=predictor,
+            acp: Optional[acp_cls]= None,
+            **acp_kwargs
+        ):
+
+        if not model:
+            model = predictor.load_model(model_config)
+
+        if not acp:
+            acp = get_acp(class_names=model.class_names, **acp_kwargs)
+
+        return predictor(model=model, acp=acp)
+
+    get_predictor.__name__ = name
+
+    return get_predictor
