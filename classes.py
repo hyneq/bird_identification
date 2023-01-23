@@ -70,11 +70,21 @@ class ClassRequiredForModeException(ValueError):
     def __init__(mode: ClassificationMode):
         super().__init__("Class must be specified for classification mode '{}'".format(mode.description))
 
+@dataclass
+class ClassNames:
+    class_names: list[str]
+
+    def get_name(self, num: int):
+        return self.class_names[num]
+    
+    def get_number(self, name: str):
+        return self.class_names.index(name)
+
 def get_acp(
         mode: Optional[ClassificationMode]=None, 
         min_confidence: Optional[float]=None,
         classes: Optional[Union[list[int],list[str], str, int]]=None,
-        class_names: Optional[list[str]]=None
+        model_class_names: Optional[ClassNames]=None
     ):
 
     if not mode:
@@ -91,21 +101,8 @@ def get_acp(
             classes = [classes]
         
         if type(classes[0]) is str:
-            classes = get_class_numbers(classes, class_names)
+            classes = [model_class_names.get_number(class_name) for class_name in classes]
     
         return mode.cs(classes,min_confidence)
     else:
         return mode.cs(min_confidence)
-
-@dataclass
-class ClassNames:
-    class_names: list[str]
-
-    def get_name(self, num: int):
-        return self.class_names[num]
-    
-    def get_number(self, name: str):
-        return self.class_names.index(name)
-
-def get_class_numbers(classes: list[str], model_class_names: list[str]) -> list[int]:
-    return [model_class_names.index(class_name) for class_name in classes]
