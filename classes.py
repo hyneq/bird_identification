@@ -6,8 +6,8 @@ from dataclasses import dataclass
 
 DEFAULT_MIN_CONFIDENCE = 0.5
 
-class AbstractClassificationProcessor(ABC):
-    __slots__ = ("min_confidence",)
+class ClassSelector(ABC):
+    __slots__: tuple
 
     min_confidence: float
 
@@ -30,7 +30,7 @@ class AbstractClassificationProcessor(ABC):
         return classes_filtered
 
 
-class FixedClassAbstractClassificationProcessor(AbstractClassificationProcessor):
+class FixedClassSelector(ClassSelector):
     __slots__: tuple
 
     classes: list
@@ -42,29 +42,29 @@ class FixedClassAbstractClassificationProcessor(AbstractClassificationProcessor)
     def get_classes(self, scores) -> list:
         return self.classes
 
-class MaxClassAbstractClassificationProcessor(AbstractClassificationProcessor):
+class MaxClassSelector(ClassSelector):
     __slots__: tuple
 
     def get_classes(self, scores) -> list:
         return [np.argmax(scores)]
 
-class SortClassAbstractClassificationProcessor(AbstractClassificationProcessor):
+class SortClassSelector(ClassSelector):
     __slots__: tuple
 
     def get_classes(self, scores) -> list:
         return np.argsort(scores)[::-1]
 
-DEFAULT_ACP = MaxClassAbstractClassificationProcessor
+DEFAULT_ACP = MaxClassSelector
 
 class ClassificationMode(Enum):
-    FIXED = ("Fixed class list", True, FixedClassAbstractClassificationProcessor)
-    MAX = ("Single class with maximum confidence", False, MaxClassAbstractClassificationProcessor)
-    SORTED = ("All classes, sorted by confidence", False, SortClassAbstractClassificationProcessor)
+    FIXED = ("Fixed class list", True, FixedClassSelector)
+    MAX = ("Single class with maximum confidence", False, MaxClassSelector)
+    SORTED = ("All classes, sorted by confidence", False, SortClassSelector)
 
-    def __init__(self, description: str, classes_needed: bool, acp: AbstractClassificationProcessor):
+    def __init__(self, description: str, classes_needed: bool, cs: ClassSelector):
         self.description = description
         self.classes_needed = classes_needed
-        self.acp = acp
+        self.cs = cs
 
 class ClassRequiredForModeException(ValueError):
     def __init__(mode: ClassificationMode):
@@ -93,9 +93,9 @@ def get_acp(
         if type(classes[0]) is str:
             classes = get_class_numbers(classes, class_names)
     
-        return mode.acp(classes,min_confidence)
+        return mode.cs(classes,min_confidence)
     else:
-        return mode.acp(min_confidence)
+        return mode.cs(min_confidence)
 
 @dataclass
 class ClassNames:
