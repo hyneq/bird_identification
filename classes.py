@@ -2,6 +2,7 @@ from enum import Enum
 import numpy as np
 from typing import Optional, Union
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 
 DEFAULT_MIN_CONFIDENCE = 0.5
 
@@ -65,7 +66,6 @@ class ClassificationMode(Enum):
         self.classes_needed = classes_needed
         self.acp = acp
 
-
 class ClassRequiredForModeException(ValueError):
     def __init__(mode: ClassificationMode):
         super().__init__("Class must be specified for classification mode '{}'".format(mode.description))
@@ -96,6 +96,16 @@ def get_acp(
         return mode.acp(classes,min_confidence)
     else:
         return mode.acp(min_confidence)
+
+@dataclass
+class ClassNames:
+    class_names: list[str]
+
+    def get_name(self, num: int):
+        return self.class_names[num]
+    
+    def get_number(self, name: str):
+        return self.class_names.index(name)
 
 def get_class_numbers(classes: list[str], model_class_names: list[str]) -> list[int]:
     return [model_class_names.index(class_name) for class_name in classes]
