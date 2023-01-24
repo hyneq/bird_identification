@@ -54,7 +54,7 @@ class SortClassSelector(ClassSelector):
     def get_classes(self, scores) -> list:
         return np.argsort(scores)[::-1]
 
-DEFAULT_ACP = MaxClassSelector
+DEFAULT_CLASS_SELECTOR = MaxClassSelector
 
 class ClassificationMode(Enum):
     FIXED = ("Fixed class list", True, FixedClassSelector)
