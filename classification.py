@@ -17,7 +17,7 @@ import numpy as np
 from PIL.Image import Image, open as open_image
 
 import prediction
-from classes import AbstractClassificationProcessor as ACP, DEFAULT_ACP, ClassificationMode, get_acp
+from classes import ClassSelector, DEFAULT_CLASS_SELECTOR, ClassificationMode, get_class_selector
 
 @dataclass()
 class ClassificationModelConfig(prediction.PredictionModelConfig):
@@ -56,18 +56,18 @@ DEFAULT_MODEL_PATH = os.path.join(os.path.dirname(__file__), "models", "czbirds"
 
 DEFAULT_MODEL_CONFIG = ClassificationModelConfig.from_dir(DEFAULT_MODEL_PATH)
 
-class ClassificationProcessor(prediction.PredictionProcessorWithACP[np.ndarray, Result]):
+class ClassificationProcessor(prediction.PredictionProcessorWithCS[np.ndarray, Result]):
     def get_results(self, classes) -> list:
         return [Result(class_, self.scores[class_]) for class_ in classes]
 
     def process(self) -> list:
         self.scores = self.output
 
-        classes = self.acp.get_filtered_classes(self.scores)
+        classes = self.cs.get_filtered_classes(self.scores)
         
         return self.get_results(classes)
 
-class ImageClassifier(prediction.PredictorWithACP[ClassificationModel, ClassificationModelConfig, ClassificationProcessor, Image, Result]):
+class ImageClassifier(prediction.PredictorWithCS[ClassificationModel, ClassificationModelConfig, ClassificationProcessor, Image, Result]):
     __slots__: tuple
 
     model_cls = ClassificationModel
