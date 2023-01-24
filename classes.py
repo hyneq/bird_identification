@@ -80,7 +80,7 @@ class ClassNames:
     def get_number(self, name: str):
         return self.class_names.index(name)
 
-def get_acp(
+def get_class_selector(
         mode: Optional[ClassificationMode]=None, 
         min_confidence: Optional[float]=None,
         classes: Optional[Union[list[int],list[str], str, int]]=None,
