@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 import csv
 import numpy as np
+from PIL.Image import Image, open as open_image
 
 from classes import ClassSelector, get_class_selector, DEFAULT_CLASS_SELECTOR
 
@@ -92,6 +93,8 @@ class Predictor(Generic[TPredictionModel, TPredictionModelConfig, TPredictionPro
 
         return self.prediction_processor(output).process()
 
+TPredictor = TypeVar("TPredictor", bound=Predictor)
+
 class PredictorWithCS(Predictor[TPredictionModel, TPredictionModelConfig, TPredictionProcessorWithCS, TPredictionModelInput, TPredictionModelOutput]):
 
     def __init__(self,
@@ -106,7 +109,26 @@ class PredictorWithCS(Predictor[TPredictionModel, TPredictionModelConfig, TPredi
         self.prediction_processor = self.prediction_processor.with_cs(cs)
 
         super().__init__(*args, **kwargs)
-            
+
+class FileImagePredictor(Generic[TPredictor]):
+    __slots__: tuple
+
+    predictor_cls: type[TPredictor]
+
+    predictor: TPredictor
+
+    def __init__(self, *args, predictor: Optional[TPredictor] = None, **kwargs):
+
+        if not predictor:
+            predictor = self.predictor_cls(*args, **kwargs)
+        
+        self.predictor = predictor
+    
+    def predict(self, path: str):
+        image = open_image(path)
+
+        return self.predictor.predict(image)
+
     
 def get_predictor_factory(
         name: str,
