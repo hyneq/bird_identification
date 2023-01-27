@@ -86,10 +86,6 @@ class Predictor(Generic[TPredictionModel, TPredictionModelConfig, TPredictionPro
         else:
             self.model = model
 
-    @classmethod
-    def load_model(cls, cfg: TPredictionModelConfig) -> TPredictionModel:
-        return cls.model_cls(cfg)
-
     def predict(self, input: TPredictionModelInput) -> TPredictionResult:
         output: TPredictionModelOutput = self.model.predict(input)
 
@@ -151,7 +147,7 @@ def get_predictor_factory(
         ):
 
         if not model:
-            model = predictor.load_model(model_config)
+            model = model_cls(model_config)
 
         if not cs:
             cs = get_class_selector(model_class_names=model.class_names, **cs_kwargs)
