@@ -28,7 +28,9 @@ class ClassificationModelConfig(prediction.PredictionModelConfig):
         return cls(model_path=os.path.join(path, "model.h5"), classes_path=os.path.join(path, "classes.csv"))
 
 class ClassificationModel(prediction.PredictionModel[ClassificationModelConfig, Image, np.ndarray]):
-    mdoel: keras.Model
+    __slots__: tuple
+
+    model: keras.Model
     model_lock: Lock
 
     def __init__(self, cfg: ClassificationModelConfig):
@@ -57,6 +59,8 @@ DEFAULT_MODEL_PATH = os.path.join(os.path.dirname(__file__), "models", "czbirds"
 DEFAULT_MODEL_CONFIG = ClassificationModelConfig.from_dir(DEFAULT_MODEL_PATH)
 
 class ClassificationProcessor(prediction.PredictionProcessorWithCS[np.ndarray, Result]):
+    __slots__: tuple
+
     def get_results(self, classes) -> list:
         return [Result(class_, self.scores[class_]) for class_ in classes]
 
@@ -75,6 +79,8 @@ class ImageClassifier(prediction.PredictorWithCS[ClassificationModel, Classifica
     prediction_processor = ClassificationProcessor
 
 class FileImageClassifier(ImageClassifier):
+    __slots__: tuple
+
     def predict(self, im_path: str):
         return super().predict(open_image(im_path))
 
