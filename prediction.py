@@ -63,7 +63,7 @@ class PredictionProcessorWithCS(PredictionProcessor[TPredictionModelOutput, TPre
         return cls_copy
 
 TPredictionProcessor = TypeVar("TPredictionProcessor", bound=PredictionProcessor)
-TPredictionProcessorWithACP = TypeVar("TPredictionProcessorWithACP", bound=PredictionProcessorWithCS)
+TPredictionProcessorWithCS = TypeVar("TPredictionProcessorWithCS", bound=PredictionProcessorWithCS)
 
 class Predictor(Generic[TPredictionModel, TPredictionModelConfig, TPredictionProcessor, TPredictionModelInput, TPredictionModelOutput]):
 
@@ -92,7 +92,7 @@ class Predictor(Generic[TPredictionModel, TPredictionModelConfig, TPredictionPro
 
         return self.prediction_processor(output).process()
 
-class PredictorWithCS(Predictor[TPredictionModel, TPredictionModelConfig, TPredictionProcessorWithACP, TPredictionModelInput, TPredictionModelOutput]):
+class PredictorWithCS(Predictor[TPredictionModel, TPredictionModelConfig, TPredictionProcessorWithCS, TPredictionModelInput, TPredictionModelOutput]):
 
     def __init__(self,
             cs: Optional[ClassSelector]=None,
@@ -110,7 +110,7 @@ class PredictorWithCS(Predictor[TPredictionModel, TPredictionModelConfig, TPredi
     
 def get_predictor_factory(
         name: str,
-        predictor: type[PredictorWithCS[TPredictionModel, TPredictionModelConfig, TPredictionProcessorWithACP, TPredictionModelInput, TPredictionModelOutput]],
+        predictor: type[PredictorWithCS[TPredictionModel, TPredictionModelConfig, TPredictionProcessorWithCS, TPredictionModelInput, TPredictionModelOutput]],
         model_cls: type[TPredictionModel],
         model_cfg_cls: type[TPredictionModelConfig],
         DEFAULT_MODEL_CONFIG: TPredictionModelConfig,
