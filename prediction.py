@@ -19,6 +19,7 @@ class PredictionModelConfig:
 TPredictionModelConfig = TypeVar("TPredictionModelConfig", bound=PredictionModelConfig)
 
 class PredictionModel(ABC, Generic[TPredictionModelConfig, TPredictionModelInput, TPredictionModelOutput]):
+    __slots__: tuple
 
     class_names: list[str]
 
@@ -67,7 +68,8 @@ TPredictionProcessor = TypeVar("TPredictionProcessor", bound=PredictionProcessor
 TPredictionProcessorWithCS = TypeVar("TPredictionProcessorWithCS", bound=PredictionProcessorWithCS)
 
 class Predictor(Generic[TPredictionModel, TPredictionModelConfig, TPredictionProcessor, TPredictionModelInput, TPredictionModelOutput]):
-
+    __slots__: tuple
+    
     model_cls: type[TPredictionModel]
     
     model: TPredictionModel
@@ -96,7 +98,8 @@ class Predictor(Generic[TPredictionModel, TPredictionModelConfig, TPredictionPro
 TPredictor = TypeVar("TPredictor", bound=Predictor)
 
 class PredictorWithCS(Predictor[TPredictionModel, TPredictionModelConfig, TPredictionProcessorWithCS, TPredictionModelInput, TPredictionModelOutput]):
-
+    __slots__: tuple
+    
     def __init__(self,
             cs: Optional[ClassSelector]=None,
             *args, **kwargs
