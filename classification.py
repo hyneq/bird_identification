@@ -78,11 +78,10 @@ class ImageClassifier(prediction.PredictorWithCS[ClassificationModel, Classifica
 
     prediction_processor = ClassificationProcessor
 
-class FileImageClassifier(ImageClassifier):
+class FileImageClassifier(prediction.FileImagePredictor[ImageClassifier]):
     __slots__: tuple
 
-    def predict(self, im_path: str):
-        return super().predict(open_image(im_path))
+    predictor_cls = ImageClassifier
 
 get_image_classifier = prediction.get_predictor_factory(
     "get_image_classifier",
