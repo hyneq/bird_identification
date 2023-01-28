@@ -2,7 +2,7 @@ from typing import Optional, Generic, TypeVar
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-from PIL.Image import Image, open as open_image
+import cv2
 
 from classes import ClassSelector, get_class_selector, DEFAULT_CLASS_SELECTOR, ClassNames
 
@@ -120,7 +120,7 @@ class FileImagePredictor(Generic[TPredictor]):
         self.predictor = predictor
     
     def predict(self, path: str):
-        image = open_image(path)
+        image = cv2.imread(path)
 
         return self.predictor.predict(image)
 
