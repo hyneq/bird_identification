@@ -1,9 +1,7 @@
-from typing import Optional, Generic, TypeVar, get_type_hints
+from typing import Optional, Generic, TypeVar
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-import csv
-import numpy as np
 from PIL.Image import Image, open as open_image
 
 from classes import ClassSelector, get_class_selector, DEFAULT_CLASS_SELECTOR, ClassNames
