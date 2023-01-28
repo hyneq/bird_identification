@@ -51,8 +51,8 @@ class ClassificationModel(prediction.PredictionModel[ClassificationModelConfig, 
 
 @dataclass
 class Result:
-    class_name: str
-    confidence: float
+    class_names: list[str]
+    confidences: list[float]
 
 DEFAULT_MODEL_PATH = os.path.join(os.path.dirname(__file__), "models", "czbirds")
 
@@ -62,7 +62,7 @@ class ClassificationProcessor(prediction.PredictionProcessorWithCS[np.ndarray, R
     __slots__: tuple
 
     def get_results(self, classes) -> list:
-        return [Result(class_, self.scores[class_]) for class_ in classes]
+        return Result(classes, list(self.scores[classes]))
 
     def process(self) -> list:
         self.scores = self.output
