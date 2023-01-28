@@ -3,22 +3,123 @@
 # This code is heavily based on https://medium.com/analytics-vidhya/object-detection-using-yolov3-d48100de2ebb
 
 import os, sys, glob, re
+from typing import Optional, Union
+from enum import Enum
 from dataclasses import dataclass
+from abc import ABC, abstractmethod, ABCMeta
+from threading import Lock
 
 import cv2
 import numpy as np
+from PIL.Image import Image, open as open_image
 
-model_path = os.path.join(os.path.dirname(__file__),"models","YOLOv3-COCO")
+import prediction
+from classes import ClassSelector, DEFAULT_CLASS_SELECTOR, ClassificationMode, get_class_selector
 
-config_path = os.path.join(model_path, "yolov3.cfg")
-weights_path = os.path.join(model_path, "yolov3.weights")
-labels_path = os.path.join(model_path, "coco.names")
+YOLO_COCO_PATH = os.path.join(os.path.dirname(__file__),"models","YOLOv3-COCO")
+
+DEFAULT_PROBABILITY_MINIMUM = 0.5
+DEFAULT_NMS_THRESHOLD = 0.3
 
 @dataclass()
-class Model:
+class DetectionModelConfig(prediction.PredictionModelConfig):
+    config_path: str
+    weights_path: str
+
+DEFAULT_MODEL_CONFIG = DetectionModelConfig(
+    classes_path=os.path.join(YOLO_COCO_PATH, "coco.names"),
+    config_path=os.path.join(YOLO_COCO_PATH, "yolov3.cfg"),
+    weights_path=os.path.join(YOLO_COCO_PATH, "yolov3.weights")
+)
+
+@dataclass()
+class DetectionModelOutput:
+    __slots__: tuple
+
+    raw_output: np.ndarray
+    width: int
+    height: int
+
+    def get_box(self, obj: np.ndarray):
+        box = obj[0:4] * np.array([self.width, self.height, self.width, self.height])
+
+        # From YOLO data format, we can get top left corner coordinates
+        # that are x_min and y_min
+        x_center, y_center, box_width, box_height = box
+        x_min = int(x_center - (box_width / 2))
+        y_min = int(y_center - (box_height / 2))
+
+        return [x_min, y_min, int(box_width), int(box_height)]
+    
+    def get_scores(self, obj: np.ndarray):
+        return obj[5:]
+    
+    def __iter__(self):
+        return DetectionModelOutputIter(self.raw_output)    
+
+class DetectionModelOutputIter:
+    __slots__: tuple
+
+    raw_output: np.ndarray
+
+    _layer_len: int
+    _layer_index: int = 0
+
+    _object_len: int
+    _object_index: int = 0
+
+
+    def __init__(self, raw_output: np.ndarray):
+        self.raw_output = raw_output
+
+        self._layer_len = len(raw_output.shape[0])
+        self._object_len = len(raw_output.shape[1])
+    
+    def __next__(self) -> np.ndarray:
+        if self._layer_index < self._layer_len:
+            i = (self._layer_index, self._object_index)
+
+            self._object_index += 1
+            if self._object_index == self._object_len:
+                self._layer_index += 1
+                self._object_index = 0
+        
+            return self.raw_output[i]
+        
+        raise StopIteration
+
+class DetectionModel(prediction.PredictionModel[DetectionModelConfig, Image, DetectionModelOutput]):
+    __slots__: tuple
+
     network: any
     layer_names_output: any
     labels: any
+    lock: Lock
+
+    def __init__(self, cfg: DetectionModelConfig):
+        self.network = network = cv2.dnn.readNetFromDarknet(cfg.config_path, cfg.weights_path)
+
+        # Getting list with names of all layers from YOLO v3 network
+        layers_names_all = network.getLayerNames()
+
+        # Getting only output layers' names that we need from YOLO v3 algorithm
+        # with function that returns indexes of layers with unconnected outputs
+        self.layers_names_output = \
+            [layers_names_all[i - 1] for i in network.getUnconnectedOutLayers()]
+
+        super().__init__(cfg)
+    
+    def predict(self, input: Image) -> DetectionModelOutput:
+        height, width = input.shape[0:2]
+
+        # blob from image
+        blob = cv2.dnn.blobFromImage(input, 1 / 255.0, (416, 416),
+                                    swapRB=True, crop=False)
+        
+        self.network.setInput(blob)
+        raw_output = self.network.forward(self.model.layer_names_output)
+
+        return DetectionModelOutput(raw_output, width, height)
 
 @dataclass()
 class BoundingBox:
@@ -33,94 +134,98 @@ class Result:
     bounding_box: BoundingBox
     confidence: any
 
+class DetectionProcessor(prediction.PredictionProcessorWithCS[DetectionModelOutput, Result]):
+    __slots__: tuple
 
-def load_model(config_path=config_path, weights_path=weights_path, labels_path=labels_path):
-    with open(labels_path) as f:
-        # Getting labels reading every line
-        # and putting them into the list
-        labels = [line.strip() for line in f]
-    
-    network = cv2.dnn.readNetFromDarknet(config_path, weights_path)
-
-    # Getting list with names of all layers from YOLO v3 network
-    layers_names_all = network.getLayerNames()
-
-    # Getting only output layers' names that we need from YOLO v3 algorithm
-    # with function that returns indexes of layers with unconnected outputs
-    layers_names_output = \
-        [layers_names_all[i - 1] for i in network.getUnconnectedOutLayers()]
-    
-    return Model(network, layers_names_output, labels)
-
-
-def detect_objects(image, model=None):
-    if model is None:
-        model = load_model()
-
-
-    if type(image) == str:
-        image = cv2.imread(image)
-
-    height, width = image.shape[0:2]
-    
-    probability_minimum = 0.5
-
-    threshold = 0.3
-
-    # blob from image
-    blob = cv2.dnn.blobFromImage(image, 1 / 255.0, (416, 416),
-                                 swapRB=True, crop=False)
-    
-    model.network.setInput(blob)
-
-    output = model.network.forward(model.layer_names_output)
-
-    # Preparing lists for detected bounding boxes,
+    # Lists for detected bounding boxes,
     # obtained confidences and class's number
     bounding_boxes = []
     confidences = []
-    class_numbers = []
+    classes = []
 
-    # Going through all output layers after feed forward pass
-    for result in output:
-        # Going through all detections from current output layer
-        for detected_objects in result:
-            # Getting 80 classes' probabilities for current detected object
-            scores = detected_objects[5:]
-            # Getting index of the class with the maximum value of probability
-            class_current = np.argmax(scores)
-            # Getting value of probability for defined class
-            confidence_current = scores[class_current]
-
-            if confidence_current > probability_minimum:
-                #print(labels[class_current], confidence_current)
-
-                box_current = detected_objects[0:4] * np.array([width, height, width, height])
-
-                # Now, from YOLO data format, we can get top left corner coordinates
-                # that are x_min and y_min
-                x_center, y_center, box_width, box_height = box_current
-                x_min = int(x_center - (box_width / 2))
-                y_min = int(y_center - (box_height / 2))
-
-                # Adding results into prepared lists
-                bounding_boxes.append([x_min, y_min,
-                                       int(box_width), int(box_height)])
-                confidences.append(float(confidence_current))
-                class_numbers.append(class_current)
-
-
-    # Implementing non-maximum suppression of given bounding boxes
-    # With this technique we exclude some of bounding boxes if their
-    # corresponding confidences are low or there is another
-    # bounding box for this region with higher confidence
-
-    filtered = cv2.dnn.NMSBoxes(bounding_boxes, confidences,
-                            probability_minimum, threshold)
+    cs: ClassSelector
     
-    results = [Result(model.labels[class_numbers[i]], BoundingBox(*bounding_boxes[i]), confidences[i]) for i in filtered]
+    def add_detected_objects(self, bounding_box, confidence, class_number):
+        self.bounding_boxes.append(bounding_box)
+        self.confidences.append(confidence)
+        self.classes.append(class_number)
 
-    return results
+    def process_object(self, obj):
+
+        scores = self.output.get_scores(obj)
+
+        classes = self.cs.get_filtered_classes(scores)
+
+        if len(classes):
+            box = self.output.get_box(obj)
+
+            # Adding results into prepared lists
+            self.add_detected_object(
+                box,
+                scores[classes],
+                classes
+            )
+    
+    def NMSBoxes(self):
+        # Implementing non-maximum suppression of given bounding boxes
+        # With this technique we exclude some of bounding boxes if their
+        # corresponding confidences are low or there is another
+        # bounding box for this region with higher confidence
+
+        return cv2.dnn.NMSBoxes(self.bounding_boxes, [confidence[0] for confidence in self.confidences], self.probability_minimum, self.NMS_threshold)
+    
+    def get_results(self, filtered):
+        return [Result(self.model.class_names[self.classes[i]], BoundingBox(*self.bounding_boxes[i]), self.confidences[i]) for i in filtered]
+    
+    def process(self):
+        for obj in self.output:
+            self.process_object(obj)
+
+        filtered = self.NMSBoxes()
+
+        return self.get_results(filtered)
+
+class ObjectDetector(prediction.PredictorWithCS[DetectionModel, DetectionModelConfig, DetectionProcessor, Image, Result]):
+    __slots__: tuple
+
+    model_cls = DetectionModel
+
+    prediction_processor = DetectionProcessor
+
+class FileObjectDetector(prediction.FileImagePredictor[ObjectDetector]):
+    __slots__: tuple
+
+    predictor_cls = ObjectDetector
+
+get_object_detector = prediction.get_predictor_factory(
+        "get_object_detector",
+        ObjectDetector,
+        DetectionModel,
+        DetectionModelConfig,
+        DEFAULT_MODEL_CONFIG
+    )
+
+def detect_objects(
+        images: Union[list[str], list[Image], str, Image],
+        *args,
+        detector: Optional[Union[type[ObjectDetector],ObjectDetector]]=None,
+        **kwargs
+    ):
+
+    if type(images) is not list:
+        images = [images]
+    
+    if not detector:
+        if type(images[0]) is str:
+            detector = FileObjectDetector
+        else:
+            detector = ObjectDetector
+    
+    detector_type = type(detector)
+    if detector_type is type or detector_type is ABCMeta:
+        detector = get_object_detector(*args, predictor=detector, **kwargs)
+    
+    return [detector.predict(image) for image in images]
 
 if __name__ == "__main__":
     results = detect_objects(sys.argv[1])
