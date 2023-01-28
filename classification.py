@@ -14,7 +14,7 @@ from enum_actions import enum_action
 import tensorflow as tf
 from tensorflow import keras
 import numpy as np
-from PIL.Image import Image, open as open_image
+import cv2
 
 import prediction
 from classes import ClassSelector, DEFAULT_CLASS_SELECTOR, ClassificationMode, get_class_selector
@@ -27,7 +27,7 @@ class ClassificationModelConfig(prediction.PredictionModelConfig):
     def from_dir(cls, path: str):
         return cls(model_path=os.path.join(path, "model.h5"), classes_path=os.path.join(path, "classes.csv"))
 
-class ClassificationModel(prediction.PredictionModel[ClassificationModelConfig, Image, np.ndarray]):
+class ClassificationModel(prediction.PredictionModel[ClassificationModelConfig, np.ndarray, np.ndarray]):
     __slots__: tuple
 
     model: keras.Model
@@ -38,10 +38,10 @@ class ClassificationModel(prediction.PredictionModel[ClassificationModelConfig, 
         self.model_lock = Lock()
         super().__init__(cfg)
     
-    def predict(self, input: Image) -> np.ndarray:
-        image = input.resize((224,224))
-        blob = keras.utils.img_to_array(image)
-        blob = np.expand_dims(blob,0)
+    def predict(self, input: np.ndarray) -> np.ndarray:
+        blob: np.ndarray = cv2.dnn.blobFromImage(input, size=(224,224), swapRB=True)
+
+        blob = np.moveaxis(blob, (1, 2, 3), (3, 1, 2))
 
         with self.model_lock:
             predictions = self.model.predict(blob)
@@ -71,7 +71,7 @@ class ClassificationProcessor(prediction.PredictionProcessorWithCS[np.ndarray, R
         
         return self.get_results(classes)
 
-class ImageClassifier(prediction.PredictorWithCS[ClassificationModel, ClassificationModelConfig, ClassificationProcessor, Image, Result]):
+class ImageClassifier(prediction.PredictorWithCS[ClassificationModel, ClassificationModelConfig, ClassificationProcessor, np.ndarray, Result]):
     __slots__: tuple
 
     model_cls = ClassificationModel
@@ -92,7 +92,7 @@ get_image_classifier = prediction.get_predictor_factory(
 )
 
 def classify_images(
-        images: Union[list[str], list[Image], str, Image],
+        images: Union[list[str], list[np.ndarray], str, np.ndarray],
         *args,
         classifier: Optional[Union[type[ImageClassifier],ImageClassifier]]=None,
         **kwargs
