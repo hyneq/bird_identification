@@ -76,9 +76,14 @@ class ClassNames:
 
     def get_name(self, num: int):
         return self.class_names[num]
-    
+
     def get_number(self, name: str):
         return self.class_names.index(name)
+    
+    @classmethod
+    def load_from_file(cls, path: str):
+        with open(path, newline='') as f:
+            return cls(f.readlines())
 
 def get_class_selector(
         mode: Optional[ClassificationMode]=None, 
