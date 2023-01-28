@@ -6,7 +6,7 @@ import csv
 import numpy as np
 from PIL.Image import Image, open as open_image
 
-from classes import ClassSelector, get_class_selector, DEFAULT_CLASS_SELECTOR
+from classes import ClassSelector, get_class_selector, DEFAULT_CLASS_SELECTOR, ClassNames
 
 TPredictionModelInput = TypeVar("TPredictionModelInput")
 TPredictionModelOutput = TypeVar("TPredictionModelOutput")
@@ -21,7 +21,7 @@ TPredictionModelConfig = TypeVar("TPredictionModelConfig", bound=PredictionModel
 class PredictionModel(ABC, Generic[TPredictionModelConfig, TPredictionModelInput, TPredictionModelOutput]):
     __slots__: tuple
 
-    class_names: list[str]
+    class_names: ClassNames
 
     @abstractmethod
     def __init__(self, cfg: TPredictionModelConfig):
@@ -33,9 +33,7 @@ class PredictionModel(ABC, Generic[TPredictionModelConfig, TPredictionModelInput
 
     @staticmethod
     def load_classes(classes_path: str):
-        with open(classes_path, newline='') as f:
-            reader = csv.reader(f, delimiter=',')
-            return {int(row[0]): row[1] for row in reader}
+        return ClassNames.load_from_file(classes_path)
 
 TPredictionModel = TypeVar("TPredictionModel", bound=PredictionModel)
 
