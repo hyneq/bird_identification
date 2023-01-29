@@ -34,8 +34,6 @@ DEFAULT_MODEL_CONFIG = DetectionModelConfig(
 
 @dataclass()
 class DetectionModelOutput:
-    __slots__: tuple
-
     raw_output: np.ndarray
     width: int
     height: int
@@ -60,7 +58,7 @@ class DetectionModelOutput:
 class DetectionModelOutputIter:
     __slots__: tuple
 
-    raw_output: np.ndarray
+    raw_output: tuple[np.ndarray, np.ndarray, np.ndarray]
 
     _layer_len: int
     _layer_index: int = 0
@@ -72,19 +70,19 @@ class DetectionModelOutputIter:
     def __init__(self, raw_output: np.ndarray):
         self.raw_output = raw_output
 
-        self._layer_len = len(raw_output.shape[0])
-        self._object_len = len(raw_output.shape[1])
+        self._layer_len = len(raw_output)
+        self._object_len = raw_output[0].shape[0]
     
     def __next__(self) -> np.ndarray:
         if self._layer_index < self._layer_len:
-            i = (self._layer_index, self._object_index)
+            obj = self.raw_output[self._layer_index][self._object_index]
 
             self._object_index += 1
             if self._object_index == self._object_len:
                 self._layer_index += 1
                 self._object_index = 0
         
-            return self.raw_output[i]
+            return obj
         
         raise StopIteration
 
@@ -109,7 +107,7 @@ class DetectionModel(prediction.PredictionModel[DetectionModelConfig, Image, Det
 
         super().__init__(cfg)
     
-    def predict(self, input: Image) -> DetectionModelOutput:
+    def predict(self, input: np.ndarray) -> DetectionModelOutput:
         height, width = input.shape[0:2]
 
         # blob from image
@@ -117,7 +115,7 @@ class DetectionModel(prediction.PredictionModel[DetectionModelConfig, Image, Det
                                     swapRB=True, crop=False)
         
         self.network.setInput(blob)
-        raw_output = self.network.forward(self.model.layer_names_output)
+        raw_output = self.network.forward(self.layers_names_output)
 
         return DetectionModelOutput(raw_output, width, height)
 
