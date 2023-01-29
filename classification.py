@@ -41,7 +41,7 @@ class ClassificationModel(prediction.PredictionModel[ClassificationModelConfig, 
     def predict(self, input: np.ndarray) -> np.ndarray:
         blob: np.ndarray = cv2.dnn.blobFromImage(input, size=(224,224), swapRB=True)
 
-        blob = np.moveaxis(blob, (1, 2, 3), (3, 1, 2))
+        blob = np.moveaxis(blob, (1, 2, 3), (3, 1, 2)) # Making the color channel the last dimension instead of the first, in order to match model input shape
 
         with self.model_lock:
             predictions = self.model.predict(blob)
