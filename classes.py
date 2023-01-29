@@ -89,7 +89,7 @@ class ClassNames:
     @classmethod
     def load_from_file(cls, path: str):
         with open(path, newline='') as f:
-            return cls(f.readlines())
+            return cls(f.read().splitlines())
 
 def get_class_selector(
         mode: Optional[ClassificationMode]=None, 
