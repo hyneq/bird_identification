@@ -17,7 +17,7 @@ import numpy as np
 import cv2
 
 import prediction
-from classes import ClassSelector, DEFAULT_CLASS_SELECTOR, ClassificationMode, get_class_selector
+from classes import ClassificationMode
 
 @dataclass()
 class ClassificationModelConfig(prediction.PredictionModelConfig):
