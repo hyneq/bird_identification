@@ -58,7 +58,7 @@ DEFAULT_MODEL_PATH = os.path.join(os.path.dirname(__file__), "models", "czbirds"
 
 DEFAULT_MODEL_CONFIG = ClassificationModelConfig.from_dir(DEFAULT_MODEL_PATH)
 
-class ClassificationProcessor(prediction.PredictionProcessorWithCS[np.ndarray, Result]):
+class ClassificationProcessor(prediction.PredictionProcessorWithCS[ClassificationModel, np.ndarray, Result]):
     __slots__: tuple
 
     def get_results(self, classes) -> list:

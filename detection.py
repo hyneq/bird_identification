@@ -131,7 +131,7 @@ class Result:
     bounding_box: BoundingBox
     confidence: any
 
-class DetectionProcessor(prediction.PredictionProcessorWithCS[DetectionModelOutput, Result]):
+class DetectionProcessor(prediction.PredictionProcessorWithCS[DetectionModel, DetectionModelOutput, Result]):
     __slots__: tuple
 
     NMS_threshold = DEFAULT_NMS_THRESHOLD

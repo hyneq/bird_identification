@@ -35,7 +35,7 @@ class PredictionModel(ABC, Generic[TPredictionModelConfig, TPredictionModelInput
 
 TPredictionModel = TypeVar("TPredictionModel", bound=PredictionModel)
 
-class PredictionProcessor(ABC, Generic[TPredictionModelOutput, TPredictionResult]):
+class PredictionProcessor(ABC, Generic[TPredictionModel, TPredictionModelOutput, TPredictionResult]):
     __slots__: tuple
 
     output: TPredictionModelOutput
@@ -43,11 +43,20 @@ class PredictionProcessor(ABC, Generic[TPredictionModelOutput, TPredictionResult
     def __init__(self, output: TPredictionModelOutput):
         self.output = output
     
+    @classmethod
+    def with_model(cls, model_: TPredictionModel):
+        class cls_copy(cls):
+            model = model_
+        
+        cls_copy.__name__ = cls.__name__
+
+        return cls_copy
+    
     @abstractmethod
     def process(self) -> TPredictionResult:
         pass
 
-class PredictionProcessorWithCS(PredictionProcessor[TPredictionModelOutput, TPredictionResult]):
+class PredictionProcessorWithCS(PredictionProcessor[TPredictionModel, TPredictionModelOutput, TPredictionResult]):
     __slots__: tuple
 
     cs: ClassSelector
@@ -82,6 +91,8 @@ class Predictor(Generic[TPredictionModel, TPredictionModelConfig, TPredictionPro
             self.model = self.model_cls(model_cfg)
         else:
             self.model = model
+        
+        self.prediction_processor = self.prediction_processor.with_model(self.model)
 
     def predict(self, input: TPredictionModelInput) -> TPredictionResult:
         output: TPredictionModelOutput = self.model.predict(input)
