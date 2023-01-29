@@ -55,8 +55,9 @@ class PredictionProcessorWithCS(PredictionProcessor[TPredictionModelOutput, TPre
     @classmethod
     def with_cs(cls, cs_: ClassSelector):
         class cls_copy(cls):
-            __name__ = cls.__name__
             cs = cs_
+        
+        cls_copy.__name__ = cls.__name__
         
         return cls_copy
 
