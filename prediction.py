@@ -38,6 +38,8 @@ TPredictionModel = TypeVar("TPredictionModel", bound=PredictionModel)
 class PredictionProcessor(ABC, Generic[TPredictionModel, TPredictionModelOutput, TPredictionResult]):
     __slots__: tuple
 
+    model: TPredictionModel
+
     output: TPredictionModelOutput
 
     def __init__(self, output: TPredictionModelOutput):
