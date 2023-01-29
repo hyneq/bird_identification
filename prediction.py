@@ -79,7 +79,7 @@ class Predictor(Generic[TPredictionModel, TPredictionModelConfig, TPredictionPro
         ):
 
         if not model:
-            self.model = self.load_model(model_cfg)
+            self.model = self.model_cls(model_cfg)
         else:
             self.model = model
 
