@@ -172,7 +172,7 @@ class DetectionProcessor(prediction.PredictionProcessorWithCS[DetectionModel, De
         return cv2.dnn.NMSBoxes(self.bounding_boxes, [confidence[0] for confidence in self.confidences], self.cs.min_confidence, self.NMS_threshold)
     
     def get_results(self, filtered):
-        return [Result(self.model.class_names[self.classes[i]], BoundingBox(*self.bounding_boxes[i]), self.confidences[i]) for i in filtered]
+        return [Result(self.model.class_names.get_names(self.classes[i]), BoundingBox(*self.bounding_boxes[i]), self.confidences[i]) for i in filtered]
     
     def process(self):
         for obj in self.output:
@@ -227,5 +227,5 @@ def detect_objects(
 if __name__ == "__main__":
     results = detect_objects(sys.argv[1])
 
-    for result in results:
-        print("{} at {} with {} % confidence".format(result.label, result.bounding_box, round(result.confidence*100,2)))
+    for result in results[0]:
+        print("{} at {} with {} % confidence".format(result.label, result.bounding_box, np.round(result.confidence*100,2)))
