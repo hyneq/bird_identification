@@ -18,7 +18,7 @@ from classes import ClassSelector, DEFAULT_CLASS_SELECTOR, ClassificationMode, g
 YOLO_COCO_PATH = os.path.join(os.path.dirname(__file__),"models","YOLOv3-COCO")
 
 DEFAULT_PROBABILITY_MINIMUM = 0.5
-DEFAULT_NMS_THRESHOLD = 0.3
+DEFAULT_NMS_THRESHOLD = 0.5
 
 @dataclass()
 class DetectionModelConfig(prediction.PredictionModelConfig):
@@ -134,6 +134,8 @@ class Result:
 class DetectionProcessor(prediction.PredictionProcessorWithCS[DetectionModelOutput, Result]):
     __slots__: tuple
 
+    NMS_threshold = DEFAULT_NMS_THRESHOLD
+
     # Lists for detected bounding boxes,
     # obtained confidences and class's number
     bounding_boxes = []
@@ -167,7 +169,7 @@ class DetectionProcessor(prediction.PredictionProcessorWithCS[DetectionModelOutp
         # corresponding confidences are low or there is another
         # bounding box for this region with higher confidence
 
-        return cv2.dnn.NMSBoxes(self.bounding_boxes, [confidence[0] for confidence in self.confidences], self.probability_minimum, self.NMS_threshold)
+        return cv2.dnn.NMSBoxes(self.bounding_boxes, [confidence[0] for confidence in self.confidences], self.cs.min_confidence, self.NMS_threshold)
     
     def get_results(self, filtered):
         return [Result(self.model.class_names[self.classes[i]], BoundingBox(*self.bounding_boxes[i]), self.confidences[i]) for i in filtered]
