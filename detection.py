@@ -139,8 +139,6 @@ class DetectionProcessor(prediction.PredictionProcessorWithCS[DetectionModelOutp
     bounding_boxes = []
     confidences = []
     classes = []
-
-    cs: ClassSelector
     
     def add_detected_objects(self, bounding_box, confidence, class_number):
         self.bounding_boxes.append(bounding_box)
