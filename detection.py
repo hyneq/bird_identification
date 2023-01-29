@@ -11,7 +11,6 @@ from threading import Lock
 
 import cv2
 import numpy as np
-from PIL.Image import Image, open as open_image
 
 import prediction
 from classes import ClassSelector, DEFAULT_CLASS_SELECTOR, ClassificationMode, get_class_selector
@@ -86,7 +85,7 @@ class DetectionModelOutputIter:
         
         raise StopIteration
 
-class DetectionModel(prediction.PredictionModel[DetectionModelConfig, Image, DetectionModelOutput]):
+class DetectionModel(prediction.PredictionModel[DetectionModelConfig, np.ndarray, DetectionModelOutput]):
     __slots__: tuple
 
     network: any
@@ -183,7 +182,7 @@ class DetectionProcessor(prediction.PredictionProcessorWithCS[DetectionModelOutp
 
         return self.get_results(filtered)
 
-class ObjectDetector(prediction.PredictorWithCS[DetectionModel, DetectionModelConfig, DetectionProcessor, Image, Result]):
+class ObjectDetector(prediction.PredictorWithCS[DetectionModel, DetectionModelConfig, DetectionProcessor, np.ndarray, Result]):
     __slots__: tuple
 
     model_cls = DetectionModel
@@ -204,7 +203,7 @@ get_object_detector = prediction.get_predictor_factory(
     )
 
 def detect_objects(
-        images: Union[list[str], list[Image], str, Image],
+        images: Union[list[str], list[np.ndarray], str, np.ndarray],
         *args,
         detector: Optional[Union[type[ObjectDetector],ObjectDetector]]=None,
         **kwargs
