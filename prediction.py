@@ -99,8 +99,7 @@ class PredictorWithCS(Predictor[TPredictionModel, TPredictionModelConfig, TPredi
         ):
 
         if not cs:
-            cs = DEFAULT_CLASS_SELECTOR
-            
+            cs = DEFAULT_CLASS_SELECTOR()
         
         self.prediction_processor = self.prediction_processor.with_cs(cs)
 
