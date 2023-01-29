@@ -76,9 +76,15 @@ class ClassNames:
 
     def get_name(self, num: int):
         return self.class_names[num]
+    
+    def get_names(self, nums: Union[list[int],np.ndarray]):
+        return [self.get_name(num) for num in nums]
 
     def get_number(self, name: str):
         return self.class_names.index(name)
+    
+    def get_numbers(self, names: list[str]):
+        return [self.get_number(name) for name in names]
     
     @classmethod
     def load_from_file(cls, path: str):
