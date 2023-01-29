@@ -62,7 +62,7 @@ class ClassificationProcessor(prediction.PredictionProcessorWithCS[Classificatio
     __slots__: tuple
 
     def get_results(self, classes) -> list:
-        return Result(classes, list(self.scores[classes]))
+        return Result(self.model.class_names.get_names(classes), list(self.scores[classes]))
 
     def process(self) -> list:
         self.scores = self.output
