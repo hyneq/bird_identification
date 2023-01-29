@@ -138,9 +138,9 @@ class DetectionProcessor(prediction.PredictionProcessorWithCS[DetectionModel, De
 
     # Lists for detected bounding boxes,
     # obtained confidences and class's number
-    bounding_boxes = []
-    confidences = []
-    classes = []
+    bounding_boxes: list
+    confidences: list
+    classes: list
     
     def add_detected_object(self, bounding_box, confidence, class_number):
         self.bounding_boxes.append(bounding_box)
@@ -175,6 +175,10 @@ class DetectionProcessor(prediction.PredictionProcessorWithCS[DetectionModel, De
         return [Result(self.model.class_names.get_names(self.classes[i]), BoundingBox(*self.bounding_boxes[i]), self.confidences[i]) for i in filtered]
     
     def process(self):
+        self.bounding_boxes = []
+        self.confidences = []
+        self.classes = []
+
         for obj in self.output:
             self.process_object(obj)
 
