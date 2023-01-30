@@ -60,17 +60,19 @@ class DetectionModelOutputIter:
     raw_output: tuple[np.ndarray, np.ndarray, np.ndarray]
 
     _layer_len: int
-    _layer_index: int = 0
+    _layer_index: int
 
     _object_len: int
-    _object_index: int = 0
+    _object_index: int
 
 
     def __init__(self, raw_output: np.ndarray):
         self.raw_output = raw_output
 
         self._layer_len = len(raw_output)
+        self._layer_index = 0
         self._object_len = raw_output[0].shape[0]
+        self._object_index = 0
     
     def __next__(self) -> np.ndarray:
         if self._layer_index < self._layer_len:
@@ -79,6 +81,9 @@ class DetectionModelOutputIter:
             self._object_index += 1
             if self._object_index == self._object_len:
                 self._layer_index += 1
+                if self._layer_index != self._layer_len: 
+                    self._object_len = self.raw_output[self._layer_index].shape[0]
+                
                 self._object_index = 0
         
             return obj
