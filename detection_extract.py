@@ -78,6 +78,8 @@ def extract_detected(images, label, box_expand=[0.1, 0.1], model=None, save_path
                 classification_result = classify_images(extracted_image, classifier=classifier)[0]
                 if len(classification_result.class_names):
                     class_name = classification_result.class_names[0]
+                    if verbose:
+                        print("Classified image from {} at {} as {} with {} % confidence".format(im_path, box, class_name, np.round(classification_result.confidences[0]*100, 2)))
                 else:
                     class_name = "__not_recognized__"
 
