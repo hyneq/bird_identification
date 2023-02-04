@@ -16,18 +16,19 @@ from tensorflow import keras
 import numpy as np
 import cv2
 
-import prediction
+from prediction.models import PredictionModelConfig, PredictionModel
+from prediction.predictor import PredictionProcessorWithCS, PredictorWithCS, FileImagePredictor, get_predictor_factory
 from classes import ClassificationMode
 
 @dataclass()
-class ClassificationModelConfig(prediction.PredictionModelConfig):
+class ClassificationModelConfig(PredictionModelConfig):
     model_path: str
 
     @classmethod
     def from_dir(cls, path: str):
         return cls(model_path=os.path.join(path, "model.h5"), classes_path=os.path.join(path, "classes.csv"))
 
-class ClassificationModel(prediction.PredictionModel[ClassificationModelConfig, np.ndarray, np.ndarray]):
+class ClassificationModel(PredictionModel[ClassificationModelConfig, np.ndarray, np.ndarray]):
     __slots__: tuple
 
     model: keras.Model
@@ -58,7 +59,7 @@ DEFAULT_MODEL_PATH = os.path.join(os.path.dirname(__file__), "models", "czbirds"
 
 DEFAULT_MODEL_CONFIG = ClassificationModelConfig.from_dir(DEFAULT_MODEL_PATH)
 
-class ClassificationProcessor(prediction.PredictionProcessorWithCS[ClassificationModel, np.ndarray, Result]):
+class ClassificationProcessor(PredictionProcessorWithCS[ClassificationModel, np.ndarray, Result]):
     __slots__: tuple
 
     def get_results(self, classes) -> list:
@@ -71,19 +72,19 @@ class ClassificationProcessor(prediction.PredictionProcessorWithCS[Classificatio
         
         return self.get_results(classes)
 
-class ImageClassifier(prediction.PredictorWithCS[ClassificationModel, ClassificationModelConfig, ClassificationProcessor, np.ndarray, np.ndarray, Result]):
+class ImageClassifier(PredictorWithCS[ClassificationModel, ClassificationModelConfig, ClassificationProcessor, np.ndarray, np.ndarray, Result]):
     __slots__: tuple
 
     model_cls = ClassificationModel
 
     prediction_processor = ClassificationProcessor
 
-class FileImageClassifier(prediction.FileImagePredictor[ImageClassifier, np.ndarray]):
+class FileImageClassifier(FileImagePredictor[ImageClassifier, np.ndarray]):
     __slots__: tuple
 
     predictor_cls = ImageClassifier
 
-get_image_classifier = prediction.get_predictor_factory(
+get_image_classifier = get_predictor_factory(
     "get_image_classifier",
     ImageClassifier,
     ClassificationModel,
