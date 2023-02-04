@@ -78,7 +78,7 @@ class ImageClassifier(prediction.PredictorWithCS[ClassificationModel, Classifica
 
     prediction_processor = ClassificationProcessor
 
-class FileImageClassifier(prediction.FileImagePredictor[ImageClassifier]):
+class FileImageClassifier(prediction.FileImagePredictor[ImageClassifier, np.ndarray]):
     __slots__: tuple
 
     predictor_cls = ImageClassifier
