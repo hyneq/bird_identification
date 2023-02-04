@@ -81,7 +81,14 @@ class PredictionProcessorWithCS(PredictionProcessor[TPredictionModel, TPredictio
 TPredictionProcessor = TypeVar("TPredictionProcessor", bound=PredictionProcessor)
 TPredictionProcessorWithCS = TypeVar("TPredictionProcessorWithCS", bound=PredictionProcessorWithCS)
 
-class Predictor(Generic[TPredictionModel, TPredictionModelConfig, TPredictionProcessor, TPredictionModelInput, TPredictionModelOutput]):
+class APredictor(ABC, Generic[TPredictionModel, TPredictionModelConfig, TPredictionProcessor, TPredictionModelInput, TPredictionModelOutput]):
+    __slots__: tuple
+
+    @abstractmethod
+    def predict(TPredictionModelInput) -> TPredictionResult:
+        pass
+
+class Predictor(APredictor[TPredictionModel, TPredictionModelConfig, TPredictionProcessor, TPredictionModelInput, TPredictionModelOutput]):
     __slots__: tuple
     
     model_cls: type[TPredictionModel]
@@ -107,7 +114,7 @@ class Predictor(Generic[TPredictionModel, TPredictionModelConfig, TPredictionPro
 
         return self.prediction_processor(output).process()
 
-TPredictor = TypeVar("TPredictor", bound=Predictor)
+TPredictor = TypeVar("TPredictor", bound=APredictor)
 
 class PredictorWithCS(Predictor[TPredictionModel, TPredictionModelConfig, TPredictionProcessorWithCS, TPredictionModelInput, TPredictionModelOutput]):
     __slots__: tuple
@@ -124,7 +131,7 @@ class PredictorWithCS(Predictor[TPredictionModel, TPredictionModelConfig, TPredi
 
         super().__init__(*args, **kwargs)
 
-class FileImagePredictor(Generic[TPredictor]):
+class FileImagePredictor(APredictor[TPredictionModel, TPredictionModelConfig, TPredictionProcessorWithCS, str, TPredictionModelOutput], Generic[TPredictor]):
     __slots__: tuple
 
     predictor_cls: type[TPredictor]
@@ -138,7 +145,7 @@ class FileImagePredictor(Generic[TPredictor]):
         
         self.predictor = predictor
     
-    def predict(self, path: str):
+    def predict(self, path: str) -> TPredictionModelOutput:
         image = cv2.imread(path)
 
         return self.predictor.predict(image)
