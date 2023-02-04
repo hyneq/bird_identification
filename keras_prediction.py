@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from abc import ABC, abstractmethod
 from threading import Lock
 
@@ -7,6 +8,7 @@ import cv2
 
 import prediction
 
+@dataclass
 class KerasModelConfig(prediction.PredictionModelConfig):
     model_path: str
 
