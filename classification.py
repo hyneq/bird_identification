@@ -71,7 +71,7 @@ class ClassificationProcessor(prediction.PredictionProcessorWithCS[Classificatio
         
         return self.get_results(classes)
 
-class ImageClassifier(prediction.PredictorWithCS[ClassificationModel, ClassificationModelConfig, ClassificationProcessor, np.ndarray, Result]):
+class ImageClassifier(prediction.PredictorWithCS[ClassificationModel, ClassificationModelConfig, ClassificationProcessor, np.ndarray, np.ndarray, Result]):
     __slots__: tuple
 
     model_cls = ClassificationModel
