@@ -12,6 +12,10 @@ import prediction
 class KerasModelConfig(prediction.PredictionModelConfig):
     model_path: str
 
+    @classmethod
+    def from_dir(cls, path: str):
+        return cls(model_path=os.path.join(path, "model.h5"), classes_path=os.path.join(path, "classes.csv"))
+
 class KerasPredictionModel(ABC, prediction.ImagePredictionModel[KerasModelConfig, prediction.TPredictionModelOutput]):
     __slots__: tuple
 
