@@ -159,7 +159,7 @@ class FileImagePredictor(APredictor[str, TPredictionResult], Generic[TPredictor,
     
 def get_predictor_factory(
         name: str,
-        predictor: type[PredictorWithCS[TPredictionModel, TPredictionModelConfig, TPredictionProcessorWithCS, TPredictionModelInput, TPredictionModelOutput]],
+        predictor: type[PredictorWithCS[TPredictionModel, TPredictionModelConfig, TPredictionProcessorWithCS, TPredictionModelInput, TPredictionModelOutput, TPredictionResult]],
         model_cls: type[TPredictionModel],
         model_cfg_cls: type[TPredictionModelConfig],
         DEFAULT_MODEL_CONFIG: TPredictionModelConfig,
