@@ -87,14 +87,14 @@ class PredictionProcessorWithCS(PredictionProcessor[TPredictionModel, TPredictio
 TPredictionProcessor = TypeVar("TPredictionProcessor", bound=PredictionProcessor)
 TPredictionProcessorWithCS = TypeVar("TPredictionProcessorWithCS", bound=PredictionProcessorWithCS)
 
-class APredictor(ABC, Generic[TPredictionModel, TPredictionModelConfig, TPredictionProcessor, TPredictionModelInput, TPredictionModelOutput, TPredictionResult]):
+class APredictor(ABC, Generic[TPredictionModelInput, TPredictionResult]):
     __slots__: tuple
 
     @abstractmethod
     def predict(TPredictionModelInput) -> TPredictionResult:
         pass
 
-class Predictor(APredictor[TPredictionModel, TPredictionModelConfig, TPredictionProcessor, TPredictionModelInput, TPredictionModelOutput, TPredictionResult]):
+class Predictor(APredictor[TPredictionModelInput, TPredictionResult], Generic[TPredictionModel, TPredictionModelConfig, TPredictionProcessor, TPredictionModelInput, TPredictionModelOutput, TPredictionResult]):
     __slots__: tuple
     
     model_cls: type[TPredictionModel]
@@ -137,7 +137,7 @@ class PredictorWithCS(Predictor[TPredictionModel, TPredictionModelConfig, TPredi
 
         super().__init__(*args, **kwargs)
 
-class FileImagePredictor(APredictor[TPredictionModel, TPredictionModelConfig, TPredictionProcessorWithCS, str, TPredictionModelOutput, TPredictionResult], Generic[TPredictor]):
+class FileImagePredictor(APredictor[str, TPredictionResult], Generic[TPredictor, TPredictionResult]):
     __slots__: tuple
 
     predictor_cls: type[TPredictor]
