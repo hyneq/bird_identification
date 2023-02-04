@@ -2,9 +2,12 @@ from typing import Optional, Generic, TypeVar
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
+import numpy as np
 import cv2
 
 from classes import ClassSelector, get_class_selector, DEFAULT_CLASS_SELECTOR, ClassNames
+
+Image = np.ndarray
 
 TPredictionModelInput = TypeVar("TPredictionModelInput")
 TPredictionModelOutput = TypeVar("TPredictionModelOutput")
@@ -34,6 +37,9 @@ class PredictionModel(ABC, Generic[TPredictionModelConfig, TPredictionModelInput
         return ClassNames.load_from_file(classes_path)
 
 TPredictionModel = TypeVar("TPredictionModel", bound=PredictionModel)
+
+class ImagePredictionModel(PredictionModel[TPredictionModelConfig, Image, TPredictionModelOutput]):
+    pass
 
 class PredictionProcessor(ABC, Generic[TPredictionModel, TPredictionModelOutput, TPredictionResult]):
     __slots__: tuple
