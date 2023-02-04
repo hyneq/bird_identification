@@ -87,14 +87,14 @@ class PredictionProcessorWithCS(PredictionProcessor[TPredictionModel, TPredictio
 TPredictionProcessor = TypeVar("TPredictionProcessor", bound=PredictionProcessor)
 TPredictionProcessorWithCS = TypeVar("TPredictionProcessorWithCS", bound=PredictionProcessorWithCS)
 
-class APredictor(ABC, Generic[TPredictionModel, TPredictionModelConfig, TPredictionProcessor, TPredictionModelInput, TPredictionModelOutput]):
+class APredictor(ABC, Generic[TPredictionModel, TPredictionModelConfig, TPredictionProcessor, TPredictionModelInput, TPredictionModelOutput, TPredictionResult]):
     __slots__: tuple
 
     @abstractmethod
     def predict(TPredictionModelInput) -> TPredictionResult:
         pass
 
-class Predictor(APredictor[TPredictionModel, TPredictionModelConfig, TPredictionProcessor, TPredictionModelInput, TPredictionModelOutput]):
+class Predictor(APredictor[TPredictionModel, TPredictionModelConfig, TPredictionProcessor, TPredictionModelInput, TPredictionModelOutput, TPredictionResult]):
     __slots__: tuple
     
     model_cls: type[TPredictionModel]
@@ -122,7 +122,7 @@ class Predictor(APredictor[TPredictionModel, TPredictionModelConfig, TPrediction
 
 TPredictor = TypeVar("TPredictor", bound=APredictor)
 
-class PredictorWithCS(Predictor[TPredictionModel, TPredictionModelConfig, TPredictionProcessorWithCS, TPredictionModelInput, TPredictionModelOutput]):
+class PredictorWithCS(Predictor[TPredictionModel, TPredictionModelConfig, TPredictionProcessorWithCS, TPredictionModelInput, TPredictionModelOutput, TPredictionResult]):
     __slots__: tuple
     
     def __init__(self,
@@ -137,7 +137,7 @@ class PredictorWithCS(Predictor[TPredictionModel, TPredictionModelConfig, TPredi
 
         super().__init__(*args, **kwargs)
 
-class FileImagePredictor(APredictor[TPredictionModel, TPredictionModelConfig, TPredictionProcessorWithCS, str, TPredictionModelOutput], Generic[TPredictor]):
+class FileImagePredictor(APredictor[TPredictionModel, TPredictionModelConfig, TPredictionProcessorWithCS, str, TPredictionModelOutput, TPredictionResult], Generic[TPredictor]):
     __slots__: tuple
 
     predictor_cls: type[TPredictor]
