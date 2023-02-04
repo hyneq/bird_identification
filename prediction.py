@@ -19,24 +19,30 @@ class PredictionModelConfig:
 
 TPredictionModelConfig = TypeVar("TPredictionModelConfig", bound=PredictionModelConfig)
 
-class PredictionModel(ABC, Generic[TPredictionModelConfig, TPredictionModelInput, TPredictionModelOutput]):
+class APredictionModel(ABC, Generic[TPredictionModelConfig, TPredictionModelInput, TPredictionModelOutput]):
     __slots__: tuple
-
-    class_names: ClassNames
 
     @abstractmethod
     def __init__(self, cfg: TPredictionModelConfig):
-        self.class_names = self.load_classes(cfg.classes_path)
+        pass
 
     @abstractmethod
     def predict(self, input: TPredictionModelInput) -> TPredictionModelOutput:
         pass
 
+class PredictionModel(Generic[TPredictionModelConfig, TPredictionModelInput, TPredictionModelOutput]):
+    __slots__: tuple
+
+    class_names: ClassNames
+
+    def __init__(self, cfg: TPredictionModelConfig):
+        self.class_names = self.load_classes(cfg.classes_path)
+
     @staticmethod
     def load_classes(classes_path: str):
         return ClassNames.load_from_file(classes_path)
 
-TPredictionModel = TypeVar("TPredictionModel", bound=PredictionModel)
+TPredictionModel = TypeVar("TPredictionModel", bound=APredictionModel)
 
 class ImagePredictionModel(PredictionModel[TPredictionModelConfig, Image, TPredictionModelOutput]):
     pass
