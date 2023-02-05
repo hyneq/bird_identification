@@ -28,7 +28,7 @@ class APredictionModel(ABC, Generic[TPredictionModelConfig, TPredictionModelInpu
     def predict(self, input: TPredictionModelInput) -> TPredictionModelOutput:
         pass
 
-class PredictionModel(Generic[TPredictionModelConfig, TPredictionModelInput, TPredictionModelOutput]):
+class PredictionModel(APredictionModel[TPredictionModelConfig, TPredictionModelInput, TPredictionModelOutput]):
     __slots__: tuple
 
     class_names: ClassNames
