@@ -4,7 +4,9 @@ from dataclasses import dataclass
 import numpy as np
 
 from prediction.predictor import PredictionProcessorWithCS, PredictorWithCS, FileImagePredictor, get_predictor_factory
-from .models import ClassificationModelConfig, ClassificationModel, DEFAULT_MODEL_CONFIG
+from .models import ClassificationModelConfig, ClassificationModel
+
+from defaults.classification import DEFAULT_MODEL_CONFIG
 
 @dataclass
 class Result:
