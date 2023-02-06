@@ -134,21 +134,28 @@ class FileImagePredictor(APredictor[str, TPredictionResult], Generic[TPredictor,
 def get_predictor_factory(
         name: str,
         predictor: type[PredictorWithCS[TPredictionModel, TPredictionModelConfig, TPredictionProcessorWithCS, TPredictionModelInput, TPredictionModelOutput, TPredictionResult]],
-        model_cls: type[TPredictionModel],
-        model_cfg_cls: type[TPredictionModelConfig],
+        DEFAULT_MODEL_CLS: type[TPredictionModel],
         DEFAULT_MODEL_CONFIG: TPredictionModelConfig,
+        model_cls: type[TPredictionModel]=None,
         cs_cls: type[ClassSelector] = ClassSelector
     ):
 
     def get_predictor(
-            model_config: model_cfg_cls=DEFAULT_MODEL_CONFIG,
-            model: Optional[model_cls]=None,
-            predictor: type[predictor]=predictor,
+            model_config: TPredictionModelConfig=DEFAULT_MODEL_CONFIG,
+            model: Optional[TPredictionModel]=None,
+            predictor: type[TPredictor]=predictor,
+            model_cls: type[TPredictionModel]=model_cls,
             cs: Optional[cs_cls]= None,
             **cs_kwargs
         ):
-
+                
         if not model:
+            if not model_cls:
+                if hasattr(model_config, "model_cls"):
+                    model_cls = model_config.model_cls
+                else:
+                    model_cls = DEFAULT_MODEL_CLS
+
             model = model_cls(model_config)
 
         if not cs:
