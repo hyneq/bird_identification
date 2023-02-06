@@ -40,7 +40,8 @@ class PredictionModel(APredictionModel[TPredictionModelConfig, TPredictionModelI
     def load_classes(classes_path: str):
         return ClassNames.load_from_file(classes_path)
 
-TPredictionModel = TypeVar("TPredictionModel", bound=APredictionModel)
+class AImagePredictionModel(APredictionModel[TPredictionModelConfig, Image, TPredictionModelOutput]):
+    pass
 
-class ImagePredictionModel(PredictionModel[TPredictionModelConfig, Image, TPredictionModelOutput]):
+class ImagePredictionModel(PredictionModel[TPredictionModelConfig, Image, TPredictionModelOutput], AImagePredictionModel):
     pass
