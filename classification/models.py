@@ -6,10 +6,10 @@ import numpy as np
 from tensorflow import keras
 import cv2
 
-from prediction.models import PredictionModelConfig, APredictionModel, Image
+from prediction.models import PredictionModelConfig, AImagePredictionModel, Image
 
 class ClassificationModelConfig(PredictionModelConfig):
     pass
 
-class ClassificationModel(APredictionModel[ClassificationModelConfig, Image, np.ndarray]):
+class ClassificationModel(AImagePredictionModel[ClassificationModelConfig, np.ndarray]):
     __slots__: tuple
