@@ -28,6 +28,11 @@ class APredictionModel(ABC, Generic[TPredictionModelConfig, TPredictionModelInpu
     def predict(self, input: TPredictionModelInput) -> TPredictionModelOutput:
         pass
 
+TPredictionModel = TypeVar("TPredictionModel", bound=APredictionModel)
+
+class PredictionModelConfigWithCls(Generic[TPredictionModel]):
+    model_cls: type[TPredictionModel]
+
 class PredictionModel(APredictionModel[TPredictionModelConfig, TPredictionModelInput, TPredictionModelOutput]):
     __slots__: tuple
 
