@@ -1,5 +1,11 @@
+import os,sys
+sys.path.append(os.path.realpath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
+sys.path.remove(os.path.dirname(__file__))
+
 import argparse
+
 from enum_actions import enum_action
+
 from classification.classifier import classify_images
 from classes import ClassificationMode
 
@@ -22,3 +28,6 @@ def cli_main():
 
     for result in results:
         print(result)
+
+if __name__ == "__main__":
+    cli_main()
