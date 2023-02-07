@@ -6,7 +6,7 @@ import numpy as np
 from prediction.predictor import PredictionProcessorWithCS, PredictorWithCS, FileImagePredictor, get_predictor_factory
 from .models import ClassificationModelConfig, ClassificationModel
 
-from defaults.classification import DEFAULT_MODEL_CONFIG
+from defaults.classification import DEFAULT_MODEL_CONFIG, DEFAULT_MODEL_CLS
 
 @dataclass
 class Result:
@@ -39,11 +39,11 @@ class FileImageClassifier(FileImagePredictor[ImageClassifier, np.ndarray]):
     predictor_cls = ImageClassifier
 
 get_image_classifier = get_predictor_factory(
-    "get_image_classifier",
-    ImageClassifier,
-    ClassificationModel,
-    ClassificationModelConfig,
-    DEFAULT_MODEL_CONFIG
+    name="get_image_classifier",
+    predictor=ImageClassifier,
+    DEFAULT_MODEL_CLS=DEFAULT_MODEL_CLS,
+    DEFAULT_MODEL_CONFIG=DEFAULT_MODEL_CONFIG,
+    model_cls=ClassificationModel
 )
 
 def classify_images(
