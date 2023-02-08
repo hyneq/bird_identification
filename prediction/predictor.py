@@ -45,20 +45,6 @@ class PredictionProcessorWithCS(PredictionProcessor[TPredictionModel, TPredictio
         
         return cls_copy
 
-class PredictionProcessorWithCS(PredictionProcessor[TPredictionModel, TPredictionModelOutput, TPredictionResult]):
-    __slots__: tuple
-
-    cs: ClassSelector
-
-    @classmethod
-    def with_cs(cls, cs_: ClassSelector):
-        class cls_copy(cls):
-            cs = cs_
-        
-        cls_copy.__name__ = cls.__name__
-        
-        return cls_copy
-
 TPredictionProcessor = TypeVar("TPredictionProcessor", bound=PredictionProcessor)
 TPredictionProcessorWithCS = TypeVar("TPredictionProcessorWithCS", bound=PredictionProcessorWithCS)
 
