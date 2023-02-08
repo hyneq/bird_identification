@@ -1,12 +1,6 @@
-import os
-from threading import Lock
-from dataclasses import dataclass
-
 import numpy as np
-from tensorflow import keras
-import cv2
 
-from prediction.models import PredictionModelConfig, AImagePredictionModel, Image
+from prediction.models import PredictionModelConfig, AImagePredictionModel
 
 class ClassificationModelConfig(PredictionModelConfig):
     pass
