@@ -42,8 +42,7 @@ get_image_classifier = get_predictor_factory(
     name="get_image_classifier",
     predictor=ImageClassifier,
     DEFAULT_MODEL_CLS=DEFAULT_MODEL_CLS,
-    DEFAULT_MODEL_CONFIG=DEFAULT_MODEL_CONFIG,
-    model_cls=ClassificationModel
+    DEFAULT_MODEL_CONFIG=DEFAULT_MODEL_CONFIG
 )
 
 def classify_images(
