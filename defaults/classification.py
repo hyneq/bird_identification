@@ -7,7 +7,7 @@ from keras_models.classification import KerasClassificationModel, KerasClassific
 
 DEFAULT_MODEL_CLS: type[ClassificationModel]
 
-DEFAULT_MODEL_PATH: str = os.path.join(os.path.dirname(__file__), "models", "czbirds")
+DEFAULT_MODEL_PATH: str = os.path.join(os.path.dirname(__file__), os.path.pardir, "models", "czbirds")
 
 DEFAULT_MODEL_CONFIG: ClassificationModelConfig
 
