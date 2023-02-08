@@ -11,4 +11,4 @@ class KerasClassificationModel(KerasPredictionModel[np.ndarray], ClassificationM
         return predictions[0]
 
 class KerasClassificationModelConfig(KerasModelConfig, ClassificationModelConfig, PredictionModelConfigWithCls[KerasClassificationModel]):
-    pass
+    model_cls = KerasClassificationModel
