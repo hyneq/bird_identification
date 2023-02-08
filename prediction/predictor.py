@@ -136,7 +136,6 @@ def get_predictor_factory(
         predictor: type[PredictorWithCS[TPredictionModel, TPredictionModelConfig, TPredictionProcessorWithCS, TPredictionModelInput, TPredictionModelOutput, TPredictionResult]],
         DEFAULT_MODEL_CLS: type[TPredictionModel],
         DEFAULT_MODEL_CONFIG: TPredictionModelConfig,
-        model_cls: type[TPredictionModel]=None,
         cs_cls: type[ClassSelector] = ClassSelector
     ):
 
@@ -144,11 +143,11 @@ def get_predictor_factory(
             model_config: TPredictionModelConfig=DEFAULT_MODEL_CONFIG,
             model: Optional[TPredictionModel]=None,
             predictor: type[TPredictor]=predictor,
-            model_cls: type[TPredictionModel]=model_cls,
+            model_cls: type[TPredictionModel]=None,
             cs: Optional[cs_cls]= None,
             **cs_kwargs
         ):
-                
+
         if not model:
             if not model_cls:
                 if hasattr(model_config, "model_cls"):
