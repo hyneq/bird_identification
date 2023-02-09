@@ -4,6 +4,7 @@ from dataclasses import dataclass
 import numpy as np
 
 from prediction.predictor import PredictionProcessorWithCS, PredictorWithCS, FileImagePredictor, get_predictor_factory
+from prediction.models import Image
 from .models import ClassificationModelConfig, ClassificationModelOutput, ClassificationModel
 
 from defaults.classification import DEFAULT_MODEL_CONFIG, DEFAULT_MODEL_CLS
@@ -26,7 +27,7 @@ class ClassificationProcessor(PredictionProcessorWithCS[ClassificationModel, Cla
         
         return self.get_results(classes)
 
-class ImageClassifier(PredictorWithCS[ClassificationModel, ClassificationModelConfig, ClassificationProcessor, np.ndarray, np.ndarray, Result]):
+class ImageClassifier(PredictorWithCS[ClassificationModel, ClassificationModelConfig, ClassificationProcessor, Image, ClassificationModelOutput, Result]):
     __slots__: tuple
 
     model_cls = ClassificationModel
