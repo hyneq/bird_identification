@@ -34,7 +34,7 @@ class ImageClassifier(PredictorWithCS[ClassificationModel, ClassificationModelCo
 
     prediction_processor = ClassificationProcessor
 
-class FileImageClassifier(FileImagePredictor[ImageClassifier, np.ndarray]):
+class FileImageClassifier(FileImagePredictor[ImageClassifier, Result]):
     __slots__: tuple
 
     predictor_cls = ImageClassifier
