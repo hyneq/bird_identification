@@ -112,7 +112,7 @@ class FileImagePredictor(APredictor[str, TPredictionResult], Generic[TPredictor,
         
         self.predictor = predictor
     
-    def predict(self, path: str) -> TPredictionModelOutput:
+    def predict(self, path: str) -> TPredictionResult:
         image = cv2.imread(path)
 
         return self.predictor.predict(image)
