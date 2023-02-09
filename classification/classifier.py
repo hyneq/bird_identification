@@ -4,7 +4,7 @@ from dataclasses import dataclass
 import numpy as np
 
 from prediction.predictor import PredictionProcessorWithCS, PredictorWithCS, FileImagePredictor, get_predictor_factory
-from .models import ClassificationModelConfig, ClassificationModel
+from .models import ClassificationModelConfig, ClassificationModelOutput, ClassificationModel
 
 from defaults.classification import DEFAULT_MODEL_CONFIG, DEFAULT_MODEL_CLS
 
@@ -13,7 +13,7 @@ class Result:
     class_names: list[str]
     confidences: list[float]
 
-class ClassificationProcessor(PredictionProcessorWithCS[ClassificationModel, np.ndarray, Result]):
+class ClassificationProcessor(PredictionProcessorWithCS[ClassificationModel, ClassificationModelOutput, Result]):
     __slots__: tuple
 
     def get_results(self, classes) -> list:

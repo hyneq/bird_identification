@@ -5,5 +5,7 @@ from prediction.models import PredictionModelConfig, AImagePredictionModel
 class ClassificationModelConfig(PredictionModelConfig):
     pass
 
-class ClassificationModel(AImagePredictionModel[ClassificationModelConfig, np.ndarray]):
+ClassificationModelOutput = np.ndarray
+
+class ClassificationModel(AImagePredictionModel[ClassificationModelConfig, ClassificationModelOutput]):
     __slots__: tuple
