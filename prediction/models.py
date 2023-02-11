@@ -48,5 +48,5 @@ class PredictionModel(APredictionModel[TPredictionModelConfig, TPredictionModelI
 class AImagePredictionModel(APredictionModel[TPredictionModelConfig, Image, TPredictionModelOutput]):
     pass
 
-class ImagePredictionModel(PredictionModel[TPredictionModelConfig, Image, TPredictionModelOutput], AImagePredictionModel):
+class ImagePredictionModel(PredictionModel[TPredictionModelConfig, Image, TPredictionModelOutput], AImagePredictionModel[TPredictionModelConfig, TPredictionModelOutput]):
     pass
