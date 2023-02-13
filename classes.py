@@ -54,7 +54,6 @@ class SortClassSelector(ClassSelector):
     def get_classes(self, scores) -> list:
         return np.argsort(scores)[::-1]
 
-DEFAULT_CLASS_SELECTOR = MaxClassSelector
 
 class ClassificationMode(Enum):
     FIXED = ("Fixed class list", True, FixedClassSelector)
@@ -65,6 +64,10 @@ class ClassificationMode(Enum):
         self.description = description
         self.classes_needed = classes_needed
         self.cs = cs
+
+DEFAULT_CLASSIFICATION_MODE = ClassificationMode.MAX
+
+DEFAULT_CLASS_SELECTOR = DEFAULT_CLASSIFICATION_MODE.cs
 
 class ClassRequiredForModeException(ValueError):
     def __init__(mode: ClassificationMode):
