@@ -7,7 +7,7 @@ import argparse
 from enum_actions import enum_action
 
 from classification.classifier import classify_images
-from classes import ClassificationMode
+from prediction.classes import ClassificationMode
 
 def cli_main():
     parser = argparse.ArgumentParser()

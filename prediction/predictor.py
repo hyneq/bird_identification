@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 import cv2
 
-from classes import ClassSelector, DEFAULT_CLASS_SELECTOR, get_class_selector
+from .classes import ClassSelector, DEFAULT_CLASS_SELECTOR, get_class_selector
 from .models import TPredictionModel, TPredictionModelConfig, TPredictionModelInput, TPredictionModelOutput
 
 TPredictionResult = TypeVar("TPredictionResult")
