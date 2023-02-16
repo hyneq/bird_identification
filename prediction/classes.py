@@ -18,7 +18,7 @@ class ClassSelector(ABC):
         self.min_confidence = min_confidence
 
     @abstractmethod
-    def get_classes(self, scores):
+    def get_classes(self, scores) -> list:
         pass
 
     def get_filtered_classes(self, scores) -> list:
@@ -52,7 +52,7 @@ class SortClassSelector(ClassSelector):
     __slots__: tuple
 
     def get_classes(self, scores) -> list:
-        return np.argsort(scores)[::-1]
+        return list(np.argsort(scores)[::-1])
 
 
 class ClassificationMode(Enum):
@@ -70,7 +70,7 @@ DEFAULT_CLASSIFICATION_MODE = ClassificationMode.MAX
 DEFAULT_CLASS_SELECTOR = DEFAULT_CLASSIFICATION_MODE.cs
 
 class ClassRequiredForModeException(ValueError):
-    def __init__(mode: ClassificationMode):
+    def __init__(self, mode: ClassificationMode):
         super().__init__("Class must be specified for classification mode '{}'".format(mode.description))
 
 @dataclass
