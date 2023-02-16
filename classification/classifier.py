@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from prediction.predictor import PredictionProcessorWithCS, PredictorWithCS, FileImagePredictor, get_predictor_factory
+from prediction.predictor import PredictorConfig, PredictionProcessorWithCS, PredictorWithCS, FileImagePredictor, get_predictor_factory
 from prediction.models import Image
 from .models import ClassificationModelConfig, ClassificationModelOutput, ClassificationModel
 
@@ -38,6 +38,10 @@ class FileImageClassifier(FileImagePredictor[ImageClassifier, Result]):
     __slots__: tuple
 
     predictor_cls = ImageClassifier
+
+@dataclass
+class ClassifierConfig(PredictorConfig[ImageClassifier]):
+    pass
 
 get_image_classifier = get_predictor_factory(
     name="get_image_classifier",
