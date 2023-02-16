@@ -1,12 +1,20 @@
-from typing import Generic, TypeVar, Optional
+from typing import Generic, TypeVar, Optional, Union
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 
 import cv2
 
-from .classes import ClassSelector, DEFAULT_CLASS_SELECTOR, get_class_selector
+from .classes import ClassSelector, ClassificationMode, DEFAULT_CLASS_SELECTOR, get_class_selector
 from .models import TPredictionModel, TPredictionModelConfig, TPredictionModelInput, TPredictionModelOutput
 
 TPredictionResult = TypeVar("TPredictionResult")
+
+@dataclass
+class PredictorConfig(Generic[TPredictionModelConfig]):
+    model_config: TPredictionModelConfig
+    min_confidence: float = None
+    classification_mode: ClassificationMode = None
+    classes: Union[list[int],list[str]] = None
 
 class PredictionProcessor(ABC, Generic[TPredictionModel, TPredictionModelOutput, TPredictionResult]):
     __slots__: tuple
