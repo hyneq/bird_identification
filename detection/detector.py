@@ -4,11 +4,11 @@ from dataclasses import dataclass
 import cv2
 import numpy as np
 
-from prediction.predictor import PredictionProcessorWithCS, PredictorWithCS, FileImagePredictor, get_predictor_factory
+from prediction.predictor import PredictorConfig, PredictionProcessorWithCS, PredictorWithCS, FileImagePredictor, get_predictor_factory
 from prediction.models import Image
 from .models import DetectionModelConfig, DetectionModelOutput, DetectionModel
 
-from defaults.detection import DEFAULT_MODEL_CONFIG, DEFAULT_MODEL_CLS, DEFAULT_NMS_THRESHOLD 
+from defaults.detection import DEFAULT_MODEL_CONFIG, DEFAULT_MODEL_CLS, DEFAULT_NMS_THRESHOLD
 
 @dataclass()
 class BoundingBox:
@@ -90,6 +90,10 @@ class FileObjectDetector(FileImagePredictor[ObjectDetector, Result]):
     __slots__: tuple
 
     predictor_cls = ObjectDetector
+
+@dataclass
+class DetectorConfig(PredictorConfig[ObjectDetector]):
+    pass
 
 get_object_detector = get_predictor_factory(
     name="get_object_detector",
