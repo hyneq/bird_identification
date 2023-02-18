@@ -6,6 +6,8 @@ from dataclasses import dataclass
 
 DEFAULT_MIN_CONFIDENCE = 0.5
 
+ClassList = Union[list[int],list[str], str, int]
+
 class ClassSelector(ABC):
     __slots__: tuple
 
@@ -72,6 +74,12 @@ DEFAULT_CLASS_SELECTOR = DEFAULT_CLASSIFICATION_MODE.cs
 class ClassRequiredForModeException(ValueError):
     def __init__(self, mode: ClassificationMode):
         super().__init__("Class must be specified for classification mode '{}'".format(mode.description))
+
+@dataclass
+class ClassSelectorConfig:
+    mode: ClassificationMode = None
+    min_confidence: Optional[float] = None
+    classes: Optional[ClassList] = None
 
 @dataclass
 class ClassNames:
