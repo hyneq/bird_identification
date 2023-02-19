@@ -17,6 +17,12 @@ class BoundingBox:
     width: int
     height: int
 
+    def range(self) -> tuple[np.arange, np.arange]:
+        return (
+            np.arange(self.y, self.y + self.height),
+            np.arange(self.x, self.x + self.width)
+        )
+
 @dataclass()
 class Result:
     label: str
