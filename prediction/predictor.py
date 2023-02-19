@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 import cv2
 
+from config import merge_conf
 from .classes import ClassSelectorConfig, ClassSelector, ClassificationMode, DEFAULT_CLASS_SELECTOR, get_class_selector
 from .models import TPredictionModel, TPredictionModelConfig, TPredictionModelInput, TPredictionModelOutput
 
@@ -15,6 +16,8 @@ class PredictorConfig(Generic[TPredictionModelConfig]):
     min_confidence: float = None
     classification_mode: ClassificationMode = None
     classes: Union[list[int],list[str]] = None
+
+TPredictorConfig = TypeVar("TPredictorConfig", bound=PredictorConfig)
 
 class PredictionProcessor(ABC, Generic[TPredictionModel, TPredictionModelOutput, TPredictionResult]):
     __slots__: tuple
@@ -128,11 +131,13 @@ class FileImagePredictor(APredictor[str, TPredictionResult], Generic[TPredictor,
 def get_predictor_factory(
         name: str,
         predictor: type[PredictorWithCS[TPredictionModel, TPredictionModelConfig, TPredictionProcessorWithCS, TPredictionModelInput, TPredictionModelOutput, TPredictionResult]],
+        predictor_config_cls: type[TPredictorConfig],
         DEFAULT_MODEL_CLS: type[TPredictionModel],
         DEFAULT_MODEL_CONFIG: TPredictionModelConfig,
         cs_cls: type[ClassSelector] = ClassSelector
     ):
 
+    @merge_conf(predictor_config_cls)
     def get_predictor(
             model_config: TPredictionModelConfig=DEFAULT_MODEL_CONFIG,
             model: Optional[TPredictionModel]=None,
