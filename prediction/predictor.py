@@ -5,7 +5,7 @@ from dataclasses import dataclass
 import cv2
 
 from config import merge_conf
-from .classes import ClassSelectorConfig, ClassSelector, ClassificationMode, DEFAULT_CLASS_SELECTOR, get_class_selector
+from .classes import ClassList, ClassSelectorConfig, ClassSelector, ClassificationMode, DEFAULT_CLASS_SELECTOR, get_class_selector
 from .models import TPredictionModel, TPredictionModelConfig, TPredictionModelInput, TPredictionModelOutput
 
 TPredictionResult = TypeVar("TPredictionResult")
@@ -147,7 +147,7 @@ def get_predictor_factory(
             cs: Optional[cs_cls]= None,
             mode: Optional[ClassificationMode]=None, 
             min_confidence: Optional[float]=None,
-            classes: Optional[Union[list[int],list[str], str, int]]=None,
+            classes: Optional[ClassList]=None,
         ):
 
         if not model:
