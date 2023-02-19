@@ -141,7 +141,7 @@ def get_predictor_factory(
     def get_predictor(
             model_config: TPredictionModelConfig=DEFAULT_MODEL_CONFIG,
             model: Optional[TPredictionModel]=None,
-            predictor: type[TPredictor]=predictor,
+            predictor: type[predictor]=predictor,
             model_cls: type[TPredictionModel]=None,
             cs_config: Optional[ClassSelectorConfig]=None,
             cs: Optional[cs_cls]= None,
