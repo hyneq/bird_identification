@@ -98,6 +98,7 @@ class DetectorConfig(PredictorConfig[ObjectDetector]):
 get_object_detector = get_predictor_factory(
     name="get_object_detector",
     predictor=ObjectDetector,
+    predictor_config_cls=DetectorConfig,
     DEFAULT_MODEL_CLS=DEFAULT_MODEL_CLS,
     DEFAULT_MODEL_CONFIG=DEFAULT_MODEL_CONFIG
 )

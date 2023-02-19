@@ -46,6 +46,7 @@ class ClassifierConfig(PredictorConfig[ImageClassifier]):
 get_image_classifier = get_predictor_factory(
     name="get_image_classifier",
     predictor=ImageClassifier,
+    predictor_config_cls=ClassifierConfig,
     DEFAULT_MODEL_CLS=DEFAULT_MODEL_CLS,
     DEFAULT_MODEL_CONFIG=DEFAULT_MODEL_CONFIG
 )
