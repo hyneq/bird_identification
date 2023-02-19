@@ -4,6 +4,8 @@ from typing import Optional, Union
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
+from config import merge_conf
+
 DEFAULT_MIN_CONFIDENCE = 0.5
 
 ClassList = Union[list[int],list[str], str, int]
@@ -102,6 +104,7 @@ class ClassNames:
         with open(path, newline='') as f:
             return cls(f.read().splitlines())
 
+@merge_conf(ClassSelectorConfig)
 def get_class_selector(
         mode: Optional[ClassificationMode]=None, 
         min_confidence: Optional[float]=None,
