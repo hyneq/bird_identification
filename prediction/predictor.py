@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 import cv2
 
-from .classes import ClassSelector, ClassificationMode, DEFAULT_CLASS_SELECTOR, get_class_selector
+from .classes import ClassSelectorConfig, ClassSelector, ClassificationMode, DEFAULT_CLASS_SELECTOR, get_class_selector
 from .models import TPredictionModel, TPredictionModelConfig, TPredictionModelInput, TPredictionModelOutput
 
 TPredictionResult = TypeVar("TPredictionResult")
@@ -138,8 +138,11 @@ def get_predictor_factory(
             model: Optional[TPredictionModel]=None,
             predictor: type[TPredictor]=predictor,
             model_cls: type[TPredictionModel]=None,
+            cs_config: Optional[ClassSelectorConfig]=None,
             cs: Optional[cs_cls]= None,
-            **cs_kwargs
+            mode: Optional[ClassificationMode]=None, 
+            min_confidence: Optional[float]=None,
+            classes: Optional[Union[list[int],list[str], str, int]]=None,
         ):
 
         if not model:
@@ -152,7 +155,13 @@ def get_predictor_factory(
             model = model_cls(model_config)
 
         if not cs:
-            cs = get_class_selector(model_class_names=model.class_names, **cs_kwargs)
+            cs = get_class_selector(
+                cfg=cs_config,
+                mode=mode,
+                min_confidence=min_confidence,
+                classes=classes,
+                model_class_names=model.class_names,
+            )
 
         return predictor(model=model, cs=cs)
 
