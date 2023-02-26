@@ -1,4 +1,4 @@
-from typing import Generic, TypeVar, Optional, Union
+from typing import Generic, TypeVar, Optional, Union, Callable
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
@@ -132,14 +132,13 @@ def get_predictor_factory(
         name: str,
         predictor: type[PredictorWithCS[TPredictionModel, TPredictionModelConfig, TPredictionProcessorWithCS, TPredictionModelInput, TPredictionModelOutput, TPredictionResult]],
         predictor_config_cls: type[TPredictorConfig],
-        DEFAULT_MODEL_CLS: type[TPredictionModel],
-        DEFAULT_MODEL_CONFIG: TPredictionModelConfig,
-        cs_cls: type[ClassSelector] = ClassSelector
+        get_model: Callable,
+        cs_cls: type[ClassSelector] = ClassSelector,
     ):
 
     @merge_conf(predictor_config_cls)
     def get_predictor(
-            model_config: TPredictionModelConfig=DEFAULT_MODEL_CONFIG,
+            model_config: Optional[TPredictionModelConfig]=None,
             model: Optional[TPredictionModel]=None,
             predictor: type[predictor]=predictor,
             model_cls: type[TPredictionModel]=None,
@@ -151,13 +150,10 @@ def get_predictor_factory(
         ):
 
         if not model:
-            if not model_cls:
-                if hasattr(model_config, "model_cls"):
-                    model_cls = model_config.model_cls
-                else:
-                    model_cls = DEFAULT_MODEL_CLS
-
-            model = model_cls(model_config)
+            model = get_model(
+                model_config=model_config,
+                model_cls=model_cls,
+            )
 
         if not cs:
             cs = get_class_selector(

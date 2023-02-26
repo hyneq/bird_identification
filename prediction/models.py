@@ -1,4 +1,4 @@
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, Optional
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
@@ -52,3 +52,31 @@ class AImagePredictionModel(APredictionModel[TPredictionModelConfig, Image, TPre
 
 class ImagePredictionModel(PredictionModel[TPredictionModelConfig, Image, TPredictionModelOutput], AImagePredictionModel[TPredictionModelConfig, TPredictionModelOutput]):
     pass
+
+def get_prediction_model_factory(
+        name: str,
+        model_cls: type[TPredictionModel],
+        model_config_cls: type[TPredictionModelConfig],
+        DEFAULT_MODEL_CLS: type[TPredictionModel],
+        DEFAULT_MODEL_CONFIG: TPredictionModelConfig
+    ):
+
+    def get_prediction_model(
+            model_config: Optional[model_config_cls]=None,
+            model_cls: type[model_cls]=model_cls
+        ):
+
+        if not model_config:
+            model_config = DEFAULT_MODEL_CONFIG
+
+        if not model_cls:
+            if hasattr(model_config, "model_cls"):
+                model_cls = model_config.model_cls
+            else:
+                model_cls = DEFAULT_MODEL_CLS
+
+        return model_cls(model_config)
+    
+    get_prediction_model.__name__ = name
+    
+    return get_prediction_model

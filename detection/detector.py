@@ -6,7 +6,7 @@ import numpy as np
 
 from prediction.predictor import PredictorConfig, PredictionProcessorWithCS, PredictorWithCS, FileImagePredictor, get_predictor_factory
 from prediction.models import Image
-from .models import DetectionModelConfig, DetectionModelOutput, DetectionModel
+from .models import DetectionModelConfig, DetectionModelOutput, DetectionModel, get_detection_model
 
 from defaults.detection import DEFAULT_MODEL_CONFIG, DEFAULT_MODEL_CLS, DEFAULT_NMS_THRESHOLD
 
@@ -105,8 +105,7 @@ get_object_detector = get_predictor_factory(
     name="get_object_detector",
     predictor=ObjectDetector,
     predictor_config_cls=DetectorConfig,
-    DEFAULT_MODEL_CLS=DEFAULT_MODEL_CLS,
-    DEFAULT_MODEL_CONFIG=DEFAULT_MODEL_CONFIG
+    get_model=get_detection_model
 )
 
 def detect_objects(

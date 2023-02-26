@@ -5,7 +5,7 @@ import numpy as np
 
 from prediction.predictor import PredictorConfig, PredictionProcessorWithCS, PredictorWithCS, FileImagePredictor, get_predictor_factory
 from prediction.models import Image
-from .models import ClassificationModelConfig, ClassificationModelOutput, ClassificationModel
+from .models import ClassificationModelConfig, ClassificationModelOutput, ClassificationModel, get_classification_model
 
 from defaults.classification import DEFAULT_MODEL_CONFIG, DEFAULT_MODEL_CLS
 
@@ -47,8 +47,7 @@ get_image_classifier = get_predictor_factory(
     name="get_image_classifier",
     predictor=ImageClassifier,
     predictor_config_cls=ClassifierConfig,
-    DEFAULT_MODEL_CLS=DEFAULT_MODEL_CLS,
-    DEFAULT_MODEL_CONFIG=DEFAULT_MODEL_CONFIG
+    get_model=get_classification_model
 )
 
 def classify_images(
