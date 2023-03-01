@@ -53,17 +53,25 @@ class AImagePredictionModel(APredictionModel[TPredictionModelConfig, Image, TPre
 class ImagePredictionModel(PredictionModel[TPredictionModelConfig, Image, TPredictionModelOutput], AImagePredictionModel[TPredictionModelConfig, TPredictionModelOutput]):
     pass
 
+@dataclass
+class PredictionModelType(Generic[TPredictionModel, TPredictionModelConfig]):
+    name: str
+    model_cls: type[TPredictionModel]
+    model_config_cls: type[TPredictionModelConfig]
+
 def get_prediction_model_factory(
         name: str,
         model_cls: type[TPredictionModel],
         model_config_cls: type[TPredictionModelConfig],
+        model_type_cls: type[PredictionModelType[TPredictionModel, TPredictionModelConfig]],
         DEFAULT_MODEL_CLS: type[TPredictionModel],
         DEFAULT_MODEL_CONFIG: TPredictionModelConfig
     ):
 
     def get_prediction_model(
             model_config: Optional[model_config_cls]=None,
-            model_cls: type[model_cls]=model_cls
+            model_cls: type[model_cls]=model_cls,
+            model_type: Optional[model_type_cls]=None
         ):
 
         if not model_config:
@@ -72,6 +80,8 @@ def get_prediction_model_factory(
         if not model_cls:
             if hasattr(model_config, "model_cls"):
                 model_cls = model_config.model_cls
+            elif model_type:
+                model_cls = model_type.model_cls
             else:
                 model_cls = DEFAULT_MODEL_CLS
 
