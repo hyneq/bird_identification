@@ -4,7 +4,7 @@ from collections.abc import Sequence
 
 import numpy as np
 
-from prediction.models import PredictionModelConfig, AImagePredictionModel, get_prediction_model_factory
+from prediction.models import PredictionModelConfig, AImagePredictionModel, PredictionModelType, get_prediction_model_factory
 
 class DetectionModelConfig(PredictionModelConfig):
     pass
@@ -49,12 +49,16 @@ class DetectionModelOutput(ABC, Generic[TDetectionObj, TDetectionModelRawOutput,
 class DetectionModel(AImagePredictionModel[DetectionModelConfig, DetectionModelOutput]):
     pass
 
+class DetectionModelType(PredictionModelType[DetectionModel, DetectionModelConfig]):
+    pass
+
 from defaults.detection import DEFAULT_MODEL_CLS, DEFAULT_MODEL_CONFIG
 
 get_detection_model = get_prediction_model_factory(
     name="get_classification_model",
     model_cls=DetectionModel,
     model_config_cls=DetectionModelConfig,
+    model_type_cls=DetectionModelType,
     DEFAULT_MODEL_CLS=DEFAULT_MODEL_CLS,
     DEFAULT_MODEL_CONFIG=DEFAULT_MODEL_CONFIG
 )
