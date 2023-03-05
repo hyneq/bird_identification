@@ -1,4 +1,5 @@
 import numpy as np
+import os
 
 from prediction.models import PredictionModelConfigWithCls
 from detection.models import DetectionModelType
@@ -12,6 +13,14 @@ class DarknetYOLOv3DetectionModel(DarknetPredictionModel[YOLOv3DetectionModelOut
 
 class DarknetYOLOv3DetectionModelConfig(DarknetPredictionModelConfig, YOLOv3DetectionModelConfig, PredictionModelConfigWithCls[DarknetYOLOv3DetectionModel]):
     model_cls = DarknetYOLOv3DetectionModel
+
+    @classmethod
+    def from_path(cls, path: str):
+        return cls(
+            classes_path=os.path.join(path, "coco.names"),
+            config_path=os.path.join(path, "yolov3.cfg"),
+            weights_path=os.path.join(path, "yolov3.weights")
+        )
 
 DARKNET_YOLOV3_DETECTION_MODEL_TYPE = DetectionModelType(
     name="darknet-YOLOv3",
