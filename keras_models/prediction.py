@@ -7,14 +7,14 @@ import numpy as np
 from tensorflow import keras
 import cv2
 
-from prediction.models import PredictionModelConfig, ImagePredictionModel, TPredictionModelOutput, Image
+from prediction.models import PathPredictionModelConfig, ImagePredictionModel, TPredictionModelOutput, Image
 
 @dataclass
-class KerasModelConfig(PredictionModelConfig):
+class KerasModelConfig(PathPredictionModelConfig):
     model_path: str
 
     @classmethod
-    def from_dir(cls, path: str):
+    def from_path(cls, path: str):
         return cls(model_path=os.path.join(path, "model.h5"), classes_path=os.path.join(path, "classes.csv"))
 
 class KerasPredictionModel(ImagePredictionModel[KerasModelConfig, TPredictionModelOutput], ABC):

@@ -13,7 +13,7 @@ DEFAULT_MODEL_CLS = KerasClassificationModel
 
 DEFAULT_MODEL_PATH = os.path.join(os.path.dirname(__file__), os.path.pardir, "models", "czbirds")
 
-DEFAULT_MODEL_CONFIG = KerasClassificationModelConfig.from_dir(DEFAULT_MODEL_PATH)
+DEFAULT_MODEL_CONFIG = KerasClassificationModelConfig.from_path(DEFAULT_MODEL_PATH)
 
 DEFAULT_MODEL_TYPE = KERAS_CLASSIFICATION_MODEL_TYPE
 
