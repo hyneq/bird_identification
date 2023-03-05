@@ -1,16 +1,25 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from threading import Lock
+import os
 
 import cv2
 import numpy as np
 
-from prediction.models import PredictionModelConfig, ImagePredictionModel, TPredictionModelOutput, Image
+from prediction.models import PathPredictionModelConfig, ImagePredictionModel, TPredictionModelOutput, Image
 
 @dataclass()
-class DarknetPredictionModelConfig(PredictionModelConfig):
+class DarknetPredictionModelConfig(PathPredictionModelConfig):
     config_path: str
     weights_path: str
+
+    @classmethod
+    def from_path(cls, path: str):
+        return cls(
+            classes_path=os.path.join(path, "classes.names"),
+            config_path=os.path.join(path, "model.cfg"),
+            weights_path=os.path.join(path, "model.weights")
+        )
 
 class DarknetPredictionModel(ImagePredictionModel[DarknetPredictionModelConfig, TPredictionModelOutput], ABC):
     __slots__: tuple
