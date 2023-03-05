@@ -1,5 +1,5 @@
 from typing import Generic, TypeVar, Optional
-from abc import ABC, abstractmethod
+from abc import ABC, abstractmethod, abstractclassmethod
 from dataclasses import dataclass
 
 import numpy as np
@@ -14,6 +14,12 @@ TPredictionModelOutput = TypeVar("TPredictionModelOutput")
 @dataclass()
 class PredictionModelConfig:
     classes_path: str
+
+class PathPredictionModelConfig(PredictionModelConfig, ABC):
+    
+    @abstractclassmethod
+    def from_path(cls):
+        pass
 
 TPredictionModelConfig = TypeVar("TPredictionModelConfig", bound=PredictionModelConfig)
 
