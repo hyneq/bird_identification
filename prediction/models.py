@@ -76,7 +76,7 @@ def get_prediction_model_factory(
 
     def get_prediction_model(
             model_config: Optional[model_config_cls]=None,
-            model_cls: type[model_cls]=model_cls,
+            model_cls: Optional[type[model_cls]]=None,
             model_type: Optional[model_type_cls]=None
         ):
 
