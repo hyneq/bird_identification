@@ -42,6 +42,9 @@ def conf_from_file(cfg_cls: type, loader=None):
 
 def load_conf_from_file(path: str, cfg_cls: type, loader=None):
     
+    if not loader:
+        loader = DEFAULT_CONFIG_FILE_LOADER
+
     with open(path) as f:
         cfg_dict = loader(f)
     
