@@ -30,9 +30,9 @@ def conf_from_file(cfg_cls: type, loader=None):
 
     def conf_from_file_with_cls(func: Callable) -> Callable:
 
-        def inner(*args, cfg_path: Optional[str]=None, **kwargs):
+        def inner(*args, cfg_path: Optional[str]=None, cfg_loader=loader, **kwargs):
             if cfg_path:
-                kwargs['cfg'] = load_conf_from_file(path=cfg_path, cfg_cls=cfg_cls)
+                kwargs['cfg'] = load_conf_from_file(path=cfg_path, cfg_cls=cfg_cls, loader=cfg_loader)
             
             return func(*args, **kwargs)
         
