@@ -23,6 +23,8 @@ class PathPredictionModelConfig(PredictionModelConfig, ABC):
     def from_path(cls):
         pass
 
+TPathPredictionModelConfig = TypeVar("TPathPredictionModelConfig", bound=PathPredictionModelConfig)
+
 class APredictionModel(ABC, Generic[TPredictionModelConfig, TPredictionModelInput, TPredictionModelOutput]):
     __slots__: tuple
 
