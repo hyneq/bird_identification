@@ -15,13 +15,13 @@ TPredictionModelOutput = TypeVar("TPredictionModelOutput")
 class PredictionModelConfig:
     classes_path: str
 
+TPredictionModelConfig = TypeVar("TPredictionModelConfig", bound=PredictionModelConfig)
+
 class PathPredictionModelConfig(PredictionModelConfig, ABC):
     
     @abstractclassmethod
     def from_path(cls):
         pass
-
-TPredictionModelConfig = TypeVar("TPredictionModelConfig", bound=PredictionModelConfig)
 
 class APredictionModel(ABC, Generic[TPredictionModelConfig, TPredictionModelInput, TPredictionModelOutput]):
     __slots__: tuple
