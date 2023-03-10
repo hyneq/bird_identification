@@ -22,7 +22,7 @@ class DarknetYOLOv3DetectionModelConfig(DarknetPredictionModelConfig, YOLOv3Dete
             weights_path=os.path.join(path, "yolov3.weights")
         )
 
-DARKNET_YOLOV3_DETECTION_MODEL_TYPE = DetectionModelType(
+DARKNET_YOLOV3_DETECTION_MODEL_TYPE = DetectionModelType[DarknetYOLOv3DetectionModel, DarknetYOLOv3DetectionModelConfig](
     name="darknet-YOLOv3",
     model_cls=DarknetYOLOv3DetectionModel,
     model_config_cls=DarknetPredictionModelConfig
