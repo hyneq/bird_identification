@@ -73,6 +73,14 @@ class PredictionModelType(Generic[TPredictionModel, TPredictionModelConfig]):
         
         return self.model_cls(cfg)
 
+class PathPredictionModelType(PredictionModelType[TPredictionModel, TPathPredictionModelConfig]):
+
+    def get_model(self, *args, path: Optional[str]=None, **kwargs):
+        if path:
+            kwargs["cfg"] = self.model_config_cls.from_path(path)
+        
+        return super().get_model(*args, **kwargs)
+
 def get_prediction_model_factory(
         name: str,
         model_cls: type[TPredictionModel],
