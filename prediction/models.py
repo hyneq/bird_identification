@@ -67,6 +67,12 @@ class PredictionModelType(Generic[TPredictionModel, TPredictionModelConfig]):
     model_cls: type[TPredictionModel]
     model_config_cls: type[TPredictionModelConfig]
 
+    def get_model(self, *cfg_args, cfg: Optional[TPredictionModelConfig]=None, **cfg_kwargs):
+        if not cfg:
+            cfg = self.model_config_cls(*cfg_args, **cfg_kwargs)
+        
+        return self.model_cls(cfg)
+
 def get_prediction_model_factory(
         name: str,
         model_cls: type[TPredictionModel],
