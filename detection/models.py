@@ -9,6 +9,8 @@ from prediction.models import PredictionModelConfig, AImagePredictionModel, Pred
 class DetectionModelConfig(PredictionModelConfig):
     pass
 
+TDetectionModelConfig = TypeVar("TDetectionModelConfig", bound=DetectionModelConfig)
+
 TDetectionObj = TypeVar("TDetectionObj")
 
 TDetectionModelRawOutput = TypeVar("TDetectionModelRawOutput")
@@ -48,6 +50,8 @@ class DetectionModelOutput(ABC, Generic[TDetectionObj, TDetectionModelRawOutput,
 
 class DetectionModel(AImagePredictionModel[DetectionModelConfig, DetectionModelOutput]):
     pass
+
+TDetectionModel = TypeVar("TDetectionModel", bound=DetectionModel)
 
 class DetectionModelType(PredictionModelType[DetectionModel, DetectionModelConfig]):
     pass
