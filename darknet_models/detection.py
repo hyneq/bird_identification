@@ -2,7 +2,7 @@ import numpy as np
 import os
 
 from prediction.models import PredictionModelConfigWithCls
-from detection.models import DetectionModelType
+from detection.models import DetectionModelFactory
 from .prediction import DarknetPredictionModel, DarknetPredictionModelConfig
 from YOLOv3_models.detection import YOLOv3DetectionModel, YOLOv3DetectionModelConfig, YOLOv3DetectionModelOutput, YOLOv3DetectionModelRawOutput
 
@@ -22,7 +22,7 @@ class DarknetYOLOv3DetectionModelConfig(DarknetPredictionModelConfig, YOLOv3Dete
             weights_path=os.path.join(path, "yolov3.weights")
         )
 
-DARKNET_YOLOV3_DETECTION_MODEL_TYPE = DetectionModelType[DarknetYOLOv3DetectionModel, DarknetYOLOv3DetectionModelConfig](
+DARKNET_YOLOV3_DETECTION_MODEL_FACTORY = DetectionModelFactory[DarknetYOLOv3DetectionModel, DarknetYOLOv3DetectionModelConfig](
     name="darknet-YOLOv3",
     model_cls=DarknetYOLOv3DetectionModel,
     model_config_cls=DarknetPredictionModelConfig
