@@ -13,7 +13,7 @@ class KerasClassificationModel(KerasPredictionModel[ClassificationModelOutput], 
 class KerasClassificationModelConfig(KerasModelConfig, ClassificationModelConfig, PredictionModelConfigWithCls[KerasClassificationModel]):
     model_cls = KerasClassificationModel
 
-KERAS_CLASSIFICATION_MODEL_TYPE = ClassificationModelType(
+KERAS_CLASSIFICATION_MODEL_TYPE = ClassificationModelType[KerasClassificationModel, KerasClassificationModelConfig](
     name="keras",
     model_cls=KerasClassificationModel,
     model_config_cls=KerasClassificationModelConfig
