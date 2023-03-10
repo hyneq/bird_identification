@@ -1,3 +1,5 @@
+from typing import TypeVar
+
 import numpy as np
 
 from prediction.models import PredictionModelConfig, AImagePredictionModel, PredictionModelType, get_prediction_model_factory
@@ -5,10 +7,14 @@ from prediction.models import PredictionModelConfig, AImagePredictionModel, Pred
 class ClassificationModelConfig(PredictionModelConfig):
     pass
 
+TClassificationModelConfig = TypeVar("TClassificationModelConfig", bound=ClassificationModelConfig)
+
 ClassificationModelOutput = np.ndarray
 
 class ClassificationModel(AImagePredictionModel[ClassificationModelConfig, ClassificationModelOutput]):
     __slots__: tuple
+
+TClassificationModel = TypeVar("TClassificationModel", bound=ClassificationModel)
 
 class ClassificationModelType(PredictionModelType[ClassificationModel, ClassificationModelConfig]):
     pass
