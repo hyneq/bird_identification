@@ -16,7 +16,7 @@ class ClassificationModel(AImagePredictionModel[ClassificationModelConfig, Class
 
 TClassificationModel = TypeVar("TClassificationModel", bound=ClassificationModel)
 
-class ClassificationModelType(PredictionModelType[ClassificationModel, ClassificationModelConfig]):
+class ClassificationModelType(PredictionModelType[TClassificationModel, TClassificationModelConfig]):
     pass
 
 from defaults.classification import DEFAULT_MODEL_CLS, DEFAULT_MODEL_CONFIG
