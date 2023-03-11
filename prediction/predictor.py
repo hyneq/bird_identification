@@ -8,6 +8,7 @@ from config import merge_conf
 from .classes import ClassList, ClassSelectorConfig, ClassSelector, ClassificationMode, DEFAULT_CLASS_SELECTOR, get_class_selector
 from .models import TPredictionModel, TPredictionModelConfig, TPredictionModelInput, TPredictionModelOutput
 
+TPredictionInput = TypeVar("TPredictionInput")
 TPredictionResult = TypeVar("TPredictionResult")
 
 @dataclass
@@ -59,11 +60,11 @@ class PredictionProcessorWithCS(PredictionProcessor[TPredictionModel, TPredictio
 TPredictionProcessor = TypeVar("TPredictionProcessor", bound=PredictionProcessor)
 TPredictionProcessorWithCS = TypeVar("TPredictionProcessorWithCS", bound=PredictionProcessorWithCS)
 
-class IPredictor(ABC, Generic[TPredictionModelInput, TPredictionResult]):
+class IPredictor(ABC, Generic[TPredictionInput, TPredictionResult]):
     __slots__: tuple
 
     @abstractmethod
-    def predict(self, input: TPredictionModelInput) -> TPredictionResult:
+    def predict(self, input: TPredictionInput) -> TPredictionResult:
         pass
 
 class Predictor(IPredictor[TPredictionModelInput, TPredictionResult], Generic[TPredictionModel, TPredictionModelConfig, TPredictionProcessor, TPredictionModelInput, TPredictionModelOutput, TPredictionResult]):
