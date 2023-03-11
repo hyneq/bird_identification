@@ -2,7 +2,7 @@ from typing import TypeVar
 
 import numpy as np
 
-from prediction.models import PredictionModelConfig, AImagePredictionModel, PredictionModelFactory, get_prediction_model_factory
+from prediction.models import PredictionModelConfig, IImagePredictionModel, PredictionModelFactory, get_prediction_model_factory
 
 class ClassificationModelConfig(PredictionModelConfig):
     pass
@@ -11,7 +11,7 @@ TClassificationModelConfig = TypeVar("TClassificationModelConfig", bound=Classif
 
 ClassificationModelOutput = np.ndarray
 
-class ClassificationModel(AImagePredictionModel[ClassificationModelConfig, ClassificationModelOutput]):
+class ClassificationModel(IImagePredictionModel[ClassificationModelConfig, ClassificationModelOutput]):
     __slots__: tuple
 
 TClassificationModel = TypeVar("TClassificationModel", bound=ClassificationModel)

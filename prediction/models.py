@@ -25,7 +25,7 @@ class PathPredictionModelConfig(PredictionModelConfig, ABC):
 
 TPathPredictionModelConfig = TypeVar("TPathPredictionModelConfig", bound=PathPredictionModelConfig)
 
-class APredictionModel(ABC, Generic[TPredictionModelConfig, TPredictionModelInput, TPredictionModelOutput]):
+class IPredictionModel(ABC, Generic[TPredictionModelConfig, TPredictionModelInput, TPredictionModelOutput]):
     __slots__: tuple
 
     @abstractmethod
@@ -36,14 +36,14 @@ class APredictionModel(ABC, Generic[TPredictionModelConfig, TPredictionModelInpu
     def predict(self, input: TPredictionModelInput) -> TPredictionModelOutput:
         pass
 
-TPredictionModel = TypeVar("TPredictionModel", bound=APredictionModel)
+TPredictionModel = TypeVar("TPredictionModel", bound=IPredictionModel)
 
 class PredictionModelConfigWithCls(Generic[TPredictionModel]):
     model_cls: type[TPredictionModel]
 
 TPredictionModelConfigWithCls = TypeVar("TPredictionModelConfigWithCls", bound=PredictionModelConfigWithCls)
 
-class PredictionModel(APredictionModel[TPredictionModelConfig, TPredictionModelInput, TPredictionModelOutput]):
+class PredictionModel(IPredictionModel[TPredictionModelConfig, TPredictionModelInput, TPredictionModelOutput]):
     __slots__: tuple
 
     class_names: ClassNames
@@ -55,10 +55,10 @@ class PredictionModel(APredictionModel[TPredictionModelConfig, TPredictionModelI
     def load_classes(classes_path: str):
         return ClassNames.load_from_file(classes_path)
 
-class AImagePredictionModel(APredictionModel[TPredictionModelConfig, Image, TPredictionModelOutput]):
+class IImagePredictionModel(IPredictionModel[TPredictionModelConfig, Image, TPredictionModelOutput]):
     pass
 
-class ImagePredictionModel(PredictionModel[TPredictionModelConfig, Image, TPredictionModelOutput], AImagePredictionModel[TPredictionModelConfig, TPredictionModelOutput]):
+class ImagePredictionModel(PredictionModel[TPredictionModelConfig, Image, TPredictionModelOutput], IImagePredictionModel[TPredictionModelConfig, TPredictionModelOutput]):
     pass
 
 @dataclass

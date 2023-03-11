@@ -4,7 +4,7 @@ from collections.abc import Sequence
 
 import numpy as np
 
-from prediction.models import PredictionModelConfig, AImagePredictionModel, PredictionModelFactory, get_prediction_model_factory
+from prediction.models import PredictionModelConfig, IImagePredictionModel, PredictionModelFactory, get_prediction_model_factory
 
 class DetectionModelConfig(PredictionModelConfig):
     pass
@@ -48,7 +48,7 @@ class DetectionModelOutput(ABC, Generic[TDetectionObj, TDetectionModelRawOutput,
     def __iter__(self) -> TDetectionModelOutputIter:
         return self.iter_cls(self.raw_output)
 
-class DetectionModel(AImagePredictionModel[DetectionModelConfig, DetectionModelOutput]):
+class DetectionModel(IImagePredictionModel[DetectionModelConfig, DetectionModelOutput]):
     pass
 
 TDetectionModel = TypeVar("TDetectionModel", bound=DetectionModel)
