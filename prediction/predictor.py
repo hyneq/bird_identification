@@ -63,7 +63,7 @@ class IPredictor(ABC, Generic[TPredictionModelInput, TPredictionResult]):
     __slots__: tuple
 
     @abstractmethod
-    def predict(TPredictionModelInput) -> TPredictionResult:
+    def predict(self, input: TPredictionModelInput) -> TPredictionResult:
         pass
 
 class Predictor(IPredictor[TPredictionModelInput, TPredictionResult], Generic[TPredictionModel, TPredictionModelConfig, TPredictionProcessor, TPredictionModelInput, TPredictionModelOutput, TPredictionResult]):
