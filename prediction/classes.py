@@ -9,23 +9,24 @@ from config import merge_conf
 DEFAULT_MIN_CONFIDENCE = 0.5
 
 ClassList = Union[list[int],list[str], str, int]
+Scores = np.ndarray
 
 class ClassSelector(ABC):
     __slots__: tuple
 
     min_confidence: float
 
-    def __init__(self, min_confidence=None):
+    def __init__(self, min_confidence: Optional[float]=None):
         if not min_confidence:
             min_confidence = DEFAULT_MIN_CONFIDENCE
 
         self.min_confidence = min_confidence
 
     @abstractmethod
-    def get_classes(self, scores) -> list:
+    def get_classes(self, scores: Scores) -> list:
         pass
 
-    def get_filtered_classes(self, scores) -> list:
+    def get_filtered_classes(self, scores: Scores) -> list:
         classes_filtered = []
         for class_ in self.get_classes(scores):
             if scores[class_] > self.min_confidence:
@@ -39,23 +40,23 @@ class FixedClassSelector(ClassSelector):
 
     classes: list
 
-    def __init__(self, classes, *args, **kwargs):
+    def __init__(self, classes: list, *args, **kwargs):
         super().__init__(*args,**kwargs)
         self.classes = classes
 
-    def get_classes(self, scores) -> list:
+    def get_classes(self, scores: Scores) -> list:
         return self.classes
 
 class MaxClassSelector(ClassSelector):
     __slots__: tuple
 
-    def get_classes(self, scores) -> list:
+    def get_classes(self, scores: Scores) -> list:
         return [np.argmax(scores)]
 
 class SortClassSelector(ClassSelector):
     __slots__: tuple
 
-    def get_classes(self, scores) -> list:
+    def get_classes(self, scores: Scores) -> list:
         return list(np.argsort(scores)[::-1])
 
 
