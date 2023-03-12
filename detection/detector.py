@@ -33,13 +33,21 @@ class DetectionResult:
 class DetectionProcessor(PredictionProcessorWithCS[DetectionModel, DetectionModelOutput, DetectionResult]):
     __slots__: tuple
 
-    NMS_threshold = DEFAULT_NMS_THRESHOLD
+    NMS_threshold: float
 
     # Lists for detected bounding boxes,
     # obtained confidences and class's number
     bounding_boxes: list
     confidences: list
     classes: list
+
+    @classmethod
+    def with_args(cls, *args, NMS_threshold=DEFAULT_NMS_THRESHOLD, **kwargs):
+        cls = super().with_args(*args, **kwargs)
+
+        cls.NMS_threshold = NMS_threshold
+
+        return cls
     
     def add_detected_object(self, bounding_box, confidence, class_number):
         self.bounding_boxes.append(bounding_box)
