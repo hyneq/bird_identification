@@ -39,6 +39,14 @@ class PredictionProcessor(ABC, Generic[TPredictionModel, TPredictionModelOutput,
         cls_copy.__name__ = cls.__name__
 
         return cls_copy
+    
+    @classmethod
+    def with_args(cls, model_: TPredictionModel) -> Self:
+        cls = cls.get_subclass()
+
+        cls.model = model_
+
+        return cls
 
     @classmethod
     def with_model(cls, model_: TPredictionModel) -> Self:
@@ -56,6 +64,14 @@ class PredictionProcessorWithCS(PredictionProcessor[TPredictionModel, TPredictio
     __slots__: tuple
 
     cs: ClassSelector
+
+    @classmethod
+    def with_args(cls, *args, cs_: ClassSelector, **kwargs):
+        cls = super().with_args(*args, **kwargs)
+
+        cls.cs = cs_
+
+        return cls 
 
     @classmethod
     def with_cs(cls, cs_: ClassSelector) -> Self:
@@ -85,8 +101,10 @@ class Predictor(IPredictor[TPredictionModelInput, TPredictionResult], Generic[TP
     prediction_processor: type[TPredictionProcessor]
 
     def __init__(self,
+            *processor_args,
             model: Optional[TPredictionModel]=None,
             model_cfg: Optional[TPredictionModelConfig]=None,
+            **processor_kwargs
         ):
 
         if not model:
@@ -94,7 +112,7 @@ class Predictor(IPredictor[TPredictionModelInput, TPredictionResult], Generic[TP
         else:
             self.model = model
         
-        self.prediction_processor = self.prediction_processor.with_model(self.model)
+        self.prediction_processor = self.prediction_processor.with_args(self.model, *processor_args, **processor_kwargs)
 
     def predict(self, input: TPredictionModelInput) -> TPredictionResult:
         output: TPredictionModelOutput = self.model.predict(input)
@@ -113,10 +131,8 @@ class PredictorWithCS(Predictor[TPredictionModel, TPredictionModelConfig, TPredi
 
         if not cs:
             cs = DEFAULT_CLASS_SELECTOR()
-        
-        self.prediction_processor = self.prediction_processor.with_cs(cs)
 
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs, cs_=cs)
 
 class FileImagePredictor(IPredictor[str, TPredictionResult], Generic[TPredictor, TPredictionResult]):
     __slots__: tuple
