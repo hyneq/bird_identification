@@ -10,15 +10,15 @@ from .models import ClassificationModelConfig, ClassificationModelOutput, Classi
 from defaults.classification import DEFAULT_MODEL_CONFIG, DEFAULT_MODEL_CLS
 
 @dataclass
-class Result:
+class ClassificationResult:
     class_names: list[str]
     confidences: list[float]
 
-class ClassificationProcessor(PredictionProcessorWithCS[ClassificationModel, ClassificationModelOutput, Result]):
+class ClassificationProcessor(PredictionProcessorWithCS[ClassificationModel, ClassificationModelOutput, ClassificationResult]):
     __slots__: tuple
 
     def get_results(self, classes) -> list:
-        return Result(self.model.class_names.get_names(classes), list(self.scores[classes]))
+        return ClassificationResult(self.model.class_names.get_names(classes), list(self.scores[classes]))
 
     def process(self) -> list:
         self.scores = self.output
@@ -27,14 +27,14 @@ class ClassificationProcessor(PredictionProcessorWithCS[ClassificationModel, Cla
         
         return self.get_results(classes)
 
-class ImageClassifier(PredictorWithCS[ClassificationModel, ClassificationModelConfig, ClassificationProcessor, Image, ClassificationModelOutput, Result]):
+class ImageClassifier(PredictorWithCS[ClassificationModel, ClassificationModelConfig, ClassificationProcessor, Image, ClassificationModelOutput, ClassificationResult]):
     __slots__: tuple
 
     model_cls = ClassificationModel
 
     prediction_processor = ClassificationProcessor
 
-class FileImageClassifier(FileImagePredictor[ImageClassifier, Result]):
+class FileImageClassifier(FileImagePredictor[ImageClassifier, ClassificationResult]):
     __slots__: tuple
 
     predictor_cls = ImageClassifier
