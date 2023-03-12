@@ -53,7 +53,7 @@ class DetectionModel(IImagePredictionModel[DetectionModelConfig, DetectionModelO
 
 TDetectionModel = TypeVar("TDetectionModel", bound=DetectionModel)
 
-class DetectionModelFactory(PredictionModelFactory[DetectionModel, DetectionModelConfig]):
+class DetectionModelFactory(PredictionModelFactory[TDetectionModel, TDetectionModelConfig]):
     pass
 
 from defaults.detection import DEFAULT_MODEL_CLS, DEFAULT_MODEL_CONFIG
