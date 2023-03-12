@@ -61,8 +61,21 @@ class IImagePredictionModel(IPredictionModel[TPredictionModelConfig, Image, TPre
 class ImagePredictionModel(PredictionModel[TPredictionModelConfig, Image, TPredictionModelOutput], IImagePredictionModel[TPredictionModelConfig, TPredictionModelOutput]):
     pass
 
+class IPredictionModelFactory(ABC, Generic[TPredictionModel, TPredictionModelConfig]):
+    name: str
+
+    @abstractmethod
+    def get_model(self, *args, **kwargs):
+        pass
+
+class IPathPredictionModelFactory(IPredictionModelFactory[TPredictionModel, TPathPredictionModelConfig]):
+
+    @abstractmethod
+    def get_model(self, *args, path: Optional[str]=None, **kwargs):
+        pass
+
 @dataclass
-class PredictionModelFactory(Generic[TPredictionModel, TPredictionModelConfig]):
+class PredictionModelFactory(IPredictionModelFactory[TPredictionModel, TPredictionModelConfig]):
     name: str
     model_cls: type[TPredictionModel]
     model_config_cls: type[TPredictionModelConfig]
@@ -73,7 +86,7 @@ class PredictionModelFactory(Generic[TPredictionModel, TPredictionModelConfig]):
         
         return self.model_cls(cfg)
 
-class PathPredictionModelFactory(PredictionModelFactory[TPredictionModel, TPathPredictionModelConfig]):
+class PathPredictionModelFactory(PredictionModelFactory[TPredictionModel, TPathPredictionModelConfig], IPathPredictionModelFactory[TPredictionModel, TPathPredictionModelConfig]):
 
     def get_model(self, *args, path: Optional[str]=None, **kwargs):
         if path:
