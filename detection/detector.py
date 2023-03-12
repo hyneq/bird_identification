@@ -24,13 +24,13 @@ class BoundingBox:
         )
 
 @dataclass()
-class Result:
+class DetectionResult:
     label: str
     bounding_box: BoundingBox
     confidence: any
 
 
-class DetectionProcessor(PredictionProcessorWithCS[DetectionModel, DetectionModelOutput, Result]):
+class DetectionProcessor(PredictionProcessorWithCS[DetectionModel, DetectionModelOutput, DetectionResult]):
     __slots__: tuple
 
     NMS_threshold = DEFAULT_NMS_THRESHOLD
@@ -71,7 +71,7 @@ class DetectionProcessor(PredictionProcessorWithCS[DetectionModel, DetectionMode
         return cv2.dnn.NMSBoxes(self.bounding_boxes, [confidence[0] for confidence in self.confidences], self.cs.min_confidence, self.NMS_threshold)
     
     def get_results(self, filtered):
-        return [Result(self.model.class_names.get_names(self.classes[i]), BoundingBox(*self.bounding_boxes[i]), self.confidences[i]) for i in filtered]
+        return [DetectionResult(self.model.class_names.get_names(self.classes[i]), BoundingBox(*self.bounding_boxes[i]), self.confidences[i]) for i in filtered]
     
     def process(self):
         self.bounding_boxes = []
@@ -85,14 +85,14 @@ class DetectionProcessor(PredictionProcessorWithCS[DetectionModel, DetectionMode
 
         return self.get_results(filtered)
 
-class ObjectDetector(PredictorWithCS[DetectionModel, DetectionModelConfig, DetectionProcessor, Image, DetectionModelOutput, Result]):
+class ObjectDetector(PredictorWithCS[DetectionModel, DetectionModelConfig, DetectionProcessor, Image, DetectionModelOutput, DetectionResult]):
     __slots__: tuple
 
     model_cls = DetectionModel
 
     prediction_processor = DetectionProcessor
 
-class FileObjectDetector(FileImagePredictor[ObjectDetector, Result]):
+class FileObjectDetector(FileImagePredictor[ObjectDetector, DetectionResult]):
     __slots__: tuple
 
     predictor_cls = ObjectDetector
