@@ -1,4 +1,5 @@
 from typing import Generic, TypeVar, Optional, Union, Callable
+from typing_extensions import Self
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
@@ -31,13 +32,21 @@ class PredictionProcessor(ABC, Generic[TPredictionModel, TPredictionModelOutput,
         self.output = output
     
     @classmethod
-    def with_model(cls, model_: TPredictionModel):
+    def get_subclass(cls) -> Self:
         class cls_copy(cls):
-            model = model_
+            pass
         
         cls_copy.__name__ = cls.__name__
 
         return cls_copy
+
+    @classmethod
+    def with_model(cls, model_: TPredictionModel) -> Self:
+        cls = cls.get_subclass()
+
+        cls.model = model_
+
+        return cls
     
     @abstractmethod
     def process(self) -> TPredictionResult:
@@ -49,13 +58,12 @@ class PredictionProcessorWithCS(PredictionProcessor[TPredictionModel, TPredictio
     cs: ClassSelector
 
     @classmethod
-    def with_cs(cls, cs_: ClassSelector):
-        class cls_copy(cls):
-            cs = cs_
-        
-        cls_copy.__name__ = cls.__name__
-        
-        return cls_copy
+    def with_cs(cls, cs_: ClassSelector) -> Self:
+        cls = cls.get_subclass()
+
+        cls.cs = cs_
+
+        return cls
 
 TPredictionProcessor = TypeVar("TPredictionProcessor", bound=PredictionProcessor)
 TPredictionProcessorWithCS = TypeVar("TPredictionProcessorWithCS", bound=PredictionProcessorWithCS)
