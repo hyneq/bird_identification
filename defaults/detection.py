@@ -8,9 +8,6 @@ DEFAULT_MODEL_CLS: type[DetectionModel]
 
 DEFAULT_MODEL_CONFIG: DetectionModelConfig
 
-
-from detection.models import DetectionModelConfig, DetectionModel
-
 DEFAULT_MODEL_CLS = DarknetYOLOv3DetectionModel
 
 YOLO_COCO_PATH = os.path.join(os.path.dirname(__file__),os.path.pardir,"models","YOLOv3-COCO")
