@@ -20,7 +20,7 @@ TPredictionModelConfig = TypeVar("TPredictionModelConfig", bound=PredictionModel
 class PathPredictionModelConfig(PredictionModelConfig, ABC):
     
     @abstractclassmethod
-    def from_path(cls):
+    def from_path(cls, path: str):
         pass
 
 TPathPredictionModelConfig = TypeVar("TPathPredictionModelConfig", bound=PathPredictionModelConfig)
