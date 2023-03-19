@@ -1,4 +1,4 @@
-from typing import Generic, TypeVar, Optional
+from typing import Generic, TypeVar, Optional, Union
 from abc import ABC, abstractmethod, abstractclassmethod
 from dataclasses import dataclass
 
@@ -93,6 +93,31 @@ class PathPredictionModelFactory(PredictionModelFactory[TPredictionModel, TPathP
             kwargs["cfg"] = self.model_config_cls.from_path(path)
         
         return super().get_model(*args, **kwargs)
+
+class MultiPredictionModelFactory(IPredictionModelFactory[TPredictionModel, TPredictionModelConfig]):
+    name: str
+
+    factories: dict[str, IPredictionModelFactory[TPredictionModel, TPredictionModelConfig]]
+    default_factory: str
+
+    def __init__(self,
+                factories: Union[list[IPredictionModelFactory[TPredictionModel, TPredictionModelConfig]],dict[str,IPredictionModelFactory[TPredictionModel, TPredictionModelConfig]]],
+                default_factory: str,
+                name="multi"
+        ):
+
+        if isinstance(factories, list):
+            factories = {f.name: f for f in factories}
+
+        self.name = name
+        self.factories = factories
+        self.default_factory = default_factory
+    
+    def get_model(self, *args, factory: Optional[str]=None, **kwargs):
+        if not factory:
+            factory = self.default_factory
+        
+        return self.factories[factory].get_model(*args, **kwargs)
 
 def get_prediction_model_factory(
         name: str,
