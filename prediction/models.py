@@ -65,13 +65,13 @@ class IPredictionModelFactory(ABC, Generic[TPredictionModel, TPredictionModelCon
     name: str
 
     @abstractmethod
-    def get_model(self, cfg: Optional[TPredictionModelConfig]=None):
+    def get_model(self, cfg: Optional[TPredictionModelConfig]=None) -> TPredictionModel:
         pass
 
 class IPathPredictionModelFactory(IPredictionModelFactory[TPredictionModel, TPathPredictionModelConfig]):
 
     @abstractmethod
-    def get_model(self, path: Optional[str]=None, cfg: Optional[TPredictionModelConfig]=None):
+    def get_model(self, path: Optional[str]=None, cfg: Optional[TPathPredictionModelConfig]=None) -> TPredictionModel:
         pass
 
 @dataclass
@@ -81,7 +81,7 @@ class PredictionModelFactory(IPredictionModelFactory[TPredictionModel, TPredicti
     model_config_cls: type[TPredictionModelConfig]
     default_config: Optional[TPredictionModelConfig] = None
 
-    def get_model(self, cfg: Optional[TPredictionModelConfig]=None):
+    def get_model(self, cfg: Optional[TPredictionModelConfig]=None) -> TPredictionModel:
         if not cfg:
             if self.default_config:
                 cfg = self.default_config
@@ -94,7 +94,7 @@ class PredictionModelFactory(IPredictionModelFactory[TPredictionModel, TPredicti
 class PathPredictionModelFactory(PredictionModelFactory[TPredictionModel, TPathPredictionModelConfig], IPathPredictionModelFactory[TPredictionModel, TPathPredictionModelConfig]):
     default_path: Optional[str] = None
 
-    def get_model(self, path: Optional[str]=None, cfg: Optional[TPredictionModelConfig]=None):
+    def get_model(self, path: Optional[str]=None, cfg: Optional[TPredictionModelConfig]=None) -> TPredictionModel:
         if not cfg:
             if not path and self.default_path:
                 path = self.default_path
@@ -123,7 +123,7 @@ class MultiPredictionModelFactory(IPredictionModelFactory[TPredictionModel, TPre
         self.factories = factories
         self.default_factory = default_factory
     
-    def get_model(self, *args, factory: Optional[str]=None, **kwargs):
+    def get_model(self, *args, factory: Optional[str]=None, **kwargs) -> TPredictionModel:
         if not factory:
             factory = self.default_factory
         
