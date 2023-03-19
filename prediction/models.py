@@ -65,13 +65,13 @@ class IPredictionModelFactory(ABC, Generic[TPredictionModel, TPredictionModelCon
     name: str
 
     @abstractmethod
-    def get_model(self, *args, **kwargs):
+    def get_model(self, cfg: Optional[TPredictionModelConfig]=None):
         pass
 
 class IPathPredictionModelFactory(IPredictionModelFactory[TPredictionModel, TPathPredictionModelConfig]):
 
     @abstractmethod
-    def get_model(self, *args, path: Optional[str]=None, **kwargs):
+    def get_model(self, path: Optional[str]=None, cfg: Optional[TPredictionModelConfig]=None):
         pass
 
 @dataclass
