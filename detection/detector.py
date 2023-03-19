@@ -8,7 +8,7 @@ from prediction.predictor import PredictorConfig, PredictionProcessorWithCS, Pre
 from prediction.models import Image
 from .models import DetectionModelConfig, DetectionModelOutput, DetectionModel, get_detection_model
 
-from defaults.detection import DEFAULT_MODEL_CONFIG, DEFAULT_MODEL_CLS, DEFAULT_NMS_THRESHOLD
+from defaults.detection import DEFAULT_NMS_THRESHOLD
 
 @dataclass()
 class BoundingBox:

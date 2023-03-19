@@ -4,14 +4,14 @@ from collections.abc import Sequence
 
 import numpy as np
 
-from prediction.models import PredictionModelConfig, PathPredictionModelConfig, IImagePredictionModel, PredictionModelFactory, PathPredictionModelFactory, MultiPathPredictionModelFactory, get_prediction_model_factory
+from prediction.models import PredictionModelConfig, PathPredictionModelConfig, IImagePredictionModel, PredictionModelFactory, PathPredictionModelFactory, MultiPathPredictionModelFactory
 
 class DetectionModelConfig(PredictionModelConfig):
     pass
 
 TDetectionModelConfig = TypeVar("TDetectionModelConfig", bound=DetectionModelConfig)
 
-class PathDetectionModelConfig(PathPredictionModelConfig):
+class PathDetectionModelConfig(DetectionModelConfig, PathPredictionModelConfig):
     pass
 
 TPathDetectionModelConfig = TypeVar("TPathDetectionModelConfig", bound=PathDetectionModelConfig)
@@ -66,7 +66,7 @@ class PathDetectionModelFactory(PathPredictionModelFactory[TDetectionModel, TPat
 
 from defaults.detection import MODEL_FACTORIES, DEFAULT_MODEL_FACTORY
 
-model_factory = MultiPathPredictionModelFactory[DetectionModel, DetectionModelConfig](
+model_factory = MultiPathPredictionModelFactory[DetectionModel, PathDetectionModelConfig](
         factories=MODEL_FACTORIES,
         default_factory=DEFAULT_MODEL_FACTORY
     )
