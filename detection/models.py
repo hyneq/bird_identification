@@ -4,12 +4,17 @@ from collections.abc import Sequence
 
 import numpy as np
 
-from prediction.models import PredictionModelConfig, IImagePredictionModel, PredictionModelFactory, get_prediction_model_factory
+from prediction.models import PredictionModelConfig, PathPredictionModelConfig, IImagePredictionModel, PredictionModelFactory, get_prediction_model_factory
 
 class DetectionModelConfig(PredictionModelConfig):
     pass
 
 TDetectionModelConfig = TypeVar("TDetectionModelConfig", bound=DetectionModelConfig)
+
+class PathDetectionModelConfig(PathPredictionModelConfig):
+    pass
+
+TPathDetectionModelConfig = TypeVar("TPathDetectionModelConfig", bound=PathDetectionModelConfig)
 
 TDetectionObj = TypeVar("TDetectionObj")
 
