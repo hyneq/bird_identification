@@ -15,6 +15,7 @@ TPredictionResult = TypeVar("TPredictionResult")
 @dataclass
 class PredictorConfig(Generic[TPredictionModelConfig]):
     model_config: TPredictionModelConfig
+    model_path: str
     min_confidence: float = None
     classification_mode: ClassificationMode = None
     classes: Union[list[int],list[str]] = None
