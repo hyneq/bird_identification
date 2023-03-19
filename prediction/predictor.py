@@ -164,9 +164,9 @@ def get_predictor_factory(
     @merge_conf(predictor_config_cls)
     def get_predictor(
             model_config: Optional[TPredictionModelConfig]=None,
+            model_path: Optional[str]=None,
             model: Optional[TPredictionModel]=None,
             predictor: type[predictor]=predictor,
-            model_cls: type[TPredictionModel]=None,
             cs_config: Optional[ClassSelectorConfig]=None,
             cs: Optional[cs_cls]= None,
             mode: Optional[ClassificationMode]=None, 
@@ -176,8 +176,8 @@ def get_predictor_factory(
 
         if not model:
             model = get_model(
-                model_config=model_config,
-                model_cls=model_cls,
+                path=model_path,
+                cfg=model_config
             )
 
         if not cs:
