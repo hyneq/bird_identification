@@ -7,7 +7,6 @@ from prediction.predictor import PredictorConfig, PredictionProcessorWithCS, Pre
 from prediction.models import Image
 from .models import ClassificationModelConfig, ClassificationModelOutput, ClassificationModel, get_classification_model
 
-from defaults.classification import DEFAULT_MODEL_CONFIG, DEFAULT_MODEL_CLS
 
 @dataclass
 class ClassificationResult:

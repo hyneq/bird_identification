@@ -2,12 +2,17 @@ from typing import TypeVar
 
 import numpy as np
 
-from prediction.models import PredictionModelConfig, IImagePredictionModel, PredictionModelFactory, get_prediction_model_factory
+from prediction.models import PredictionModelConfig, PathPredictionModelConfig, IImagePredictionModel, PredictionModelFactory, PathPredictionModelFactory, MultiPathPredictionModelFactory
 
 class ClassificationModelConfig(PredictionModelConfig):
     pass
 
 TClassificationModelConfig = TypeVar("TClassificationModelConfig", bound=ClassificationModelConfig)
+
+class PathClassificationModelConfig(ClassificationModelConfig, PathPredictionModelConfig):
+    pass
+
+TPathClassificationModelConfig = TypeVar("TPathClassificationModelConfig", bound=PathClassificationModelConfig)
 
 ClassificationModelOutput = np.ndarray
 
@@ -19,13 +24,14 @@ TClassificationModel = TypeVar("TClassificationModel", bound=ClassificationModel
 class ClassificationModelFactory(PredictionModelFactory[TClassificationModel, TClassificationModelConfig]):
     pass
 
-from defaults.classification import DEFAULT_MODEL_CLS, DEFAULT_MODEL_CONFIG
+class PathClassificationModelFactory(PathPredictionModelFactory[TClassificationModel, TPathClassificationModelConfig]):
+    pass
 
-get_classification_model = get_prediction_model_factory(
-    name="get_classification_model",
-    model_cls=ClassificationModel,
-    model_config_cls=ClassificationModelConfig,
-    model_type_cls=ClassificationModelFactory,
-    DEFAULT_MODEL_CLS=DEFAULT_MODEL_CLS,
-    DEFAULT_MODEL_CONFIG=DEFAULT_MODEL_CONFIG
-)
+from defaults.classification import MODEL_FACTORIES, DEFAULT_MODEL_FACTORY
+
+model_factory = MultiPathPredictionModelFactory[ClassificationModel, PathClassificationModelConfig](
+        factories=MODEL_FACTORIES,
+        default_factory=DEFAULT_MODEL_FACTORY
+    )
+
+get_classification_model = model_factory.get_model
