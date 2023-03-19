@@ -4,7 +4,7 @@ from collections.abc import Sequence
 
 import numpy as np
 
-from prediction.models import PredictionModelConfig, PathPredictionModelConfig, IImagePredictionModel, PredictionModelFactory, get_prediction_model_factory
+from prediction.models import PredictionModelConfig, PathPredictionModelConfig, IImagePredictionModel, PredictionModelFactory, PathPredictionModelFactory, get_prediction_model_factory
 
 class DetectionModelConfig(PredictionModelConfig):
     pass
@@ -59,6 +59,9 @@ class DetectionModel(IImagePredictionModel[DetectionModelConfig, DetectionModelO
 TDetectionModel = TypeVar("TDetectionModel", bound=DetectionModel)
 
 class DetectionModelFactory(PredictionModelFactory[TDetectionModel, TDetectionModelConfig]):
+    pass
+
+class PathDetectionModelFactory(PathPredictionModelFactory[TDetectionModel, TPathDetectionModelConfig]):
     pass
 
 from defaults.detection import DEFAULT_MODEL_CLS, DEFAULT_MODEL_CONFIG
