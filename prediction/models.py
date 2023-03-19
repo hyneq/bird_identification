@@ -90,11 +90,17 @@ class PredictionModelFactory(IPredictionModelFactory[TPredictionModel, TPredicti
         
         return self.model_cls(cfg)
 
+@dataclass
 class PathPredictionModelFactory(PredictionModelFactory[TPredictionModel, TPathPredictionModelConfig], IPathPredictionModelFactory[TPredictionModel, TPathPredictionModelConfig]):
+    default_path: Optional[str] = None
 
     def get_model(self, path: Optional[str]=None, cfg: Optional[TPredictionModelConfig]=None):
-        if not cfg and path:
-            cfg = self.model_config_cls.from_path(path)
+        if not cfg:
+            if not path and self.default_path:
+                path = self.default_path
+            
+            if path:
+                cfg = self.model_config_cls.from_path(path)
         
         return super().get_model(cfg=cfg)
 
