@@ -80,19 +80,19 @@ class PredictionModelFactory(IPredictionModelFactory[TPredictionModel, TPredicti
     model_cls: type[TPredictionModel]
     model_config_cls: type[TPredictionModelConfig]
 
-    def get_model(self, *cfg_args, cfg: Optional[TPredictionModelConfig]=None, **cfg_kwargs):
+    def get_model(self, cfg: Optional[TPredictionModelConfig]=None):
         if not cfg:
-            cfg = self.model_config_cls(*cfg_args, **cfg_kwargs)
+            raise RuntimeError("No config supplied, cannot instantiate model")
         
         return self.model_cls(cfg)
 
 class PathPredictionModelFactory(PredictionModelFactory[TPredictionModel, TPathPredictionModelConfig], IPathPredictionModelFactory[TPredictionModel, TPathPredictionModelConfig]):
 
-    def get_model(self, *args, path: Optional[str]=None, **kwargs):
-        if path:
-            kwargs["cfg"] = self.model_config_cls.from_path(path)
+    def get_model(self, path: Optional[str]=None, cfg: Optional[TPredictionModelConfig]=None):
+        if not cfg and path:
+            cfg = self.model_config_cls.from_path(path)
         
-        return super().get_model(*args, **kwargs)
+        return super().get_model(cfg=cfg)
 
 class MultiPredictionModelFactory(IPredictionModelFactory[TPredictionModel, TPredictionModelConfig]):
     name: str
