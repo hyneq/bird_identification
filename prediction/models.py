@@ -79,10 +79,14 @@ class PredictionModelFactory(IPredictionModelFactory[TPredictionModel, TPredicti
     name: str
     model_cls: type[TPredictionModel]
     model_config_cls: type[TPredictionModelConfig]
+    default_config: Optional[TPredictionModelConfig] = None
 
     def get_model(self, cfg: Optional[TPredictionModelConfig]=None):
         if not cfg:
-            raise RuntimeError("No config supplied, cannot instantiate model")
+            if self.default_config:
+                cfg = self.default_config
+            else:
+                raise RuntimeError("Cannot instantiate model: No default config present and no config supplied")
         
         return self.model_cls(cfg)
 
