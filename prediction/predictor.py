@@ -158,7 +158,7 @@ class IPredictorFactory(Generic[TPredictor, TPredictionModel, TPathPredictionMod
 
     @abstractmethod
     def get_predictor(self,
-            model_config: Optional[TPredictionModelConfig]=None,
+            model_config: Optional[TPathPredictionModelConfig]=None,
             model_path: Optional[str]=None,
             model: Optional[TPredictionModel]=None,
             predictor: Optional[type[TPredictor]]=None,
@@ -209,7 +209,6 @@ class PredictorFactory(IPredictorFactory[TPredictor, TPredictionModel, TPathPred
             )
 
         return predictor(model=model, cs=cs)
-
 
 def get_predictor_factory(
         name: str,
