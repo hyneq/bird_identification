@@ -1,3 +1,4 @@
+from typing import Optional
 from abc import ABC, abstractmethod
 
 from argparse import ArgumentParser, Namespace
@@ -24,10 +25,23 @@ class CLI(ABC):
         self.parse()
 
 
+def args_required(method):
+
+    def inner(self, *args, **kwargs):
+        if not self.args:
+            raise RuntimeError("Method {} requires parsed args to be already available".format(method.__name__))
+        
+        return method(self, *args, **kwargs)
+    
+    return inner
+
 class CLIPart(ABC):
 
     parser: ArgumentParser
-    args: Namespace
+    args: Optional[Namespace]
+
+    def __init__(self, parser: ArgumentParser):
+        self.parser = parser
 
     @abstractmethod
     def add_opts(self):
