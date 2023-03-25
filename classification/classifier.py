@@ -44,6 +44,7 @@ class ClassifierConfig(PredictorConfig[ImageClassifier]):
 
 image_classifier_factory = PredictorFactory(
     predictor=ImageClassifier,
+    predictor_config=ClassifierConfig,
     model_factory=model_factory
 )
 
