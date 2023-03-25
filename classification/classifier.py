@@ -3,9 +3,9 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from prediction.predictor import PredictorConfig, PredictionProcessorWithCS, PredictorWithCS, FileImagePredictor, get_predictor_factory
+from prediction.predictor import PredictorConfig, PredictionProcessorWithCS, PredictorWithCS, FileImagePredictor, PredictorFactory, get_predictor_factory
 from prediction.models import Image
-from .models import ClassificationModelConfig, ClassificationModelOutput, ClassificationModel, get_classification_model
+from .models import ClassificationModelConfig, ClassificationModelOutput, ClassificationModel, model_factory, get_classification_model
 
 
 @dataclass
@@ -42,12 +42,12 @@ class FileImageClassifier(FileImagePredictor[ImageClassifier, ClassificationResu
 class ClassifierConfig(PredictorConfig[ImageClassifier]):
     pass
 
-get_image_classifier = get_predictor_factory(
-    name="get_image_classifier",
+image_classifier_factory = PredictorFactory(
     predictor=ImageClassifier,
-    predictor_config_cls=ClassifierConfig,
-    get_model=get_classification_model
+    model_factory=model_factory
 )
+
+get_image_classifier = image_classifier_factory.get_predictor
 
 def classify_images(
         images: Union[list[str], list[np.ndarray], str, np.ndarray],
