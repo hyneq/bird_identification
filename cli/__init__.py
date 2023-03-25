@@ -37,15 +37,31 @@ def args_required(method):
 
 class CLIPart(ABC):
 
-    parser: ArgumentParser
     args: Optional[Namespace]
 
-    def __init__(self, parser: ArgumentParser):
-        self.parser = parser
-
     @abstractmethod
-    def add_opts(self):
+    def add_opts(self, parser: ArgumentParser):
         pass
 
     def add_args(self, args: Namespace):
         self.args = args
+
+class CLIWithParts(CLI):
+
+    parts: list[CLIPart]
+
+    def __init__(self, parts: list[CLIPart]=None):
+        if not parts:
+            parts = []
+    
+    def init_parser(self):
+        super().init_parser()
+
+        for part in self.parts:
+            part.add_opts(self.parser)
+    
+    def parse(self):
+        super().parse()
+
+        for part in self.parts:
+            part.add_args(self.args)
