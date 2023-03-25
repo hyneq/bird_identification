@@ -4,9 +4,9 @@ from dataclasses import dataclass
 import cv2
 import numpy as np
 
-from prediction.predictor import PredictorConfig, PredictionProcessorWithCS, PredictorWithCS, FileImagePredictor, get_predictor_factory
+from prediction.predictor import PredictorConfig, PredictionProcessorWithCS, PredictorWithCS, FileImagePredictor, PredictorFactory
 from prediction.models import Image
-from .models import DetectionModelConfig, DetectionModelOutput, DetectionModel, get_detection_model
+from .models import DetectionModelConfig, DetectionModelOutput, DetectionModel, model_factory, get_detection_model
 
 from defaults.detection import DEFAULT_NMS_THRESHOLD
 
@@ -109,12 +109,21 @@ class FileObjectDetector(FileImagePredictor[ObjectDetector, DetectionResult]):
 class DetectorConfig(PredictorConfig[ObjectDetector]):
     pass
 
+object_detector_factory = PredictorFactory(
+    predictor=ObjectDetector,
+    model_factory=model_factory
+)
+
+get_object_detector = object_detector_factory.get_predictor
+
+"""
 get_object_detector = get_predictor_factory(
     name="get_object_detector",
     predictor=ObjectDetector,
     predictor_config_cls=DetectorConfig,
     get_model=get_detection_model
 )
+"""
 
 def detect_objects(
         images: Union[list[str], list[np.ndarray], str, np.ndarray],
