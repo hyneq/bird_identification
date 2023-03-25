@@ -128,6 +128,9 @@ class MultiPredictionModelFactory(IPredictionModelFactory[TPredictionModel, TPre
             factory = self.default_factory
         
         return self.factories[factory].get_model(*args, **kwargs)
+    
+    def get_factory_names(self):
+        return list(self.factories.keys())
 
 class MultiPathPredictionModelFactory(MultiPredictionModelFactory[TPredictionModel, TPathPredictionModelConfig], IPathPredictionModelFactory[TPredictionModel, TPathPredictionModelConfig]):
     pass
