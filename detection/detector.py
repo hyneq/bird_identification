@@ -111,6 +111,7 @@ class DetectorConfig(PredictorConfig[ObjectDetector]):
 
 object_detector_factory = PredictorFactory(
     predictor=ObjectDetector,
+    predictor_config=DetectorConfig,
     model_factory=model_factory
 )
 
