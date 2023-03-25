@@ -104,6 +104,41 @@ class ClassNames:
     def load_from_file(cls, path: str):
         with open(path, newline='') as f:
             return cls(f.read().splitlines())
+    
+@dataclass
+class ClassSelectorFactory:
+    default_min_confidence: float = DEFAULT_MIN_CONFIDENCE
+    default_classification_mode: Optional[ClassificationMode] = None
+
+    def get_class_selector(self,
+            mode: Optional[ClassificationMode]=None, 
+            min_confidence: Optional[float]=None,
+            classes: Optional[Union[list[int],list[str], str, int]]=None,
+            model_class_names: Optional[ClassNames]=None
+    ) -> ClassSelector:
+        if not mode:
+            if self.default_classification_mode:
+                mode = self.default_classification_mode
+            elif classes:
+                mode = ClassificationMode.FIXED
+            else:
+                mode = ClassificationMode.MAX
+
+        if mode.classes_needed:
+            if not classes:
+                raise ClassRequiredForModeException(mode)
+            
+            if isinstance(classes, list):
+                classes = [classes]
+            
+            if isinstance(classes[0], str):
+                classes = [model_class_names.get_number(class_name) for class_name in classes]
+        
+            return mode.cs(classes,min_confidence)
+        else:
+            return mode.cs(min_confidence)
+
+DEFAULT_CLASS_SELECTOR_FACTORY: ClassSelectorFactory = ClassSelectorFactory()
 
 @merge_conf(ClassSelectorConfig)
 def get_class_selector(
