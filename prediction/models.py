@@ -28,6 +28,8 @@ TPathPredictionModelConfig = TypeVar("TPathPredictionModelConfig", bound=PathPre
 class IPredictionModel(ABC, Generic[TPredictionModelConfig, TPredictionModelInput, TPredictionModelOutput]):
     __slots__: tuple
 
+    class_names: ClassNames
+
     @abstractmethod
     def __init__(self, cfg: TPredictionModelConfig):
         pass
@@ -45,8 +47,6 @@ TPredictionModelConfigWithCls = TypeVar("TPredictionModelConfigWithCls", bound=P
 
 class PredictionModel(IPredictionModel[TPredictionModelConfig, TPredictionModelInput, TPredictionModelOutput]):
     __slots__: tuple
-
-    class_names: ClassNames
 
     def __init__(self, cfg: TPredictionModelConfig):
         self.class_names = self.load_classes(cfg.classes_path)
