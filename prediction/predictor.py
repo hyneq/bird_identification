@@ -155,16 +155,29 @@ class FileImagePredictor(IPredictor[str, TPredictionResult], Generic[TPredictor,
         return self.predictor.predict(image)
 
 class IPredictorFactory(Generic[TPredictor, TPredictionModel, TPathPredictionModelConfig, TPredictionProcessorWithCS, TPredictionModelInput, TPredictionModelOutput, TPredictionResult]):
-    pass
+
+    @abstractmethod
+    def get_predictor(self,
+            model_config: Optional[TPredictionModelConfig]=None,
+            model_path: Optional[str]=None,
+            model: Optional[TPredictionModel]=None,
+            predictor: Optional[type[TPredictor]]=None,
+            cs_config: Optional[ClassSelectorConfig]=None,
+            cs: Optional[ClassSelector]= None,
+            mode: Optional[ClassificationMode]=None, 
+            min_confidence: Optional[float]=None,
+            classes: Optional[ClassList]=None,
+        ) -> TPredictor:
+        pass
+
 
 @dataclass
-class PredictorFactory(IPredictorFactory[TPredictor, TPredictionModel, TPathPredictionModelConfig, TPredictionProcessorWithCS, TPredictionModelInput, TPredictionModelOutput, TPredictionResult]):
+class PredictorFactory(IPredictorFactory[TPredictor, TPredictionModel, TPathPredictionModelConfig, TPredictionProcessorWithCS, TPredictionModelInput, TPredictionModelOutput, TPredictionResult], ABC):
 
     predictor: type[TPredictor]
     model_factory: MultiPathPredictionModelFactory[TPredictionModel, TPredictionModelConfig]
     cs_factory: ClassSelectorFactory=DEFAULT_CLASS_SELECTOR_FACTORY
 
-    @abstractmethod
     def get_predictor(self,
             model_config: Optional[TPredictionModelConfig]=None,
             model_path: Optional[str]=None,
