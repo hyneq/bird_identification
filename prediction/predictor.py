@@ -154,7 +154,7 @@ class FileImagePredictor(IPredictor[str, TPredictionResult], Generic[TPredictor,
 
         return self.predictor.predict(image)
 
-class IPredictorFactory(Generic[TPredictor, TPredictionModel, TPathPredictionModelConfig, TPredictionProcessorWithCS, TPredictionModelInput, TPredictionModelOutput, TPredictionResult]):
+class IPredictorFactory(Generic[TPredictor, TPredictionModel, TPathPredictionModelConfig]):
 
     @abstractmethod
     def get_predictor(self,
@@ -172,7 +172,7 @@ class IPredictorFactory(Generic[TPredictor, TPredictionModel, TPathPredictionMod
 
 
 @dataclass
-class PredictorFactory(IPredictorFactory[TPredictor, TPredictionModel, TPathPredictionModelConfig, TPredictionProcessorWithCS, TPredictionModelInput, TPredictionModelOutput, TPredictionResult], ABC):
+class PredictorFactory(IPredictorFactory[TPredictor, TPredictionModel, TPathPredictionModelConfig], ABC):
 
     predictor: type[TPredictor]
     model_factory: MultiPathPredictionModelFactory[TPredictionModel, TPredictionModelConfig]
