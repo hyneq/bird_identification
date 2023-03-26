@@ -14,11 +14,11 @@ TPredictionResult = TypeVar("TPredictionResult")
 
 @dataclass
 class PredictorConfig(Generic[TPredictionModelConfig]):
-    model_config: TPredictionModelConfig
-    model_path: str
-    min_confidence: float = None
-    classification_mode: ClassificationMode = None
-    classes: Union[list[int],list[str]] = None
+    model_config: Optional[TPredictionModelConfig] = None
+    model_path: Optional[str] = None
+    min_confidence: Optional[float] = None
+    classification_mode: Optional[ClassificationMode] = None
+    classes: Optional[ClassList] = None
 
 TPredictorConfig = TypeVar("TPredictorConfig", bound=PredictorConfig)
 
