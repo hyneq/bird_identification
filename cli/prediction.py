@@ -65,7 +65,7 @@ class PredictionCLIPart(CLIPart):
             model_path=self.args.model_path,
             model_type=self.args.model_type,
             mode=self.args.mode,
-            min_confidence=self.args.min_confidence,
+            min_confidence_pc=self.args.min_confidence,
             classes=self.args.classes
         )
 

@@ -170,6 +170,7 @@ class IPredictorFactory(Generic[TPredictor, TPredictionModel, TPredictorConfig, 
             cs: Optional[ClassSelector]= None,
             mode: Optional[ClassificationMode]=None, 
             min_confidence: Optional[float]=None,
+            min_confidence_pc: Optional[int]=None,
             classes: Optional[ClassList]=None,
         ) -> TPredictor:
         pass
@@ -197,6 +198,7 @@ class PredictorFactory(IPredictorFactory[TPredictor, TPredictionModel, TPredicto
             cs: Optional[ClassSelector]= None,
             mode: Optional[ClassificationMode]=None, 
             min_confidence: Optional[float]=None,
+            min_confidence_pc: Optional[int]=None,
             classes: Optional[ClassList]=None,
         ) -> TPredictor:
 
@@ -215,6 +217,7 @@ class PredictorFactory(IPredictorFactory[TPredictor, TPredictionModel, TPredicto
                 cfg=cs_config,
                 mode=mode,
                 min_confidence=min_confidence,
+                min_confidence_pc=min_confidence_pc,
                 classes=classes,
                 model_class_names=model.class_names,
             )

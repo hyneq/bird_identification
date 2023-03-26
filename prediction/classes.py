@@ -113,6 +113,7 @@ class ClassSelectorFactory:
     def get_class_selector(self,
             mode: Optional[ClassificationMode]=None, 
             min_confidence: Optional[float]=None,
+            min_confidence_pc: Optional[int]=None,
             classes: Optional[Union[list[int],list[str], str, int]]=None,
             model_class_names: Optional[ClassNames]=None
     ) -> ClassSelector:
@@ -125,7 +126,10 @@ class ClassSelectorFactory:
                 mode = ClassificationMode.MAX
         
         if not min_confidence:
-            min_confidence = self.default_min_confidence
+            if min_confidence_pc:
+                min_confidence = 0.01*min_confidence_pc
+            else:
+                min_confidence = self.default_min_confidence
 
         if mode.classes_needed:
             if not classes:
