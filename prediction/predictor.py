@@ -173,6 +173,10 @@ class IPredictorFactory(Generic[TPredictor, TPredictionModel, TPredictorConfig, 
         ) -> TPredictor:
         pass
 
+    @abstractmethod
+    def get_model_factory(self) -> MultiPathPredictionModelFactory[TPredictionModel, TPredictionModelConfig]:
+        pass
+
 
 @dataclass
 class PredictorFactory(IPredictorFactory[TPredictor, TPredictionModel, TPredictorConfig, TPathPredictionModelConfig], ABC):
@@ -213,6 +217,9 @@ class PredictorFactory(IPredictorFactory[TPredictor, TPredictionModel, TPredicto
             )
 
         return predictor(model=model, cs=cs)
+    
+    def get_model_factory(self) -> MultiPathPredictionModelFactory[TPredictionModel, TPredictionModelConfig]:
+        return self.model_factory
 
 @dataclass
 class WrapperPredictorFactory(IPredictorFactory[TPredictor, TPredictionModel, TPredictorConfig, TPathPredictionModelConfig]):
@@ -223,6 +230,9 @@ class WrapperPredictorFactory(IPredictorFactory[TPredictor, TPredictionModel, TP
 
         def get_predictor(self, *args, **kwargs) -> TPredictor:
             return self.wrapper_predictor_cls(self.wrapped_predictor_factory(*args, **kwargs))
+        
+        def get_model_factory(self) -> MultiPathPredictionModelFactory[TPredictionModel, TPredictionModelConfig]:
+            return self.wrapped_predictor_factory.get_model_factory()
 
 
 def get_predictor_factory(
