@@ -213,7 +213,7 @@ class PredictorFactory(IPredictorFactory[TPredictor, TPredictionModel, TPredicto
             )
 
         if not cs:
-            cs = get_class_selector(
+            cs = self.cs_factory.get_class_selector(
                 cfg=cs_config,
                 mode=mode,
                 min_confidence=min_confidence,
