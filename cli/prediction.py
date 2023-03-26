@@ -32,6 +32,7 @@ class PredictionCLIPart(CLIPart):
             dest="min_confidence",
             type=int,
             choices=range(0,100),
+            metavar="[0,100]",
             help="Minimum confidence to take into account"
         )
 
