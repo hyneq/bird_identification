@@ -6,7 +6,7 @@ import numpy as np
 
 from prediction.predictor import PredictorConfig, PredictionProcessorWithCS, PredictorWithCS, FileImagePredictor, PredictorFactory
 from prediction.models import Image
-from .models import DetectionModelConfig, DetectionModelOutput, DetectionModel, model_factory, get_detection_model
+from .models import DetectionModelConfig, DetectionModelOutput, DetectionModel, model_factory
 
 from defaults.detection import DEFAULT_NMS_THRESHOLD
 
