@@ -123,6 +123,9 @@ class ClassSelectorFactory:
                 mode = ClassificationMode.FIXED
             else:
                 mode = ClassificationMode.MAX
+        
+        if not min_confidence:
+            min_confidence = self.default_min_confidence
 
         if mode.classes_needed:
             if not classes:
