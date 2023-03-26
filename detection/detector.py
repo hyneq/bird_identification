@@ -4,7 +4,7 @@ from dataclasses import dataclass
 import cv2
 import numpy as np
 
-from prediction.predictor import PredictorConfig, PredictionProcessorWithCS, PredictorWithCS, FileImagePredictor, PredictorFactory
+from prediction.predictor import PredictorConfig, PredictionProcessorWithCS, PredictorWithCS, FileImagePredictor, PredictorFactory, WrapperPredictorFactory
 from prediction.models import Image
 from .models import DetectionModelConfig, DetectionModelOutput, DetectionModel, model_factory
 
@@ -113,6 +113,11 @@ object_detector_factory = PredictorFactory(
     predictor=ObjectDetector,
     predictor_config=DetectorConfig,
     model_factory=model_factory
+)
+
+file_object_detector_factory = WrapperPredictorFactory(
+    wrapper_predictor_cls = FileObjectDetector,
+    wrapped_predictor_factory = object_detector_factory
 )
 
 get_object_detector = object_detector_factory.get_predictor
