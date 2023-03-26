@@ -163,6 +163,7 @@ class IPredictorFactory(Generic[TPredictor, TPredictionModel, TPredictorConfig, 
     def get_predictor(self,
             model_config: Optional[TPathPredictionModelConfig]=None,
             model_path: Optional[str]=None,
+            model_type: Optional[str]=None,
             model: Optional[TPredictionModel]=None,
             predictor: Optional[type[TPredictor]]=None,
             cs_config: Optional[ClassSelectorConfig]=None,
@@ -189,6 +190,7 @@ class PredictorFactory(IPredictorFactory[TPredictor, TPredictionModel, TPredicto
     def get_predictor(self,
             model_config: Optional[TPredictionModelConfig]=None,
             model_path: Optional[str]=None,
+            model_type: Optional[str]=None,
             model: Optional[TPredictionModel]=None,
             predictor: Optional[type[TPredictor]]=None,
             cs_config: Optional[ClassSelectorConfig]=None,
@@ -203,6 +205,7 @@ class PredictorFactory(IPredictorFactory[TPredictor, TPredictionModel, TPredicto
 
         if not model:
             model = self.model_factory.get_model(
+                factory=model_type,
                 path=model_path,
                 cfg=model_config
             )
