@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from prediction.predictor import PredictorConfig, PredictionProcessorWithCS, PredictorWithCS, FileImagePredictor, PredictorFactory
+from prediction.predictor import PredictorConfig, PredictionProcessorWithCS, PredictorWithCS, FileImagePredictor, PredictorFactory, WrapperPredictorFactory
 from prediction.models import Image
 from .models import ClassificationModelConfig, ClassificationModelOutput, ClassificationModel, model_factory
 
@@ -45,6 +45,11 @@ image_classifier_factory = PredictorFactory(
     predictor=ImageClassifier,
     predictor_config=ClassifierConfig,
     model_factory=model_factory
+)
+
+file_image_classifier_factory = WrapperPredictorFactory(
+    wrapper_predictor_cls = FileImageClassifier,
+    wrapped_predictor_factory = image_classifier_factory
 )
 
 get_image_classifier = image_classifier_factory.get_predictor
