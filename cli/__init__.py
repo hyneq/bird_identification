@@ -53,6 +53,8 @@ class CLIWithParts(CLI):
     def __init__(self, parts: list[CLIPart]=None):
         if not parts:
             parts = []
+        
+        self.parts = parts
     
     def init_parser(self):
         super().init_parser()
