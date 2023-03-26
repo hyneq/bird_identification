@@ -229,7 +229,7 @@ class WrapperPredictorFactory(IPredictorFactory[TPredictor, TPredictionModel, TP
         wrapped_predictor_factory: IPredictorFactory[TPredictor, TPredictionModel, TPredictorConfig, TPathPredictionModelConfig]
 
         def get_predictor(self, *args, **kwargs) -> TPredictor:
-            return self.wrapper_predictor_cls(self.wrapped_predictor_factory(*args, **kwargs))
+            return self.wrapper_predictor_cls(self.wrapped_predictor_factory.get_predictor(*args, **kwargs))
         
         def get_model_factory(self) -> MultiPathPredictionModelFactory[TPredictionModel, TPredictionModelConfig]:
             return self.wrapped_predictor_factory.get_model_factory()
