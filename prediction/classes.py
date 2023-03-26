@@ -110,6 +110,7 @@ class ClassSelectorFactory:
     default_min_confidence: float = DEFAULT_MIN_CONFIDENCE
     default_classification_mode: Optional[ClassificationMode] = None
 
+    @merge_conf(ClassSelectorConfig)
     def get_class_selector(self,
             mode: Optional[ClassificationMode]=None, 
             min_confidence: Optional[float]=None,
