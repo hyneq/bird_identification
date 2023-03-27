@@ -1,6 +1,7 @@
 from enum import Enum
 import numpy as np
 from typing import Optional, Union
+from  typing_extensions import Self
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
@@ -80,7 +81,7 @@ class ClassRequiredForModeException(ValueError):
 
 @dataclass
 class ClassSelectorConfig:
-    mode: ClassificationMode = None
+    mode: Optional[ClassificationMode] = None
     min_confidence: Optional[float] = None
     classes: Optional[ClassList] = None
 
@@ -88,10 +89,10 @@ class ClassSelectorConfig:
 class ClassNames:
     class_names: list[str]
 
-    def get_name(self, num: int):
+    def get_name(self, num: int) -> str:
         return self.class_names[num]
     
-    def get_names(self, nums: Union[list[int],np.ndarray]):
+    def get_names(self, nums: Union[list[int],np.ndarray]) -> list[str]:
         return [self.get_name(num) for num in nums]
 
     def get_number(self, name: str):
@@ -101,7 +102,7 @@ class ClassNames:
         return [self.get_number(name) for name in names]
     
     @classmethod
-    def load_from_file(cls, path: str):
+    def load_from_file(cls, path: str) -> Self:
         with open(path, newline='') as f:
             return cls(f.read().splitlines())
     
