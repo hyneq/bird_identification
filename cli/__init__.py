@@ -7,9 +7,12 @@ from argparse import ArgumentParser, Namespace
 
 class CLI(ABC):
     
-    raw_args: list[str]
+    raw_args: Optional[list[str]]
     parser: ArgumentParser
     args: Namespace
+
+    def __init__(self, raw_args: Optional[list[str]] = None):
+        self.raw_args = raw_args
 
     @abstractmethod
     def init_parser(self):
@@ -18,7 +21,7 @@ class CLI(ABC):
     def parse(self):
         self.init_parser()
 
-        self.args = self.parser.parse_args()
+        self.args = self.parser.parse_args(args = self.raw_args)
     
     @abstractmethod
     def run(self):
@@ -50,11 +53,13 @@ class CLIWithParts(CLI):
 
     parts: list[CLIPart]
 
-    def __init__(self, parts: list[CLIPart]=None):
+    def __init__(self, *args, parts: Optional[list[CLIPart]]=None, **kwargs):
         if not parts:
             parts = []
         
         self.parts = parts
+        
+        super().__init__(*args, **kwargs)
     
     def init_parser(self):
         super().init_parser()
