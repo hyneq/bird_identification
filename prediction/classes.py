@@ -136,10 +136,10 @@ class ClassSelectorFactory:
             if not classes:
                 raise ClassRequiredForModeException(mode)
             
-            if isinstance(classes, list):
+            if not isinstance(classes, list):
                 classes = [classes]
             
-            if isinstance(classes[0], str):
+            if not isinstance(classes[0], int):
                 classes = [model_class_names.get_number(class_name) for class_name in classes]
         
             return mode.cs(classes,min_confidence)
