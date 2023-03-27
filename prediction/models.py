@@ -94,7 +94,7 @@ class PredictionModelFactory(IPredictionModelFactory[TPredictionModel, TPredicti
 class PathPredictionModelFactory(PredictionModelFactory[TPredictionModel, TPathPredictionModelConfig], IPathPredictionModelFactory[TPredictionModel, TPathPredictionModelConfig]):
     default_path: Optional[str] = None
 
-    def get_model(self, path: Optional[str]=None, cfg: Optional[TPredictionModelConfig]=None) -> TPredictionModel:
+    def get_model(self, path: Optional[str]=None, cfg: Optional[TPathPredictionModelConfig]=None) -> TPredictionModel:
         if not cfg:
             if not path and self.default_path:
                 path = self.default_path
