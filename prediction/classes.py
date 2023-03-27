@@ -66,7 +66,7 @@ class ClassificationMode(Enum):
     MAX = ("Single class with maximum confidence", False, MaxClassSelector)
     SORTED = ("All classes, sorted by confidence", False, SortClassSelector)
 
-    def __init__(self, description: str, classes_needed: bool, cs: ClassSelector):
+    def __init__(self, description: str, classes_needed: bool, cs: type[ClassSelector]):
         self.description = description
         self.classes_needed = classes_needed
         self.cs = cs
