@@ -40,11 +40,6 @@ class IPredictionModel(ABC, Generic[TPredictionModelConfig, TPredictionModelInpu
 
 TPredictionModel = TypeVar("TPredictionModel", bound=IPredictionModel)
 
-class PredictionModelConfigWithCls(Generic[TPredictionModel]):
-    model_cls: type[TPredictionModel]
-
-TPredictionModelConfigWithCls = TypeVar("TPredictionModelConfigWithCls", bound=PredictionModelConfigWithCls)
-
 class PredictionModel(IPredictionModel[TPredictionModelConfig, TPredictionModelInput, TPredictionModelOutput]):
     __slots__: tuple
 
