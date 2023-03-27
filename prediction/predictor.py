@@ -176,7 +176,7 @@ class IPredictorFactory(Generic[TPredictor, TPredictionModel, TPredictorConfig, 
         pass
 
     @abstractmethod
-    def get_model_factory(self) -> MultiPathPredictionModelFactory[TPredictionModel, TPredictionModelConfig]:
+    def get_model_factory(self) -> MultiPathPredictionModelFactory[TPredictionModel, TPathPredictionModelConfig]:
         pass
 
 
@@ -185,7 +185,7 @@ class PredictorFactory(IPredictorFactory[TPredictor, TPredictionModel, TPredicto
 
     predictor: type[TPredictor]
     predictor_config: type[TPredictorConfig]
-    model_factory: MultiPathPredictionModelFactory[TPredictionModel, TPredictionModelConfig]
+    model_factory: MultiPathPredictionModelFactory[TPredictionModel, TPathPredictionModelConfig]
     cs_factory: ClassSelectorFactory=DEFAULT_CLASS_SELECTOR_FACTORY
 
     def get_predictor(self,
@@ -224,13 +224,13 @@ class PredictorFactory(IPredictorFactory[TPredictor, TPredictionModel, TPredicto
 
         return predictor(model=model, cs=cs)
     
-    def get_model_factory(self) -> MultiPathPredictionModelFactory[TPredictionModel, TPredictionModelConfig]:
+    def get_model_factory(self) -> MultiPathPredictionModelFactory[TPredictionModel, TPathPredictionModelConfig]:
         return self.model_factory
 
 @dataclass
 class WrapperPredictorFactory(IPredictorFactory[TPredictor, TPredictionModel, TPredictorConfig, TPathPredictionModelConfig]):
         
-    wrapper_predictor_cls: TPredictor
+    wrapper_predictor_cls: type[TPredictor]
     
     wrapped_predictor_factory: IPredictorFactory[IPredictor, TPredictionModel, TPredictorConfig, TPathPredictionModelConfig]
 
@@ -238,7 +238,7 @@ class WrapperPredictorFactory(IPredictorFactory[TPredictor, TPredictionModel, TP
         wrapped_predictor = self.wrapped_predictor_factory.get_predictor(*args, **kwargs)
         return self.wrapper_predictor_cls(predictor=wrapped_predictor)
     
-    def get_model_factory(self) -> MultiPathPredictionModelFactory[TPredictionModel, TPredictionModelConfig]:
+    def get_model_factory(self) -> MultiPathPredictionModelFactory[TPredictionModel, TPathPredictionModelConfig]:
         return self.wrapped_predictor_factory.get_model_factory()
 
 
