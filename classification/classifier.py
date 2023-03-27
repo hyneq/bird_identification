@@ -15,10 +15,10 @@ class ClassificationResult:
 class ClassificationProcessor(PredictionProcessorWithCS[ClassificationModel, ClassificationModelOutput, ClassificationResult]):
     __slots__: tuple
 
-    def get_results(self, classes) -> list:
+    def get_results(self, classes) -> ClassificationResult:
         return ClassificationResult(self.model.class_names.get_names(classes), list(self.scores[classes]))
 
-    def process(self) -> list:
+    def process(self) -> ClassificationResult:
         self.scores = self.output
 
         classes = self.cs.get_filtered_classes(self.scores)
@@ -38,7 +38,7 @@ class FileImageClassifier(FileImagePredictor[ImageClassifier, ClassificationResu
     predictor_cls = ImageClassifier
 
 @dataclass
-class ClassifierConfig(PredictorConfig[ImageClassifier]):
+class ClassifierConfig(PredictorConfig[ClassificationModelConfig]):
     pass
 
 image_classifier_factory = PredictorFactory(
