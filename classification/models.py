@@ -29,9 +29,9 @@ class PathClassificationModelFactory(PathPredictionModelFactory[TClassificationM
 
 from defaults.classification import MODEL_FACTORIES, DEFAULT_MODEL_FACTORY
 
-model_factory = MultiPathPredictionModelFactory[ClassificationModel, PathClassificationModelConfig](
+classification_model_factory = MultiPathPredictionModelFactory[ClassificationModel, PathClassificationModelConfig](
         factories=MODEL_FACTORIES,
         default_factory=DEFAULT_MODEL_FACTORY
     )
 
-get_classification_model = model_factory.get_model
+get_classification_model = classification_model_factory.get_model
