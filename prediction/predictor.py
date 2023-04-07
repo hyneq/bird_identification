@@ -103,15 +103,11 @@ class Predictor(IPredictor[TPredictionModelInput, TPredictionResult], Generic[TP
 
     def __init__(self,
             *processor_args,
-            model: Optional[TPredictionModel]=None,
-            model_cfg: Optional[TPredictionModelConfig]=None,
+            model: TPredictionModel,
             **processor_kwargs
         ):
 
-        if not model:
-            self.model = self.model_cls(model_cfg)
-        else:
-            self.model = model
+        self.model = model
         
         self.prediction_processor = self.prediction_processor.with_args(self.model, *processor_args, **processor_kwargs)
 
@@ -126,12 +122,9 @@ class PredictorWithCS(Predictor[TPredictionModel, TPredictionModelConfig, TPredi
     __slots__: tuple
     
     def __init__(self,
-            cs: Optional[ClassSelector]=None,
+            cs: ClassSelector,
             *args, **kwargs
         ):
-
-        if not cs:
-            cs = DEFAULT_CLASS_SELECTOR()
 
         super().__init__(*args, **kwargs, cs_=cs)
 
