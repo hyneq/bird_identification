@@ -68,7 +68,7 @@ class IPathPredictionModelFactory(IPredictionModelFactory[TPredictionModel, TPat
     def get_model(self, path: Optional[str]=None, cfg: Optional[TPathPredictionModelConfig]=None) -> TPredictionModel:
         pass
 
-@dataclass
+@dataclass(frozen=True)
 class PredictionModelFactory(IPredictionModelFactory[TPredictionModel, TPredictionModelConfig]):
     name: str
     model_cls: type[TPredictionModel]
@@ -84,7 +84,7 @@ class PredictionModelFactory(IPredictionModelFactory[TPredictionModel, TPredicti
         
         return self.model_cls(cfg)
 
-@dataclass
+@dataclass(frozen=True)
 class PathPredictionModelFactory(PredictionModelFactory[TPredictionModel, TPathPredictionModelConfig], IPathPredictionModelFactory[TPredictionModel, TPathPredictionModelConfig]):
     default_path: Optional[str] = None
 

@@ -106,7 +106,7 @@ class ClassNames:
         with open(path, newline='') as f:
             return cls(f.read().splitlines())
     
-@dataclass
+@dataclass(frozen=True)
 class ClassSelectorFactory:
     default_min_confidence: float = DEFAULT_MIN_CONFIDENCE
     default_classification_mode: Optional[ClassificationMode] = None

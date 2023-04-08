@@ -163,7 +163,7 @@ class IPredictorFactory(Generic[TPredictor, TPredictionModel, TPredictionModelIn
         pass
 
 
-@dataclass
+@dataclass(frozen=True)
 class PredictorFactory(IPredictorFactory[TPredictor, TPredictionModel, TPredictionModelInput, TPredictorConfig, TPathPredictionModelConfig], ABC):
 
     predictor: type[TPredictor]
