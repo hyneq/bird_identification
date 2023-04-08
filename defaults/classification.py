@@ -2,7 +2,7 @@ import os
 
 from classification.models import ClassificationModelConfig, ClassificationModel
 
-from keras_models.classification import KerasClassificationModelConfig, KERAS_CLASSIFICATION_MODEL_FACTORY
+from keras_models.classification import KERAS_CLASSIFICATION_MODEL_FACTORY
 
 DEFAULT_MODEL_CLS: type[ClassificationModel]
 
