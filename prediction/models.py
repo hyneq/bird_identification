@@ -2,8 +2,6 @@ from typing import Generic, TypeVar, Optional, Union
 from abc import ABC, abstractmethod, abstractclassmethod
 from dataclasses import dataclass
 
-import numpy as np
-
 from .classes import ClassNames
 from .image_utils import Image
 
