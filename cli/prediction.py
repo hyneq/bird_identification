@@ -3,6 +3,7 @@ from enum_actions import enum_action
 import cv2
 
 from prediction import predictor, classes
+from prediction import image_utils
 from . import args_required, CLIPart, CLIWithParts
 
 class PredictionCLIPart(CLIPart):
@@ -72,7 +73,7 @@ class PredictionCLI(CLIWithParts):
 
     prediction_cli_part: PredictionCLIPart
 
-    def __init__(self, predictor_factory: predictor.IPredictorFactory[predictor.Predictor, predictor.TPredictionModel, predictor.TPredictorConfig, predictor.TPathPredictionModelConfig]):
+    def __init__(self, predictor_factory: predictor.IPredictorFactory[predictor.Predictor, predictor.TPredictionModel, predictor.TPredictionModelInput, predictor.TPredictorConfig, predictor.TPathPredictionModelConfig]):
         self.prediction_cli_part = prediction_cli_part = PredictionCLIPart(predictor_factory)
         super().__init__(parts=[prediction_cli_part])
     
@@ -87,5 +88,5 @@ class PredictionCLI(CLIWithParts):
 
         predictor = self.prediction_cli_part.get_predictor()
 
-        print([predictor.predict(cv2.imread(image)) for image in self.args.image])
+        print([predictor.predict(image, input_strategy=image_utils.img_from_file_strategy) for image in self.args.image])
 
