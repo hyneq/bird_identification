@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
 from config import merge_conf
-from .classes import ClassList, ClassSelectorConfig, ClassSelector, ClassificationMode, ClassSelectorFactory, DEFAULT_CLASS_SELECTOR_FACTORY, get_class_selector
+from .classes import ClassList, ClassSelectorConfig, ClassSelector, ClassificationMode, ClassSelectorFactory, DEFAULT_CLASS_SELECTOR_FACTORY
 from .models import TPredictionModel, TPredictionModelConfig, TPathPredictionModelConfig, TPredictionModelInput, TPredictionModelOutput, MultiPathPredictionModelFactory
 
 TPredictionInput = TypeVar("TPredictionInput")
@@ -193,45 +193,3 @@ class PredictorFactory(IPredictorFactory[TPredictor, TPredictionModel, TPredicto
     
     def get_model_factory(self) -> MultiPathPredictionModelFactory[TPredictionModel, TPathPredictionModelConfig]:
         return self.model_factory
-
-def get_predictor_factory(
-        name: str,
-        predictor: type[PredictorWithCS[TPredictionModel, TPredictionModelConfig, TPredictionProcessorWithCS, TPredictionModelInput, TPredictionModelOutput, TPredictionResult]],
-        predictor_config_cls: type[TPredictorConfig],
-        get_model: Callable,
-        cs_cls: type[ClassSelector] = ClassSelector,
-    ):
-
-    @merge_conf(predictor_config_cls)
-    def get_predictor(
-            model_config: Optional[TPredictionModelConfig]=None,
-            model_path: Optional[str]=None,
-            model: Optional[TPredictionModel]=None,
-            predictor: type[predictor]=predictor,
-            cs_config: Optional[ClassSelectorConfig]=None,
-            cs: Optional[cs_cls]= None,
-            mode: Optional[ClassificationMode]=None, 
-            min_confidence: Optional[float]=None,
-            classes: Optional[ClassList]=None,
-        ):
-
-        if not model:
-            model = get_model(
-                path=model_path,
-                cfg=model_config
-            )
-
-        if not cs:
-            cs = get_class_selector(
-                cfg=cs_config,
-                mode=mode,
-                min_confidence=min_confidence,
-                classes=classes,
-                model_class_names=model.class_names,
-            )
-
-        return predictor(model=model, cs=cs)
-
-    get_predictor.__name__ = name
-
-    return get_predictor

@@ -148,31 +148,3 @@ class ClassSelectorFactory:
             return mode.cs(min_confidence)
 
 DEFAULT_CLASS_SELECTOR_FACTORY: ClassSelectorFactory = ClassSelectorFactory()
-
-@merge_conf(ClassSelectorConfig)
-def get_class_selector(
-        mode: Optional[ClassificationMode]=None, 
-        min_confidence: Optional[float]=None,
-        classes: Optional[Union[list[int],list[str], str, int]]=None,
-        model_class_names: Optional[ClassNames]=None
-    ):
-
-    if not mode:
-        if classes:
-            mode = ClassificationMode.FIXED
-        else:
-            mode = ClassificationMode.MAX
-
-    if mode.classes_needed:
-        if not classes:
-            raise ClassRequiredForModeException(mode)
-        
-        if type(classes) is not list:
-            classes = [classes]
-        
-        if type(classes[0]) is str:
-            classes = [model_class_names.get_number(class_name) for class_name in classes]
-    
-        return mode.cs(classes,min_confidence)
-    else:
-        return mode.cs(min_confidence)
