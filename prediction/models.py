@@ -126,35 +126,3 @@ class MultiPredictionModelFactory(IPredictionModelFactory[TPredictionModel, TPre
 
 class MultiPathPredictionModelFactory(MultiPredictionModelFactory[TPredictionModel, TPathPredictionModelConfig], IPathPredictionModelFactory[TPredictionModel, TPathPredictionModelConfig]):
     pass
-
-def get_prediction_model_factory(
-        name: str,
-        model_cls: type[TPredictionModel],
-        model_config_cls: type[TPredictionModelConfig],
-        model_type_cls: type[PredictionModelFactory[TPredictionModel, TPredictionModelConfig]],
-        DEFAULT_MODEL_CLS: type[TPredictionModel],
-        DEFAULT_MODEL_CONFIG: TPredictionModelConfig
-    ):
-
-    def get_prediction_model(
-            model_config: Optional[model_config_cls]=None,
-            model_cls: Optional[type[model_cls]]=None,
-            model_type: Optional[model_type_cls]=None
-        ):
-
-        if not model_config:
-            model_config = DEFAULT_MODEL_CONFIG
-
-        if not model_cls:
-            if hasattr(model_config, "model_cls"):
-                model_cls = model_config.model_cls
-            elif model_type:
-                model_cls = model_type.model_cls
-            else:
-                model_cls = DEFAULT_MODEL_CLS
-
-        return model_cls(model_config)
-    
-    get_prediction_model.__name__ = name
-    
-    return get_prediction_model
