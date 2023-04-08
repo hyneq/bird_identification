@@ -1,6 +1,4 @@
-from typing import Optional, Callable
-
-from argparse import ArgumentParser, Namespace
+from argparse import ArgumentParser
 from enum_actions import enum_action
 import cv2
 

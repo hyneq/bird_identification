@@ -2,8 +2,6 @@ import os,sys
 sys.path.append(os.path.realpath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 sys.path.remove(os.path.dirname(__file__))
 
-import numpy as np
-
 from detection.detector import object_detector_factory
 
 from cli.prediction import PredictionCLI
