@@ -1,12 +1,10 @@
-from typing import Generic, TypeVar, Optional, Union, Callable
+from typing import Generic, TypeVar, Optional, Callable
 from typing_extensions import Self
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-import cv2
-
 from config import merge_conf
-from .classes import ClassList, ClassSelectorConfig, ClassSelector, ClassificationMode, DEFAULT_CLASS_SELECTOR, ClassSelectorFactory, DEFAULT_CLASS_SELECTOR_FACTORY, get_class_selector
+from .classes import ClassList, ClassSelectorConfig, ClassSelector, ClassificationMode, ClassSelectorFactory, DEFAULT_CLASS_SELECTOR_FACTORY, get_class_selector
 from .models import TPredictionModel, TPredictionModelConfig, TPathPredictionModelConfig, TPredictionModelInput, TPredictionModelOutput, MultiPathPredictionModelFactory
 
 TPredictionInput = TypeVar("TPredictionInput")
