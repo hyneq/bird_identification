@@ -93,8 +93,6 @@ class IPredictor(ABC, Generic[TPredictionInput, TPredictionResult]):
 class Predictor(IPredictor[TPredictionModelInput, TPredictionResult], Generic[TPredictionModel, TPredictionModelConfig, TPredictionProcessor, TPredictionModelInput, TPredictionModelOutput, TPredictionResult]):
     __slots__: tuple
     
-    model_cls: type[TPredictionModel]
-    
     model: TPredictionModel
 
     prediction_processor: type[TPredictionProcessor]
