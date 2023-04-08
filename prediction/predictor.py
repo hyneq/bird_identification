@@ -128,28 +128,6 @@ class PredictorWithCS(Predictor[TPredictionModel, TPredictionModelConfig, TPredi
 
         super().__init__(*args, **kwargs, cs_=cs)
 
-class WrapperPredictor(IPredictor[TPredictionInput, TPredictionResult], Generic[TPredictionInput, TPredictor, TPredictionResult]):
-    __slots__: tuple
-
-    predictor_cls: type[TPredictor]
-
-    predictor: TPredictor
-
-    def __init__(self, *args, predictor: Optional[TPredictor] = None, **kwargs):
-        if not predictor:
-            predictor = self.predictor_cls(*args, **kwargs)
-        
-        self.predictor = predictor
-
-
-class FileImagePredictor(WrapperPredictor[str, TPredictor, TPredictionResult]):
-    __slots__: tuple
-    
-    def predict(self, path: str) -> TPredictionResult:
-        image = cv2.imread(path)
-
-        return self.predictor.predict(image)
-
 class IPredictorFactory(Generic[TPredictor, TPredictionModel, TPredictorConfig, TPathPredictionModelConfig]):
 
     @abstractmethod
@@ -219,21 +197,6 @@ class PredictorFactory(IPredictorFactory[TPredictor, TPredictionModel, TPredicto
     
     def get_model_factory(self) -> MultiPathPredictionModelFactory[TPredictionModel, TPathPredictionModelConfig]:
         return self.model_factory
-
-@dataclass
-class WrapperPredictorFactory(IPredictorFactory[TPredictor, TPredictionModel, TPredictorConfig, TPathPredictionModelConfig]):
-        
-    wrapper_predictor_cls: type[TPredictor]
-    
-    wrapped_predictor_factory: IPredictorFactory[IPredictor, TPredictionModel, TPredictorConfig, TPathPredictionModelConfig]
-
-    def get_predictor(self, *args, **kwargs) -> TPredictor:
-        wrapped_predictor = self.wrapped_predictor_factory.get_predictor(*args, **kwargs)
-        return self.wrapper_predictor_cls(predictor=wrapped_predictor)
-    
-    def get_model_factory(self) -> MultiPathPredictionModelFactory[TPredictionModel, TPathPredictionModelConfig]:
-        return self.wrapped_predictor_factory.get_model_factory()
-
 
 def get_predictor_factory(
         name: str,

@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from prediction.predictor import PredictorConfig, PredictionProcessorWithCS, PredictorWithCS, FileImagePredictor, PredictorFactory, WrapperPredictorFactory
+from prediction.predictor import PredictorConfig, PredictionProcessorWithCS, PredictorWithCS, PredictorFactory
 from prediction.models import Image
 from .models import ClassificationModelConfig, ClassificationModelOutput, ClassificationModel, classification_model_factory
 
@@ -32,11 +32,6 @@ class ImageClassifier(PredictorWithCS[ClassificationModel, ClassificationModelCo
 
     prediction_processor = ClassificationProcessor
 
-class FileImageClassifier(FileImagePredictor[ImageClassifier, ClassificationResult]):
-    __slots__: tuple
-
-    predictor_cls = ImageClassifier
-
 @dataclass
 class ClassifierConfig(PredictorConfig[ClassificationModelConfig]):
     pass
@@ -45,11 +40,6 @@ image_classifier_factory = PredictorFactory(
     predictor=ImageClassifier,
     predictor_config=ClassifierConfig,
     model_factory=classification_model_factory
-)
-
-file_image_classifier_factory = WrapperPredictorFactory(
-    wrapper_predictor_cls = FileImageClassifier,
-    wrapped_predictor_factory = image_classifier_factory
 )
 
 get_image_classifier = image_classifier_factory.get_predictor
@@ -65,10 +55,7 @@ def classify_images(
         images = [images]
     
     if not classifier:
-        if type(images[0]) is str:
-            classifier = FileImageClassifier
-        else:
-            classifier = ImageClassifier
+        classifier = ImageClassifier
 
     if isinstance(classifier, type):
         classifier = get_image_classifier(*args, predictor=classifier, **kwargs)

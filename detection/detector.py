@@ -4,7 +4,7 @@ from dataclasses import dataclass
 import cv2
 import numpy as np
 
-from prediction.predictor import PredictorConfig, PredictionProcessorWithCS, PredictorWithCS, FileImagePredictor, PredictorFactory, WrapperPredictorFactory
+from prediction.predictor import PredictorConfig, PredictionProcessorWithCS, PredictorWithCS, PredictorFactory
 from prediction.models import Image
 from .models import DetectionModelConfig, DetectionModelOutput, DetectionModel, model_factory
 
@@ -100,11 +100,6 @@ class ObjectDetector(PredictorWithCS[DetectionModel, DetectionModelConfig, Detec
 
     prediction_processor = DetectionProcessor
 
-class FileObjectDetector(FileImagePredictor[ObjectDetector, DetectionResult]):
-    __slots__: tuple
-
-    predictor_cls = ObjectDetector
-
 @dataclass
 class DetectorConfig(PredictorConfig[ObjectDetector]):
     pass
@@ -113,11 +108,6 @@ object_detector_factory = PredictorFactory(
     predictor=ObjectDetector,
     predictor_config=DetectorConfig,
     model_factory=model_factory
-)
-
-file_object_detector_factory = WrapperPredictorFactory(
-    wrapper_predictor_cls = FileObjectDetector,
-    wrapped_predictor_factory = object_detector_factory
 )
 
 get_object_detector = object_detector_factory.get_predictor
@@ -142,10 +132,7 @@ def detect_objects(
         images = [images]
     
     if not detector:
-        if type(images[0]) is str:
-            detector = FileObjectDetector
-        else:
-            detector = ObjectDetector
+        detector = ObjectDetector
     
     
     if isinstance(detector, type):

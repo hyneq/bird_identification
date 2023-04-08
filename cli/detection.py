@@ -4,12 +4,12 @@ sys.path.remove(os.path.dirname(__file__))
 
 import numpy as np
 
-from detection.detector import file_object_detector_factory
+from detection.detector import object_detector_factory
 
 from cli.prediction import PredictionCLI
 
 def cli_main():
-    PredictionCLI(file_object_detector_factory).run()
+    PredictionCLI(object_detector_factory).run()
 
 """
 def cli_main():
