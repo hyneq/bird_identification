@@ -5,8 +5,7 @@ from dataclasses import dataclass
 import numpy as np
 
 from .classes import ClassNames
-
-Image = np.ndarray
+from .image_utils import Image
 
 TPredictionModelInput = TypeVar("TPredictionModelInput")
 TPredictionModelOutput = TypeVar("TPredictionModelOutput")

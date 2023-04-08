@@ -4,7 +4,7 @@ from dataclasses import dataclass
 import numpy as np
 
 from prediction.predictor import PredictorConfig, PredictionProcessorWithCS, PredictorWithCS, PredictorFactory
-from prediction.models import Image
+from prediction.image_utils import Image
 from .models import ClassificationModelConfig, ClassificationModelOutput, ClassificationModel, classification_model_factory
 
 @dataclass

@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 
 from prediction.predictor import PredictorConfig, PredictionProcessorWithCS, PredictorWithCS, PredictorFactory
-from prediction.models import Image
+from prediction.image_utils import Image
 from .models import DetectionModelConfig, DetectionModelOutput, DetectionModel, model_factory
 
 from defaults.detection import DEFAULT_NMS_THRESHOLD

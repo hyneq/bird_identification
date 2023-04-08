@@ -7,7 +7,8 @@ import numpy as np
 from tensorflow import keras
 import cv2
 
-from prediction.models import PathPredictionModelConfig, ImagePredictionModel, TPredictionModelOutput, Image
+from prediction.models import PathPredictionModelConfig, ImagePredictionModel, TPredictionModelOutput
+from prediction.image_utils import Image
 
 @dataclass
 class KerasModelConfig(PathPredictionModelConfig):

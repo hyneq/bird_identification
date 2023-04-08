@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-from prediction.models import Image
+from prediction.image_utils import Image
 from detection.detector import ObjectDetector, DetectionResult, BoundingBox
 
 class Extraction:
