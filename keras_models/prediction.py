@@ -40,5 +40,5 @@ class KerasPredictionModel(ImagePredictionModel[KerasModelConfig, TPredictionMod
         return self.get_output(predictions)
     
     @abstractmethod
-    def get_output(predictions: np.ndarray) -> TPredictionModelOutput:
+    def get_output(self, predictions: np.ndarray) -> TPredictionModelOutput:
         pass
