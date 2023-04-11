@@ -53,16 +53,13 @@ class DetectionModelOutput(ABC, Generic[TDetectionObj, TDetectionModelRawOutput,
     def __iter__(self) -> TDetectionModelOutputIter:
         return self.iter_cls(self.raw_output)
 
-class DetectionModel(IImagePredictionModel[DetectionModelConfig, DetectionModelOutput]):
-    pass
+DetectionModel = IImagePredictionModel[DetectionModelConfig, DetectionModelOutput]
 
 TDetectionModel = TypeVar("TDetectionModel", bound=DetectionModel)
 
-class DetectionModelFactory(PredictionModelFactory[TDetectionModel, TDetectionModelConfig]):
-    pass
+DetectionModelFactory = PredictionModelFactory[TDetectionModel, TDetectionModelConfig]
 
-class PathDetectionModelFactory(PathPredictionModelFactory[TDetectionModel, TPathDetectionModelConfig]):
-    pass
+PathDetectionModelFactory = PathPredictionModelFactory[TDetectionModel, TPathDetectionModelConfig]
 
 from defaults.detection import MODEL_FACTORIES, DEFAULT_MODEL_FACTORY
 

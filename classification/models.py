@@ -16,16 +16,13 @@ TPathClassificationModelConfig = TypeVar("TPathClassificationModelConfig", bound
 
 ClassificationModelOutput = np.ndarray
 
-class ClassificationModel(IImagePredictionModel[ClassificationModelConfig, ClassificationModelOutput]):
-    __slots__: tuple
+ClassificationModel = IImagePredictionModel[ClassificationModelConfig, ClassificationModelOutput]
 
 TClassificationModel = TypeVar("TClassificationModel", bound=ClassificationModel)
 
-class ClassificationModelFactory(PredictionModelFactory[TClassificationModel, TClassificationModelConfig]):
-    pass
+ClassificationModelFactory = PredictionModelFactory[TClassificationModel, TClassificationModelConfig]
 
-class PathClassificationModelFactory(PathPredictionModelFactory[TClassificationModel, TPathClassificationModelConfig]):
-    pass
+PathClassificationModelFactory = PathPredictionModelFactory[TClassificationModel, TPathClassificationModelConfig]
 
 from defaults.classification import MODEL_FACTORIES, DEFAULT_MODEL_FACTORY
 
