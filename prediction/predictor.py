@@ -1,4 +1,4 @@
-from typing import Generic, TypeVar, Optional, Callable
+from typing import Any, Generic, TypeVar, Optional, Callable
 from typing_extensions import Self
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
@@ -100,14 +100,14 @@ class Predictor(IPredictor[TPredictionModelInput, TPredictionResult], Generic[TP
     
     model: TPredictionModel
 
-    input_strategy: InputStrategy[TPredictionInput, TPredictionModelInput]
+    input_strategy: InputStrategy[Any, TPredictionModelInput]
 
     prediction_processor: type[TPredictionProcessor]
 
     def __init__(self,
             *processor_args,
             model: TPredictionModel,
-            input_strategy: InputStrategy[TPredictionInput, TPredictionModelInput],
+            input_strategy: InputStrategy[Any, TPredictionModelInput],
             **processor_kwargs
         ):
 
@@ -169,7 +169,7 @@ class PredictorFactory(IPredictorFactory[TPredictor, TPredictionModel, TPredicti
     predictor: type[TPredictor]
     predictor_config: type[TPredictorConfig]
     model_factory: MultiPathPredictionModelFactory[TPredictionModel, TPathPredictionModelConfig]
-    input_strategy: InputStrategy[TPredictionInput, TPredictionModelInput]=default_input_strategy
+    input_strategy: InputStrategy[Any, TPredictionModelInput]=default_input_strategy
     cs_factory: ClassSelectorFactory=DEFAULT_CLASS_SELECTOR_FACTORY
 
     def get_predictor(self,
