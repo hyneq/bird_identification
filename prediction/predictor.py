@@ -1,11 +1,11 @@
-from typing import Any, Generic, TypeVar, Optional, Callable
+from typing import Any, Generic, TypeVar, Optional, Callable, Union
 from typing_extensions import Self
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
 from config import merge_conf
 from .classes import ClassList, ClassSelectorConfig, ClassSelector, ClassificationMode, ClassSelectorFactory, DEFAULT_CLASS_SELECTOR_FACTORY
-from .models import TPredictionModel, TPredictionModelConfig, TPathPredictionModelConfig, TPredictionModelInput, TPredictionModelOutput, MultiPathPredictionModelFactory
+from .models import TPredictionModel, TPredictionModelConfig, TPredictionModelInput, TPredictionModelOutput, MultiPathPredictionModelFactory
 
 TPredictionInput = TypeVar("TPredictionInput")
 TPredictionResult = TypeVar("TPredictionResult")
@@ -139,11 +139,11 @@ class PredictorWithCS(Predictor[TPredictionModel, TPredictionModelConfig, TPredi
 
         super().__init__(*args, **kwargs, cs_=cs)
 
-class IPredictorFactory(Generic[TPredictor, TPredictionModel, TPredictionModelInput, TPredictorConfig, TPathPredictionModelConfig]):
+class IPredictorFactory(Generic[TPredictor, TPredictionModel, TPredictionModelInput, TPredictorConfig, TPredictionModelConfig]):
 
     @abstractmethod
     def get_predictor(self,
-            model_config: Optional[TPathPredictionModelConfig]=None,
+            model_config: Optional[TPredictionModelConfig]=None,
             model_path: Optional[str]=None,
             model_type: Optional[str]=None,
             model: Optional[TPredictionModel]=None,
@@ -159,16 +159,16 @@ class IPredictorFactory(Generic[TPredictor, TPredictionModel, TPredictionModelIn
         pass
 
     @abstractmethod
-    def get_model_factory(self) -> MultiPathPredictionModelFactory[TPredictionModel, TPathPredictionModelConfig]:
+    def get_model_factory(self) -> MultiPathPredictionModelFactory[TPredictionModel, TPredictionModelConfig]:
         pass
 
 
 @dataclass(frozen=True)
-class PredictorFactory(IPredictorFactory[TPredictor, TPredictionModel, TPredictionModelInput, TPredictorConfig, TPathPredictionModelConfig], ABC):
+class PredictorFactory(IPredictorFactory[TPredictor, TPredictionModel, TPredictionModelInput, TPredictorConfig, TPredictionModelConfig], ABC):
 
     predictor: type[TPredictor]
     predictor_config: type[TPredictorConfig]
-    model_factory: MultiPathPredictionModelFactory[TPredictionModel, TPathPredictionModelConfig]
+    model_factory: MultiPathPredictionModelFactory[TPredictionModel, TPredictionModelConfig]
     input_strategy: InputStrategy[Any, TPredictionModelInput]=default_input_strategy
     cs_factory: ClassSelectorFactory=DEFAULT_CLASS_SELECTOR_FACTORY
 
@@ -196,7 +196,7 @@ class PredictorFactory(IPredictorFactory[TPredictor, TPredictionModel, TPredicti
         if not model:
             model = self.model_factory.get_model(
                 factory=model_type,
-                path=model_path,
+                cfg_input=model_path,
                 cfg=model_config
             )
 
@@ -216,5 +216,5 @@ class PredictorFactory(IPredictorFactory[TPredictor, TPredictionModel, TPredicti
             input_strategy=input_strategy
         )
     
-    def get_model_factory(self) -> MultiPathPredictionModelFactory[TPredictionModel, TPathPredictionModelConfig]:
+    def get_model_factory(self) -> MultiPathPredictionModelFactory[TPredictionModel, TPredictionModelConfig]:
         return self.model_factory

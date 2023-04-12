@@ -6,11 +6,11 @@ import os
 import cv2
 import numpy as np
 
-from prediction.models import PathPredictionModelConfig, ImagePredictionModel, TPredictionModelOutput
+from prediction.models import PredictionModelConfig, ImagePredictionModel, TPredictionModelOutput
 from prediction.image_utils import Image
 
 @dataclass()
-class DarknetPredictionModelConfig(PathPredictionModelConfig):
+class DarknetPredictionModelConfig(PredictionModelConfig):
     config_path: str
     weights_path: str
 

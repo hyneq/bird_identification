@@ -101,7 +101,7 @@ class ObjectDetector(PredictorWithCS[DetectionModel, DetectionModelConfig, Detec
     prediction_processor = DetectionProcessor
 
 @dataclass
-class DetectorConfig(PredictorConfig[ObjectDetector]):
+class DetectorConfig(PredictorConfig[DetectionModelConfig]):
     pass
 
 object_detector_factory = PredictorFactory(

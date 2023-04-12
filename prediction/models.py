@@ -1,4 +1,4 @@
-from typing import Generic, TypeVar, Optional, Union
+from typing import Any, Generic, TypeVar, Optional, Union, Callable
 from abc import ABC, abstractmethod, abstractclassmethod
 from dataclasses import dataclass
 
@@ -14,13 +14,15 @@ class PredictionModelConfig:
 
 TPredictionModelConfig = TypeVar("TPredictionModelConfig", bound=PredictionModelConfig)
 
-class PathPredictionModelConfig(PredictionModelConfig, ABC):
-    
-    @abstractclassmethod
-    def from_path(cls, path: str):
-        pass
+ModelConfigLoaderInputT = TypeVar("ModelConfigLoaderInputT")
 
-TPathPredictionModelConfig = TypeVar("TPathPredictionModelConfig", bound=PathPredictionModelConfig)
+ModelConfigLoaderInputT_cls = TypeVar("ModelConfigLoaderInputT_cls")
+ModelConfigLoaderInputT_fun = TypeVar("ModelConfigLoaderInputT_fun")
+
+ModelConfigLoader = Callable[[ModelConfigLoaderInputT], TPredictionModelConfig]
+
+def default_model_config_loader(input: TPredictionModelConfig) -> TPredictionModelConfig:
+    return input
 
 class IPredictionModel(ABC, Generic[TPredictionModelConfig, TPredictionModelInput, TPredictionModelOutput]):
     __slots__: tuple
@@ -53,57 +55,46 @@ class IImagePredictionModel(IPredictionModel[TPredictionModelConfig, Image, TPre
 class ImagePredictionModel(PredictionModel[TPredictionModelConfig, Image, TPredictionModelOutput], IImagePredictionModel[TPredictionModelConfig, TPredictionModelOutput]):
     pass
 
-class IPredictionModelFactory(ABC, Generic[TPredictionModel, TPredictionModelConfig]):
+class IPredictionModelFactory(ABC, Generic[TPredictionModel, ModelConfigLoaderInputT_cls, TPredictionModelConfig]):
     name: str
 
     @abstractmethod
-    def get_model(self, cfg: Optional[TPredictionModelConfig]=None) -> TPredictionModel:
-        pass
-
-class IPathPredictionModelFactory(IPredictionModelFactory[TPredictionModel, TPathPredictionModelConfig]):
-
-    @abstractmethod
-    def get_model(self, path: Optional[str]=None, cfg: Optional[TPathPredictionModelConfig]=None) -> TPredictionModel:
+    def get_model(self, cfg_input: Optional[Union[ModelConfigLoaderInputT_cls, ModelConfigLoaderInputT_fun]]=None, loader: Optional[ModelConfigLoader[ModelConfigLoaderInputT_fun, TPredictionModelConfig]]=None) -> TPredictionModel:
         pass
 
 @dataclass(frozen=True)
-class PredictionModelFactory(IPredictionModelFactory[TPredictionModel, TPredictionModelConfig]):
+class PredictionModelFactory(IPredictionModelFactory[TPredictionModel, ModelConfigLoaderInputT_cls, TPredictionModelConfig]):
     name: str
     model_cls: type[TPredictionModel]
     model_config_cls: type[TPredictionModelConfig]
-    default_config: Optional[TPredictionModelConfig] = None
+    model_config_loader: ModelConfigLoader[Any, TPredictionModelConfig] = default_model_config_loader
+    default_model_config_input: Optional[Any] = None
 
-    def get_model(self, cfg: Optional[TPredictionModelConfig]=None) -> TPredictionModel:
+    def get_model_cfg(self, cfg_input: Optional[Union[ModelConfigLoaderInputT_cls, ModelConfigLoaderInputT_fun]]=None, cfg_loader: Optional[ModelConfigLoader[ModelConfigLoaderInputT_fun, TPredictionModelConfig]]=None) -> TPredictionModelConfig:
+        if cfg_input:
+            if not cfg_loader:
+                cfg_loader = self.model_config_loader
+            
+            cfg = cfg_loader(cfg_input)
+        else:
+            cfg = self.model_config_loader(self.default_model_config_input)
+        
+        return cfg
+    
+    def get_model(self, *args, cfg: Optional[TPredictionModelConfig]=None, **kwargs) -> TPredictionModel:
         if not cfg:
-            if self.default_config:
-                cfg = self.default_config
-            else:
-                raise RuntimeError("Cannot instantiate model: No default config present and no config supplied")
+            cfg = self.get_model_cfg(*args, **kwargs)
         
         return self.model_cls(cfg)
 
-@dataclass(frozen=True)
-class PathPredictionModelFactory(PredictionModelFactory[TPredictionModel, TPathPredictionModelConfig], IPathPredictionModelFactory[TPredictionModel, TPathPredictionModelConfig]):
-    default_path: Optional[str] = None
-
-    def get_model(self, path: Optional[str]=None, cfg: Optional[TPathPredictionModelConfig]=None) -> TPredictionModel:
-        if not cfg:
-            if not path and self.default_path:
-                path = self.default_path
-            
-            if path:
-                cfg = self.model_config_cls.from_path(path)
-        
-        return super().get_model(cfg=cfg)
-
-class MultiPredictionModelFactory(IPredictionModelFactory[TPredictionModel, TPredictionModelConfig]):
+class MultiPredictionModelFactory(IPredictionModelFactory[TPredictionModel, ModelConfigLoaderInputT_cls, TPredictionModelConfig]):
     name: str
 
-    factories: dict[str, IPredictionModelFactory[TPredictionModel, TPredictionModelConfig]]
+    factories: dict[str, IPredictionModelFactory[TPredictionModel, ModelConfigLoaderInputT_cls, TPredictionModelConfig]]
     default_factory: str
 
     def __init__(self,
-                factories: Union[list[IPredictionModelFactory[TPredictionModel, TPredictionModelConfig]],dict[str,IPredictionModelFactory[TPredictionModel, TPredictionModelConfig]]],
+                factories: Union[list[IPredictionModelFactory[TPredictionModel, ModelConfigLoaderInputT_cls, TPredictionModelConfig]],dict[str,IPredictionModelFactory[TPredictionModel, ModelConfigLoaderInputT_cls, TPredictionModelConfig]]],
                 default_factory: str,
                 name="multi"
         ):
@@ -124,5 +115,4 @@ class MultiPredictionModelFactory(IPredictionModelFactory[TPredictionModel, TPre
     def get_factory_names(self):
         return list(self.factories.keys())
 
-class MultiPathPredictionModelFactory(MultiPredictionModelFactory[TPredictionModel, TPathPredictionModelConfig], IPathPredictionModelFactory[TPredictionModel, TPathPredictionModelConfig]):
-    pass
+MultiPathPredictionModelFactory = MultiPredictionModelFactory[TPredictionModel, str, TPredictionModelConfig]
