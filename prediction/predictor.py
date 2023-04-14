@@ -5,34 +5,34 @@ from dataclasses import dataclass
 
 from config import merge_conf
 from .classes import ClassList, ClassSelectorConfig, ClassSelector, ClassificationMode, ClassSelectorFactory, DEFAULT_CLASS_SELECTOR_FACTORY
-from .models import TPredictionModel, TPredictionModelConfig, TPredictionModelInput, TPredictionModelOutput, MultiPathPredictionModelFactory
+from .models import PredictionModelT, PredictionModelConfigT, PredictionModelInputT, PredictionModelOutputT, MultiPathPredictionModelFactory
 
-TPredictionInput = TypeVar("TPredictionInput")
-TPredictionResult = TypeVar("TPredictionResult")
+PredictionInputT = TypeVar("PredictionInputT")
+PredictionResultT = TypeVar("PredictionResultT")
 
 @dataclass
-class PredictorConfig(Generic[TPredictionModelConfig]):
-    model_config: Optional[TPredictionModelConfig] = None
+class PredictorConfig(Generic[PredictionModelConfigT]):
+    model_config: Optional[PredictionModelConfigT] = None
     model_path: Optional[str] = None
     min_confidence: Optional[float] = None
     classification_mode: Optional[ClassificationMode] = None
     classes: Optional[ClassList] = None
 
-TPredictorConfig = TypeVar("TPredictorConfig", bound=PredictorConfig)
+PredictorConfigT = TypeVar("PredictorConfigT", bound=PredictorConfig)
 
-InputStrategy = Callable[[TPredictionInput], TPredictionModelInput]
+InputStrategy = Callable[[PredictionInputT], PredictionModelInputT]
 
-def default_input_strategy(input: TPredictionModelInput) -> TPredictionModelInput:
+def default_input_strategy(input: PredictionModelInputT) -> PredictionModelInputT:
     return input
 
-class PredictionProcessor(ABC, Generic[TPredictionModel, TPredictionModelOutput, TPredictionResult]):
+class PredictionProcessor(ABC, Generic[PredictionModelT, PredictionModelOutputT, PredictionResultT]):
     __slots__: tuple
 
-    model: TPredictionModel
+    model: PredictionModelT
 
-    output: TPredictionModelOutput
+    output: PredictionModelOutputT
 
-    def __init__(self, output: TPredictionModelOutput):
+    def __init__(self, output: PredictionModelOutputT):
         self.output = output
     
     @classmethod
@@ -45,7 +45,7 @@ class PredictionProcessor(ABC, Generic[TPredictionModel, TPredictionModelOutput,
         return cls_copy
     
     @classmethod
-    def with_args(cls, model_: TPredictionModel) -> Self:
+    def with_args(cls, model_: PredictionModelT) -> Self:
         cls = cls.get_subclass()
 
         cls.model = model_
@@ -53,7 +53,7 @@ class PredictionProcessor(ABC, Generic[TPredictionModel, TPredictionModelOutput,
         return cls
 
     @classmethod
-    def with_model(cls, model_: TPredictionModel) -> Self:
+    def with_model(cls, model_: PredictionModelT) -> Self:
         cls = cls.get_subclass()
 
         cls.model = model_
@@ -61,10 +61,10 @@ class PredictionProcessor(ABC, Generic[TPredictionModel, TPredictionModelOutput,
         return cls
     
     @abstractmethod
-    def process(self) -> TPredictionResult:
+    def process(self) -> PredictionResultT:
         pass
 
-class PredictionProcessorWithCS(PredictionProcessor[TPredictionModel, TPredictionModelOutput, TPredictionResult]):
+class PredictionProcessorWithCS(PredictionProcessor[PredictionModelT, PredictionModelOutputT, PredictionResultT]):
     __slots__: tuple
 
     cs: ClassSelector
@@ -85,29 +85,29 @@ class PredictionProcessorWithCS(PredictionProcessor[TPredictionModel, TPredictio
 
         return cls
 
-TPredictionProcessor = TypeVar("TPredictionProcessor", bound=PredictionProcessor)
-TPredictionProcessorWithCS = TypeVar("TPredictionProcessorWithCS", bound=PredictionProcessorWithCS)
+PredictionProcessorT = TypeVar("PredictionProcessorT", bound=PredictionProcessor)
+PredictionProcessorWithCST = TypeVar("PredictionProcessorWithCST", bound=PredictionProcessorWithCS)
 
-class IPredictor(ABC, Generic[TPredictionModelInput, TPredictionResult]):
+class IPredictor(ABC, Generic[PredictionModelInputT, PredictionResultT]):
     __slots__: tuple
 
     @abstractmethod
-    def predict(self, input: TPredictionInput, input_strategy: Optional[InputStrategy[TPredictionInput, TPredictionModelInput]]=None) -> TPredictionResult:
+    def predict(self, input: PredictionInputT, input_strategy: Optional[InputStrategy[PredictionInputT, PredictionModelInputT]]=None) -> PredictionResultT:
         pass
 
-class Predictor(IPredictor[TPredictionModelInput, TPredictionResult], Generic[TPredictionModel, TPredictionModelConfig, TPredictionProcessor, TPredictionModelInput, TPredictionModelOutput, TPredictionResult]):
+class Predictor(IPredictor[PredictionModelInputT, PredictionResultT], Generic[PredictionModelT, PredictionModelConfigT, PredictionProcessorT, PredictionModelInputT, PredictionModelOutputT, PredictionResultT]):
     __slots__: tuple
     
-    model: TPredictionModel
+    model: PredictionModelT
 
-    input_strategy: InputStrategy[Any, TPredictionModelInput]
+    input_strategy: InputStrategy[Any, PredictionModelInputT]
 
-    prediction_processor: type[TPredictionProcessor]
+    prediction_processor: type[PredictionProcessorT]
 
     def __init__(self,
             *processor_args,
-            model: TPredictionModel,
-            input_strategy: InputStrategy[Any, TPredictionModelInput],
+            model: PredictionModelT,
+            input_strategy: InputStrategy[Any, PredictionModelInputT],
             **processor_kwargs
         ):
 
@@ -117,19 +117,19 @@ class Predictor(IPredictor[TPredictionModelInput, TPredictionResult], Generic[TP
         
         self.prediction_processor = self.prediction_processor.with_args(self.model, *processor_args, **processor_kwargs)
 
-    def predict(self, input: TPredictionInput, input_strategy: Optional[InputStrategy[TPredictionInput, TPredictionModelInput]]=None) -> TPredictionResult:
+    def predict(self, input: PredictionInputT, input_strategy: Optional[InputStrategy[PredictionInputT, PredictionModelInputT]]=None) -> PredictionResultT:
         if not input_strategy:
             input_strategy = self.input_strategy
 
         model_input = input_strategy(input)
 
-        model_output: TPredictionModelOutput = self.model.predict(model_input)
+        model_output: PredictionModelOutputT = self.model.predict(model_input)
 
         return self.prediction_processor(model_output).process()
 
-TPredictor = TypeVar("TPredictor", bound=IPredictor)
+PredictorT = TypeVar("PredictorT", bound=IPredictor)
 
-class PredictorWithCS(Predictor[TPredictionModel, TPredictionModelConfig, TPredictionProcessorWithCS, TPredictionModelInput, TPredictionModelOutput, TPredictionResult]):
+class PredictorWithCS(Predictor[PredictionModelT, PredictionModelConfigT, PredictionProcessorWithCST, PredictionModelInputT, PredictionModelOutputT, PredictionResultT]):
     __slots__: tuple
     
     def __init__(self,
@@ -139,53 +139,53 @@ class PredictorWithCS(Predictor[TPredictionModel, TPredictionModelConfig, TPredi
 
         super().__init__(*args, **kwargs, cs_=cs)
 
-class IPredictorFactory(Generic[TPredictor, TPredictionModel, TPredictionModelInput, TPredictorConfig, TPredictionModelConfig]):
+class IPredictorFactory(Generic[PredictorT, PredictionModelT, PredictionModelInputT, PredictorConfigT, PredictionModelConfigT]):
 
     @abstractmethod
     def get_predictor(self,
-            model_config: Optional[TPredictionModelConfig]=None,
+            model_config: Optional[PredictionModelConfigT]=None,
             model_path: Optional[str]=None,
             model_type: Optional[str]=None,
-            model: Optional[TPredictionModel]=None,
-            predictor: Optional[type[TPredictor]]=None,
-            input_strategy: Optional[InputStrategy[TPredictionInput, TPredictionModelInput]]=None,
+            model: Optional[PredictionModelT]=None,
+            predictor: Optional[type[PredictorT]]=None,
+            input_strategy: Optional[InputStrategy[PredictionInputT, PredictionModelInputT]]=None,
             cs_config: Optional[ClassSelectorConfig]=None,
             cs: Optional[ClassSelector]= None,
             mode: Optional[ClassificationMode]=None, 
             min_confidence: Optional[float]=None,
             min_confidence_pc: Optional[int]=None,
             classes: Optional[ClassList]=None,
-        ) -> TPredictor:
+        ) -> PredictorT:
         pass
 
     @abstractmethod
-    def get_model_factory(self) -> MultiPathPredictionModelFactory[TPredictionModel, TPredictionModelConfig]:
+    def get_model_factory(self) -> MultiPathPredictionModelFactory[PredictionModelT, PredictionModelConfigT]:
         pass
 
 
 @dataclass(frozen=True)
-class PredictorFactory(IPredictorFactory[TPredictor, TPredictionModel, TPredictionModelInput, TPredictorConfig, TPredictionModelConfig], ABC):
+class PredictorFactory(IPredictorFactory[PredictorT, PredictionModelT, PredictionModelInputT, PredictorConfigT, PredictionModelConfigT], ABC):
 
-    predictor: type[TPredictor]
-    predictor_config: type[TPredictorConfig]
-    model_factory: MultiPathPredictionModelFactory[TPredictionModel, TPredictionModelConfig]
-    input_strategy: InputStrategy[Any, TPredictionModelInput]=default_input_strategy
+    predictor: type[PredictorT]
+    predictor_config: type[PredictorConfigT]
+    model_factory: MultiPathPredictionModelFactory[PredictionModelT, PredictionModelConfigT]
+    input_strategy: InputStrategy[Any, PredictionModelInputT]=default_input_strategy
     cs_factory: ClassSelectorFactory=DEFAULT_CLASS_SELECTOR_FACTORY
 
     def get_predictor(self,
-            model_config: Optional[TPredictionModelConfig]=None,
+            model_config: Optional[PredictionModelConfigT]=None,
             model_path: Optional[str]=None,
             model_type: Optional[str]=None,
-            model: Optional[TPredictionModel]=None,
-            predictor: Optional[type[TPredictor]]=None,
-            input_strategy: Optional[InputStrategy[TPredictionInput, TPredictionModelInput]]=None,
+            model: Optional[PredictionModelT]=None,
+            predictor: Optional[type[PredictorT]]=None,
+            input_strategy: Optional[InputStrategy[PredictionInputT, PredictionModelInputT]]=None,
             cs_config: Optional[ClassSelectorConfig]=None,
             cs: Optional[ClassSelector]= None,
             mode: Optional[ClassificationMode]=None, 
             min_confidence: Optional[float]=None,
             min_confidence_pc: Optional[int]=None,
             classes: Optional[ClassList]=None,
-        ) -> TPredictor:
+        ) -> PredictorT:
 
         if not predictor:
             predictor = self.predictor
@@ -216,5 +216,5 @@ class PredictorFactory(IPredictorFactory[TPredictor, TPredictionModel, TPredicti
             input_strategy=input_strategy
         )
     
-    def get_model_factory(self) -> MultiPathPredictionModelFactory[TPredictionModel, TPredictionModelConfig]:
+    def get_model_factory(self) -> MultiPathPredictionModelFactory[PredictionModelT, PredictionModelConfigT]:
         return self.model_factory

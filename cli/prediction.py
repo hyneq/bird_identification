@@ -73,7 +73,7 @@ class PredictionCLI(CLIWithParts):
 
     prediction_cli_part: PredictionCLIPart
 
-    def __init__(self, predictor_factory: predictor.IPredictorFactory[predictor.Predictor, predictor.TPredictionModel, predictor.TPredictionModelInput, predictor.TPredictorConfig, predictor.TPredictionModelConfig]):
+    def __init__(self, predictor_factory: predictor.IPredictorFactory[predictor.Predictor, predictor.PredictionModelT, predictor.PredictionModelInputT, predictor.PredictorConfigT, predictor.PredictionModelConfigT]):
         self.prediction_cli_part = prediction_cli_part = PredictionCLIPart(predictor_factory)
         super().__init__(parts=[prediction_cli_part])
     

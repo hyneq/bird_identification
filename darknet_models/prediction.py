@@ -6,7 +6,7 @@ import os
 import cv2
 import numpy as np
 
-from prediction.models import PredictionModelConfig, ImagePredictionModel, TPredictionModelOutput
+from prediction.models import PredictionModelConfig, ImagePredictionModel, PredictionModelOutputT
 from prediction.image_utils import Image
 
 @dataclass()
@@ -22,7 +22,7 @@ class DarknetPredictionModelConfig(PredictionModelConfig):
             weights_path=os.path.join(path, "model.weights")
         )
 
-class DarknetPredictionModel(ImagePredictionModel[DarknetPredictionModelConfig, TPredictionModelOutput], ABC):
+class DarknetPredictionModel(ImagePredictionModel[DarknetPredictionModelConfig, PredictionModelOutputT], ABC):
     __slots__: tuple
 
     network: any
@@ -44,7 +44,7 @@ class DarknetPredictionModel(ImagePredictionModel[DarknetPredictionModelConfig, 
 
         super().__init__(cfg)
     
-    def predict(self, input: Image) -> TPredictionModelOutput:
+    def predict(self, input: Image) -> PredictionModelOutputT:
         height, width = input.shape[0:2]
 
         # blob from image
@@ -58,5 +58,5 @@ class DarknetPredictionModel(ImagePredictionModel[DarknetPredictionModelConfig, 
         return self.get_output(raw_output, width, height) # TODO: width, height generalize
 
     @abstractmethod
-    def get_output(self, raw_output: np.ndarray, width: int, height: int) -> TPredictionModelOutput:
+    def get_output(self, raw_output: np.ndarray, width: int, height: int) -> PredictionModelOutputT:
         pass

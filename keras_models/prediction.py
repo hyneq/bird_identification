@@ -7,7 +7,7 @@ import numpy as np
 from tensorflow import keras
 import cv2
 
-from prediction.models import ImagePredictionModel, PredictionModelConfig, TPredictionModelOutput
+from prediction.models import ImagePredictionModel, PredictionModelConfig, PredictionModelOutputT
 from prediction.image_utils import Image
 
 @dataclass
@@ -18,7 +18,7 @@ class KerasModelConfig(PredictionModelConfig):
     def from_path(cls, path: str):
         return cls(model_path=os.path.join(path, "model.h5"), classes_path=os.path.join(path, "classes.csv"))
 
-class KerasPredictionModel(ImagePredictionModel[KerasModelConfig, TPredictionModelOutput], ABC):
+class KerasPredictionModel(ImagePredictionModel[KerasModelConfig, PredictionModelOutputT], ABC):
     __slots__: tuple
 
     model: keras.Model
@@ -29,7 +29,7 @@ class KerasPredictionModel(ImagePredictionModel[KerasModelConfig, TPredictionMod
         self.model_lock = Lock()
         super().__init__(cfg)
     
-    def predict(self, input: Image) -> TPredictionModelOutput:
+    def predict(self, input: Image) -> PredictionModelOutputT:
         blob: np.ndarray = cv2.dnn.blobFromImage(input, size=(224,224), swapRB=True)
 
         blob = np.moveaxis(blob, (1, 2, 3), (3, 1, 2)) # Making the color channel the last dimension instead of the first, in order to match model input shape
@@ -40,5 +40,5 @@ class KerasPredictionModel(ImagePredictionModel[KerasModelConfig, TPredictionMod
         return self.get_output(predictions)
     
     @abstractmethod
-    def get_output(self, predictions: np.ndarray) -> TPredictionModelOutput:
+    def get_output(self, predictions: np.ndarray) -> PredictionModelOutputT:
         pass

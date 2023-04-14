@@ -7,13 +7,13 @@ from prediction.models import PredictionModelConfig, ModelConfigLoaderInputT, II
 class ClassificationModelConfig(PredictionModelConfig):
     pass
 
-TClassificationModelConfig = TypeVar("TClassificationModelConfig", bound=ClassificationModelConfig)
+ClassificationModelConfigT = TypeVar("ClassificationModelConfigT", bound=ClassificationModelConfig)
 
 ClassificationModelOutput = np.ndarray
 
 ClassificationModel = IImagePredictionModel[ClassificationModelConfig, ClassificationModelOutput]
 
-ClassificationModelFactory = PredictionModelFactory[ClassificationModel, ModelConfigLoaderInputT, TClassificationModelConfig]
+ClassificationModelFactory = PredictionModelFactory[ClassificationModel, ModelConfigLoaderInputT, ClassificationModelConfigT]
 
 from defaults.classification import MODEL_FACTORIES, DEFAULT_MODEL_FACTORY
 

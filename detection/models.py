@@ -9,50 +9,48 @@ from prediction.models import PredictionModelConfig, IImagePredictionModel, Mode
 class DetectionModelConfig(PredictionModelConfig):
     pass
 
-TDetectionModelConfig = TypeVar("TDetectionModelConfig", bound=DetectionModelConfig)
+DetectionModelConfigT = TypeVar("DetectionModelConfigT", bound=DetectionModelConfig)
 
-TDetectionObj = TypeVar("TDetectionObj")
+DetectionObjT = TypeVar("DetectionObjT")
 
-TDetectionModelRawOutput = TypeVar("TDetectionModelRawOutput")
+DetectionModelRawOutputT = TypeVar("DetectionModelRawOutputT")
 
-class DetectionModelOutputIter(ABC, Generic[TDetectionObj, TDetectionModelRawOutput]):
+class DetectionModelOutputIter(ABC, Generic[DetectionObjT, DetectionModelRawOutputT]):
 
-    raw_output: TDetectionModelRawOutput
+    raw_output: DetectionModelRawOutputT
 
-    def __init__(self, raw_output: TDetectionModelRawOutput):
+    def __init__(self, raw_output: DetectionModelRawOutputT):
         self.raw_output = raw_output
 
     @abstractmethod
-    def __next__(self) -> TDetectionObj:
+    def __next__(self) -> DetectionObjT:
         pass
 
-TDetectionModelOutputIter = TypeVar("TDetectionModelOutputIter", bound=DetectionModelOutputIter)
+DetectionModelOutputIterT = TypeVar("DetectionModelOutputIterT", bound=DetectionModelOutputIter)
 
-class DetectionModelOutput(ABC, Generic[TDetectionObj, TDetectionModelRawOutput, TDetectionModelOutputIter]):
+class DetectionModelOutput(ABC, Generic[DetectionObjT, DetectionModelRawOutputT, DetectionModelOutputIterT]):
 
-    raw_output: TDetectionModelRawOutput
+    raw_output: DetectionModelRawOutputT
 
-    iter_cls: type[TDetectionModelOutputIter]
+    iter_cls: type[DetectionModelOutputIterT]
 
-    def __init__(self, raw_output: TDetectionModelRawOutput):
+    def __init__(self, raw_output: DetectionModelRawOutputT):
         self.raw_output = raw_output
 
     @abstractmethod
-    def get_box(self, obj: TDetectionObj) -> Sequence:
+    def get_box(self, obj: DetectionObjT) -> Sequence:
         pass
     
     @abstractmethod
-    def get_scores(self, obj: TDetectionObj) -> np.ndarray:
+    def get_scores(self, obj: DetectionObjT) -> np.ndarray:
         pass
     
-    def __iter__(self) -> TDetectionModelOutputIter:
+    def __iter__(self) -> DetectionModelOutputIterT:
         return self.iter_cls(self.raw_output)
 
 DetectionModel = IImagePredictionModel[DetectionModelConfig, DetectionModelOutput]
 
-TDetectionModel = TypeVar("TDetectionModel", bound=DetectionModel)
-
-DetectionModelFactory = PredictionModelFactory[DetectionModel, ModelConfigLoaderInputT_cls, TDetectionModelConfig]
+DetectionModelFactory = PredictionModelFactory[DetectionModel, ModelConfigLoaderInputT_cls, DetectionModelConfigT]
 
 from defaults.detection import MODEL_FACTORIES, DEFAULT_MODEL_FACTORY
 
