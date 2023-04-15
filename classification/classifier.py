@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from prediction.predictor import PredictorConfig, PredictionProcessorWithCS, PredictorWithCS, PredictorFactory
+from prediction.predictor import PredictionInputT_cls, PredictorConfig, PredictionProcessorWithCS, PredictorWithCS, PredictorFactory
 from prediction.image_utils import Image
 from .models import ClassificationModelConfig, ClassificationModelOutput, ClassificationModel, classification_model_factory
 
@@ -25,7 +25,7 @@ class ClassificationProcessor(PredictionProcessorWithCS[ClassificationModel, Cla
         
         return self.get_results(classes)
 
-class ImageClassifier(PredictorWithCS[Image, ClassificationModelOutput, ClassificationResult]):
+class ImageClassifier(PredictorWithCS[PredictionInputT_cls, Image, ClassificationModelOutput, ClassificationResult]):
     __slots__: tuple
 
     model_cls = ClassificationModel
