@@ -69,12 +69,6 @@ class PredictionModelWithClasses(IPredictionModelWithClasses[PredictionModelWith
     def load_classes(classes_path: str):
         return ClassNames.load_from_file(classes_path)
 
-class IImagePredictionModel(IPredictionModel[PredictionModelConfigT, Image, PredictionModelOutputT]):
-    pass
-
-class ImagePredictionModel(PredictionModel[PredictionModelConfigT, Image, PredictionModelOutputT], IImagePredictionModel[PredictionModelConfigT, PredictionModelOutputT]):
-    pass
-
 class IPredictionModelFactory(ABC, Generic[ModelConfigLoaderInputT_cls, PredictionModelConfigT, PredictionModelInputT, PredictionModelOutputT]):
     name: str
 

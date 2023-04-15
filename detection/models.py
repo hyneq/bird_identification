@@ -5,7 +5,7 @@ from collections.abc import Sequence
 import numpy as np
 
 from prediction.image_utils import Image
-from prediction.models import PredictionModelConfig, IImagePredictionModel, ModelConfigLoaderInputT_cls, PredictionModelFactory, MultiPathPredictionModelFactory
+from prediction.models import PredictionModelConfig, IPredictionModel, ModelConfigLoaderInputT_cls, PredictionModelFactory, MultiPathPredictionModelFactory
 
 class DetectionModelConfig(PredictionModelConfig):
     pass
@@ -49,7 +49,7 @@ class DetectionModelOutput(ABC, Generic[DetectionObjT, DetectionModelRawOutputT,
     def __iter__(self) -> DetectionModelOutputIterT:
         return self.iter_cls(self.raw_output)
 
-DetectionModel = IImagePredictionModel[DetectionModelConfig, DetectionModelOutput]
+DetectionModel = IPredictionModel[DetectionModelConfig, Image, DetectionModelOutput]
 
 DetectionModelFactory = PredictionModelFactory[ModelConfigLoaderInputT_cls, DetectionModelConfigT, Image, DetectionModelOutput]
 
