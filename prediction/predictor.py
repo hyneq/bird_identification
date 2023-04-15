@@ -96,7 +96,7 @@ class IPredictor(ABC, Generic[PredictionInputT_cls, PredictionModelInputT, Predi
 
     @abstractmethod
     @overload
-    def predict(self, input: PredictionInputT_cls):
+    def predict(self, input: PredictionInputT_cls) -> PredictionResultT:
         pass
 
     @abstractmethod
