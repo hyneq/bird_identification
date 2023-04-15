@@ -4,8 +4,8 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
 from config import merge_conf
-from .classes import ClassList, ClassSelectorConfig, ClassSelector, ClassificationMode, ClassSelectorFactory, DEFAULT_CLASS_SELECTOR_FACTORY
-from .models import IPredictionModel, PredictionModelT, PredictionModelConfigT, PredictionModelInputT, PredictionModelOutputT, MultiPathPredictionModelFactory
+from .classes import ClassList, ClassNames, ClassSelectorConfig, ClassSelector, ClassificationMode, ClassSelectorFactory, DEFAULT_CLASS_SELECTOR_FACTORY
+from .models import IPredictionModel, IPredictionModelWithClasses, PredictionModelT, PredictionModelConfigT, PredictionModelWithClassesConfigT, PredictionModelInputT, PredictionModelOutputT, MultiPathPredictionModelFactory
 
 PredictionInputT = TypeVar("PredictionInputT")
 PredictionInputT_cls = TypeVar("PredictionInputT_cls")
@@ -28,68 +28,68 @@ InputStrategy = Callable[[PredictionInputT], PredictionModelInputT]
 def default_input_strategy(input: PredictionModelInputT) -> PredictionModelInputT:
     return input
 
-class PredictionProcessor(ABC, Generic[PredictionModelT, PredictionModelOutputT, PredictionResultT]):
+class PredictionProcessor(ABC, Generic[PredictionModelOutputT, PredictionResultT]):
     __slots__: tuple
-
-    model: PredictionModelT
-
-    output: PredictionModelOutputT
-
-    def __init__(self, output: PredictionModelOutputT):
-        self.output = output
-    
-    @classmethod
-    def get_subclass(cls) -> Self:
-        class cls_copy(cls):
-            pass
-        
-        cls_copy.__name__ = cls.__name__
-
-        return cls_copy
-    
-    @classmethod
-    def with_args(cls, model_: PredictionModelT) -> Self:
-        cls = cls.get_subclass()
-
-        cls.model = model_
-
-        return cls
-
-    @classmethod
-    def with_model(cls, model_: PredictionModelT) -> Self:
-        cls = cls.get_subclass()
-
-        cls.model = model_
-
-        return cls
     
     @abstractmethod
-    def process(self) -> PredictionResultT:
+    def process(self, output: PredictionModelOutputT) -> PredictionResultT:
         pass
 
-class PredictionProcessorWithClasses(PredictionProcessor[PredictionModelT, PredictionModelOutputT, PredictionResultT]):
+class PredictionProcessorWithClasses(PredictionProcessor[PredictionModelOutputT, PredictionResultT]):
     __slots__: tuple
+
+    class_names: ClassNames
 
     cs: ClassSelector
 
-    @classmethod
-    def with_args(cls, *args, cs_: ClassSelector, **kwargs):
-        cls = super().with_args(*args, **kwargs)
+    def __init__(self, class_names: ClassNames, cs: ClassSelector):
+        self.class_names = class_names
+        self.cs = cs
 
-        cls.cs = cs_
-
-        return cls 
-
-    @classmethod
-    def with_cs(cls, cs_: ClassSelector) -> Self:
-        cls = cls.get_subclass()
-
-        cls.cs = cs_
-
-        return cls
+    @abstractmethod
+    def process(self, output: PredictionModelOutputT) -> PredictionResultT:
+        pass
 
 PredictionProcessorT = TypeVar("PredictionProcessorT", bound=PredictionProcessor)
 PredictionProcessorWithClassesT = TypeVar("PredictionProcessorWithClassesT", bound=PredictionProcessorWithClasses)
+
+@dataclass()
+class PredictionProcessorFactory(ABC, Generic[PredictionModelOutputT, PredictionResultT]):
+    prediction_processor_cls: type[PredictionProcessor[PredictionModelOutputT, PredictionResultT]]
+
+    def get_prediction_processor(self) -> PredictionProcessor[PredictionModelOutputT, PredictionResultT]:
+        return self.prediction_processor_cls()
+
+@dataclass()
+class PredictionProcessorWithClassesFactory(PredictionProcessorFactory[PredictionModelOutputT, PredictionResultT]):
+    prediction_processor_cls: type[PredictionProcessorWithClasses[PredictionModelOutputT, PredictionResultT]]
+
+    cs_factory: ClassSelectorFactory=DEFAULT_CLASS_SELECTOR_FACTORY
+
+    def get_prediction_processor(self,
+            model_class_names: ClassNames,
+            *args,
+            cs_config: Optional[ClassSelectorConfig]=None,
+            cs: Optional[ClassSelector]=None,
+            mode: Optional[ClassificationMode]=None, 
+            min_confidence: Optional[float]=None,
+            min_confidence_pc: Optional[int]=None,
+            classes: Optional[ClassList]=None,
+            **kwargs
+        ) -> PredictionProcessorWithClasses[PredictionModelOutputT, PredictionResultT]:
+        
+        if not cs:
+            cs = self.cs_factory.get_class_selector(
+                cfg=cs_config,
+                mode=mode,
+                min_confidence=min_confidence,
+                min_confidence_pc=min_confidence_pc,
+                classes=classes,
+                model_class_names=model_class_names,
+            )
+        
+        return self.prediction_processor_cls(model_class_names, cs, *args, **kwargs)
+
 
 class IPredictor(ABC, Generic[PredictionInputT_cls, PredictionModelInputT, PredictionResultT]):
     __slots__: tuple
@@ -115,20 +115,19 @@ class Predictor(IPredictor[PredictionInputT_cls, PredictionModelInputT, Predicti
 
     input_strategy: InputStrategy[Any, PredictionModelInputT]
 
-    prediction_processor: type[PredictionProcessor[IPredictionModel[Any, PredictionModelInputT, PredictionModelOutputT], PredictionModelOutputT, PredictionResultT]]
+    prediction_processor: PredictionProcessor[PredictionModelOutputT, PredictionResultT]
 
     def __init__(self,
-            *processor_args,
             model: IPredictionModel[Any, PredictionModelInputT, PredictionModelOutputT],
+            prediction_processor: PredictionProcessor[PredictionModelOutputT, PredictionResultT],
             input_strategy: InputStrategy[Any, PredictionModelInputT],
-            **processor_kwargs
         ):
 
         self.model = model
 
         self.input_strategy = input_strategy
         
-        self.prediction_processor = self.prediction_processor.with_args(self.model, *processor_args, **processor_kwargs)
+        self.prediction_processor = prediction_processor
 
     def predict(self, input: Union[PredictionInputT_cls, PredictionInputT_fun], input_strategy: Optional[InputStrategy[PredictionInputT_fun, PredictionModelInputT]]=None) -> PredictionResultT:
         if not input_strategy:
@@ -138,21 +137,14 @@ class Predictor(IPredictor[PredictionInputT_cls, PredictionModelInputT, Predicti
 
         model_output: PredictionModelOutputT = self.model.predict(model_input)
 
-        return self.prediction_processor(model_output).process()
+        return self.prediction_processor.process(model_output)
 
 PredictorT = TypeVar("PredictorT", bound=IPredictor)
 
 class PredictorWithClasses(Predictor[PredictionInputT_cls, PredictionModelInputT, PredictionModelOutputT, PredictionResultT]):
     __slots__: tuple
 
-    prediction_processor: type[PredictionProcessorWithClasses[IPredictionModel[Any, PredictionModelInputT, PredictionModelOutputT], PredictionModelOutputT, PredictionResultT]]
-    
-    def __init__(self,
-            cs: ClassSelector,
-            *args, **kwargs
-        ):
-
-        super().__init__(*args, **kwargs, cs_=cs)
+    prediction_processor: PredictionProcessorWithClasses[PredictionModelOutputT, PredictionResultT]
 
 class IPredictorFactory(Generic[PredictorConfigT, PredictionModelConfigT, PredictionInputT_cls, PredictionModelInputT, PredictionModelOutputT, PredictionResultT]):
 
@@ -179,20 +171,21 @@ class IPredictorFactory(Generic[PredictorConfigT, PredictionModelConfigT, Predic
 
 
 @dataclass(frozen=True)
-class PredictorFactory(IPredictorFactory[PredictorConfigT, PredictionModelConfigT, PredictionInputT_cls, PredictionModelInputT, PredictionModelOutputT, PredictionResultT], ABC):
+class PredictorWithClassesFactory(IPredictorFactory[PredictorConfigT, PredictionModelConfigT, PredictionInputT_cls, PredictionModelInputT, PredictionModelOutputT, PredictionResultT], ABC):
 
     predictor: type[Predictor[PredictionInputT_cls, PredictionModelInputT, PredictionModelOutputT, PredictionResultT]]
     predictor_config: type[PredictorConfigT]
     model_factory: MultiPathPredictionModelFactory[PredictionModelConfigT, PredictionModelInputT, PredictionModelOutputT]
+    prediction_processor_factory: PredictionProcessorWithClassesFactory[PredictionModelOutputT, PredictionResultT]
     input_strategy: InputStrategy[Any, PredictionModelInputT]=default_input_strategy
-    cs_factory: ClassSelectorFactory=DEFAULT_CLASS_SELECTOR_FACTORY
 
     def get_predictor(self,
-            model_config: Optional[PredictionModelConfigT]=None,
+            model_config: Optional[PredictionModelWithClassesConfigT]=None,
             model_path: Optional[str]=None,
             model_type: Optional[str]=None,
-            model: Optional[IPredictionModel[PredictionModelConfigT, PredictionModelInputT, PredictionModelOutputT]]=None,
+            model: Optional[IPredictionModelWithClasses[PredictionModelWithClassesConfigT, PredictionModelInputT, PredictionModelOutputT]]=None,
             predictor: Optional[type[Predictor[PredictionInputT_cls, PredictionModelInputT, PredictionModelOutputT, PredictionResultT]]]=None,
+            prediction_processor: Optional[PredictionProcessorWithClasses[PredictionModelOutputT, PredictionResultT]]=None,
             input_strategy: Optional[InputStrategy[PredictionInputT, PredictionModelInputT]]=None,
             cs_config: Optional[ClassSelectorConfig]=None,
             cs: Optional[ClassSelector]= None,
@@ -214,21 +207,22 @@ class PredictorFactory(IPredictorFactory[PredictorConfigT, PredictionModelConfig
                 cfg_input=model_path,
                 cfg=model_config
             )
-
-        if not cs:
-            cs = self.cs_factory.get_class_selector(
-                cfg=cs_config,
+        
+        if not prediction_processor:
+            prediction_processor = self.prediction_processor_factory.get_prediction_processor(
+                model_class_names=model.class_names,
+                cs_config=cs_config,
+                cs=cs,
                 mode=mode,
                 min_confidence=min_confidence,
                 min_confidence_pc=min_confidence_pc,
-                classes=classes,
-                model_class_names=model.class_names,
+                classes=classes
             )
 
         return predictor(
             model=model,
-            cs=cs,
-            input_strategy=input_strategy
+            prediction_processor=prediction_processor,
+            input_strategy=input_strategy,
         )
     
     def get_model_factory(self) -> MultiPathPredictionModelFactory[PredictionModelConfigT, PredictionModelInputT, PredictionModelOutputT]:

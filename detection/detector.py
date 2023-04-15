@@ -4,7 +4,7 @@ from dataclasses import dataclass
 import cv2
 import numpy as np
 
-from prediction.predictor import PredictionInputT_cls, PredictorConfig, PredictionProcessorWithClasses, PredictorWithClasses, PredictorFactory
+from prediction.predictor import PredictionInputT_cls, PredictorConfig, PredictionProcessorWithClasses, PredictionProcessorWithClassesFactory, PredictorWithClasses, PredictorWithClassesFactory
 from prediction.image_utils import Image
 from .models import DetectionModelConfig, DetectionModelOutput, DetectionModel, model_factory
 
@@ -30,24 +30,32 @@ class DetectionResult:
     confidence: any
 
 
-class DetectionProcessor(PredictionProcessorWithClasses[DetectionModel, DetectionModelOutput, DetectionResult]):
+class DetectionProcessor(PredictionProcessorWithClasses[DetectionModelOutput, DetectionResult]):
     __slots__: tuple
 
     NMS_threshold: float
+
+    def __init__(self, *args, NMS_threshold: float, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.NMS_threshold = NMS_threshold
+    
+    def process(self, output: DetectionModelOutput) -> DetectionResult:
+        return DetectionProcessorInstance(self, output).process()
+
+class DetectionProcessorInstance:
+
+    processor: DetectionProcessor
+    output: DetectionModelOutput
+
+    def __init__(self, processor: DetectionProcessor, output: DetectionModelOutput):
+        self.processor = processor
+        self.output = output
 
     # Lists for detected bounding boxes,
     # obtained confidences and class's number
     bounding_boxes: list
     confidences: list
     classes: list
-
-    @classmethod
-    def with_args(cls, *args, NMS_threshold=DEFAULT_NMS_THRESHOLD, **kwargs):
-        cls = super().with_args(*args, **kwargs)
-
-        cls.NMS_threshold = NMS_threshold
-
-        return cls
     
     def add_detected_object(self, bounding_box, confidence, class_number):
         self.bounding_boxes.append(bounding_box)
@@ -58,7 +66,7 @@ class DetectionProcessor(PredictionProcessorWithClasses[DetectionModel, Detectio
 
         scores = self.output.get_scores(obj)
 
-        classes = self.cs.get_filtered_classes(scores)
+        classes = self.processor.cs.get_filtered_classes(scores)
 
         if len(classes):
             box = self.output.get_box(obj)
@@ -76,12 +84,12 @@ class DetectionProcessor(PredictionProcessorWithClasses[DetectionModel, Detectio
         # corresponding confidences are low or there is another
         # bounding box for this region with higher confidence
 
-        return cv2.dnn.NMSBoxes(self.bounding_boxes, [confidence[0] for confidence in self.confidences], self.cs.min_confidence, self.NMS_threshold)
+        return cv2.dnn.NMSBoxes(self.bounding_boxes, [confidence[0] for confidence in self.confidences], self.processor.cs.min_confidence, self.processor.NMS_threshold)
     
-    def get_results(self, filtered):
-        return [DetectionResult(self.model.class_names.get_names(self.classes[i]), BoundingBox(*self.bounding_boxes[i]), self.confidences[i]) for i in filtered]
+    def get_results(self, filtered) -> DetectionResult:
+        return [DetectionResult(self.processor.class_names.get_names(self.classes[i]), BoundingBox(*self.bounding_boxes[i]), self.confidences[i]) for i in filtered]
     
-    def process(self):
+    def process(self) -> DetectionResult:
         self.bounding_boxes = []
         self.confidences = []
         self.classes = []
@@ -92,6 +100,20 @@ class DetectionProcessor(PredictionProcessorWithClasses[DetectionModel, Detectio
         filtered = self.NMSBoxes()
 
         return self.get_results(filtered)
+
+@dataclass
+class DetectionProcessorFactory(PredictionProcessorWithClassesFactory[DetectionModelOutput, DetectionResult]):
+
+    NMS_threshold = DEFAULT_NMS_THRESHOLD
+
+    def __init__(self):
+        super().__init__(DetectionProcessor)
+
+    def get_prediction_processor(self, *args, NMS_threshold: Optional[float]=None, **kwargs) -> DetectionProcessor:
+        if not NMS_threshold:
+            NMS_threshold = self.NMS_threshold
+
+        return super().get_prediction_processor(*args, NMS_threshold=NMS_threshold, **kwargs)
 
 class ObjectDetector(PredictorWithClasses[PredictionInputT_cls, Image, DetectionModelOutput, DetectionResult]):
     __slots__: tuple
@@ -104,10 +126,11 @@ class ObjectDetector(PredictorWithClasses[PredictionInputT_cls, Image, Detection
 class DetectorConfig(PredictorConfig[DetectionModelConfig]):
     pass
 
-object_detector_factory = PredictorFactory(
+object_detector_factory = PredictorWithClassesFactory(
     predictor=ObjectDetector,
     predictor_config=DetectorConfig,
-    model_factory=model_factory
+    model_factory=model_factory,
+    prediction_processor_factory=DetectionProcessorFactory()
 )
 
 get_object_detector = object_detector_factory.get_predictor

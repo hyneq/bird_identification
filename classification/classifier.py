@@ -3,7 +3,8 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from prediction.predictor import PredictionInputT_cls, PredictorConfig, PredictionProcessorWithClasses, PredictorWithClasses, PredictorFactory
+from prediction.predictor import PredictionInputT_cls, PredictorConfig, PredictionProcessorWithClasses, PredictionProcessorWithClassesFactory, PredictorWithClasses, PredictorWithClassesFactory
+from prediction.classes import Scores
 from prediction.image_utils import Image
 from .models import ClassificationModelConfig, ClassificationModelOutput, ClassificationModel, classification_model_factory
 
@@ -12,18 +13,22 @@ class ClassificationResult:
     class_names: list[str]
     confidences: list[float]
 
-class ClassificationProcessor(PredictionProcessorWithClasses[ClassificationModel, ClassificationModelOutput, ClassificationResult]):
+class ClassificationProcessor(PredictionProcessorWithClasses[ClassificationModelOutput, ClassificationResult]):
     __slots__: tuple
 
-    def get_results(self, classes) -> ClassificationResult:
-        return ClassificationResult(self.model.class_names.get_names(classes), list(self.scores[classes]))
+    def get_results(self, classes: list, scores: Scores) -> ClassificationResult:
+        return ClassificationResult(self.class_names.get_names(classes), list(scores[classes]))
 
-    def process(self) -> ClassificationResult:
-        self.scores = self.output
+    def process(self, model_output: ClassificationModelOutput) -> ClassificationResult:
+        scores = model_output
 
-        classes = self.cs.get_filtered_classes(self.scores)
+        classes = self.cs.get_filtered_classes(scores)
         
-        return self.get_results(classes)
+        return self.get_results(classes, scores)
+
+class ClassificationProcessorFactory(PredictionProcessorWithClassesFactory[ClassificationModelOutput, ClassificationResult]):
+    def __init__(self):
+        super().__init__(ClassificationProcessor)
 
 class ImageClassifier(PredictorWithClasses[PredictionInputT_cls, Image, ClassificationModelOutput, ClassificationResult]):
     __slots__: tuple
@@ -36,10 +41,11 @@ class ImageClassifier(PredictorWithClasses[PredictionInputT_cls, Image, Classifi
 class ClassifierConfig(PredictorConfig[ClassificationModelConfig]):
     pass
 
-image_classifier_factory = PredictorFactory(
+image_classifier_factory = PredictorWithClassesFactory(
     predictor=ImageClassifier,
     predictor_config=ClassifierConfig,
-    model_factory=classification_model_factory
+    model_factory=classification_model_factory,
+    prediction_processor_factory=ClassificationProcessorFactory()
 )
 
 get_image_classifier = image_classifier_factory.get_predictor
