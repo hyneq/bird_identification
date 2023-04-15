@@ -4,7 +4,7 @@ from dataclasses import dataclass
 import cv2
 import numpy as np
 
-from prediction.predictor import PredictionInputT_cls, PredictorConfig, PredictionProcessorWithCS, PredictorWithCS, PredictorFactory
+from prediction.predictor import PredictionInputT_cls, PredictorConfig, PredictionProcessorWithClasses, PredictorWithClasses, PredictorFactory
 from prediction.image_utils import Image
 from .models import DetectionModelConfig, DetectionModelOutput, DetectionModel, model_factory
 
@@ -30,7 +30,7 @@ class DetectionResult:
     confidence: any
 
 
-class DetectionProcessor(PredictionProcessorWithCS[DetectionModel, DetectionModelOutput, DetectionResult]):
+class DetectionProcessor(PredictionProcessorWithClasses[DetectionModel, DetectionModelOutput, DetectionResult]):
     __slots__: tuple
 
     NMS_threshold: float
@@ -93,7 +93,7 @@ class DetectionProcessor(PredictionProcessorWithCS[DetectionModel, DetectionMode
 
         return self.get_results(filtered)
 
-class ObjectDetector(PredictorWithCS[PredictionInputT_cls, Image, DetectionModelOutput, DetectionResult]):
+class ObjectDetector(PredictorWithClasses[PredictionInputT_cls, Image, DetectionModelOutput, DetectionResult]):
     __slots__: tuple
 
     model_cls = DetectionModel

@@ -2,15 +2,15 @@ import numpy as np
 import os
 
 from detection.models import DetectionModelConfig, DetectionModelFactory
-from .prediction import DarknetPredictionModel, DarknetPredictionModelConfig
+from .prediction import DarknetPredictionModelWithClasses, DarknetPredictionModelWithClassesConfig
 from YOLOv3_models.detection import YOLOv3DetectionModel, YOLOv3DetectionModelConfig, YOLOv3DetectionModelOutput, YOLOv3DetectionModelRawOutput
 
-class DarknetYOLOv3DetectionModel(DarknetPredictionModel[YOLOv3DetectionModelOutput], YOLOv3DetectionModel):
+class DarknetYOLOv3DetectionModel(DarknetPredictionModelWithClasses[YOLOv3DetectionModelOutput], YOLOv3DetectionModel):
     
     def get_output(self, raw_output: YOLOv3DetectionModelRawOutput, width: int, height: int) -> YOLOv3DetectionModelOutput:
         return YOLOv3DetectionModelOutput(raw_output, width, height)
 
-class DarknetYOLOv3DetectionModelConfig(DarknetPredictionModelConfig, YOLOv3DetectionModelConfig, DetectionModelConfig):
+class DarknetYOLOv3DetectionModelConfig(DarknetPredictionModelWithClassesConfig, YOLOv3DetectionModelConfig, DetectionModelConfig):
 
     @classmethod
     def from_path(cls, path: str):

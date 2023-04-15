@@ -3,16 +3,16 @@ from typing import TypeVar
 import numpy as np
 
 from prediction.image_utils import Image
-from prediction.models import ModelConfigLoaderInputT_cls, PredictionModelConfig, ModelConfigLoaderInputT, IImagePredictionModel, PredictionModelFactory, MultiPathPredictionModelFactory
+from prediction.models import ModelConfigLoaderInputT_cls, PredictionModelWithClassesConfig, IPredictionModelWithClasses, PredictionModelFactory, MultiPathPredictionModelFactory
 
-class ClassificationModelConfig(PredictionModelConfig):
+class ClassificationModelConfig(PredictionModelWithClassesConfig):
     pass
 
 ClassificationModelConfigT = TypeVar("ClassificationModelConfigT", bound=ClassificationModelConfig)
 
 ClassificationModelOutput = np.ndarray
 
-ClassificationModel = IImagePredictionModel[ClassificationModelConfig, ClassificationModelOutput]
+ClassificationModel = IPredictionModelWithClasses[ClassificationModelConfig, Image, ClassificationModelOutput]
 
 ClassificationModelFactory = PredictionModelFactory[ModelConfigLoaderInputT_cls, ClassificationModelConfigT, Image, ClassificationModelOutput]
 

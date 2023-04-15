@@ -10,9 +10,14 @@ PredictionModelOutputT = TypeVar("PredictionModelOutputT")
 
 @dataclass()
 class PredictionModelConfig:
+    pass
+
+@dataclass()
+class PredictionModelWithClassesConfig(PredictionModelConfig):
     classes_path: str
 
 PredictionModelConfigT = TypeVar("PredictionModelConfigT", bound=PredictionModelConfig)
+PredictionModelWithClassesConfigT = TypeVar("PredictionModelWithClassesConfigT", bound=PredictionModelWithClassesConfig)
 
 ModelConfigLoaderInputT = TypeVar("ModelConfigLoaderInputT")
 
@@ -27,8 +32,6 @@ def default_model_config_loader(input: PredictionModelConfigT) -> PredictionMode
 class IPredictionModel(ABC, Generic[PredictionModelConfigT, PredictionModelInputT, PredictionModelOutputT]):
     __slots__: tuple
 
-    class_names: ClassNames
-
     @abstractmethod
     def __init__(self, cfg: PredictionModelConfigT):
         pass
@@ -39,11 +42,28 @@ class IPredictionModel(ABC, Generic[PredictionModelConfigT, PredictionModelInput
 
 PredictionModelT = TypeVar("PredictionModelT", bound=IPredictionModel)
 
+class IPredictionModelWithClasses(IPredictionModel[PredictionModelWithClassesConfigT, PredictionModelInputT, PredictionModelOutputT], ABC):
+
+    @abstractmethod
+    def get_class_names(self) -> ClassNames:
+        pass
+
 class PredictionModel(IPredictionModel[PredictionModelConfigT, PredictionModelInputT, PredictionModelOutputT]):
     __slots__: tuple
 
     def __init__(self, cfg: PredictionModelConfigT):
+        pass
+
+class PredictionModelWithClasses(IPredictionModelWithClasses[PredictionModelWithClassesConfigT, PredictionModelInputT, PredictionModelOutputT], PredictionModel[PredictionModelWithClassesConfigT, PredictionModelInputT, PredictionModelOutputT]):
+    __slots__: tuple
+
+    class_names: ClassNames
+
+    def __init__(self, cfg: PredictionModelWithClassesConfigT):
         self.class_names = self.load_classes(cfg.classes_path)
+
+    def get_class_names(self) -> ClassNames:
+        return self.class_names
 
     @staticmethod
     def load_classes(classes_path: str):

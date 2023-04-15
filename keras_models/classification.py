@@ -1,15 +1,15 @@
 import numpy as np
 
-from .prediction import KerasPredictionModel, KerasModelConfig
-from classification.models import ClassificationModel, ClassificationModelConfig, ModelConfigLoaderInputT, ClassificationModelOutput, ClassificationModelFactory
+from .prediction import KerasPredictionModelWithClasses, KerasModelWithClassesConfig
+from classification.models import ClassificationModel, ClassificationModelConfig, ClassificationModelOutput, ClassificationModelFactory
 
-class KerasClassificationModel(KerasPredictionModel[ClassificationModelOutput], ClassificationModel):
+class KerasClassificationModel(KerasPredictionModelWithClasses[ClassificationModelOutput], ClassificationModel):
     __slots__: tuple
 
     def get_output(self, predictions: np.ndarray) -> ClassificationModelOutput:
         return predictions[0]
 
-class KerasClassificationModelConfig(KerasModelConfig, ClassificationModelConfig):
+class KerasClassificationModelConfig(KerasModelWithClassesConfig, ClassificationModelConfig):
     pass
 
 KERAS_CLASSIFICATION_MODEL_FACTORY = ClassificationModelFactory[str, KerasClassificationModelConfig](

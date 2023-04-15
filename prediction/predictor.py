@@ -67,7 +67,7 @@ class PredictionProcessor(ABC, Generic[PredictionModelT, PredictionModelOutputT,
     def process(self) -> PredictionResultT:
         pass
 
-class PredictionProcessorWithCS(PredictionProcessor[PredictionModelT, PredictionModelOutputT, PredictionResultT]):
+class PredictionProcessorWithClasses(PredictionProcessor[PredictionModelT, PredictionModelOutputT, PredictionResultT]):
     __slots__: tuple
 
     cs: ClassSelector
@@ -89,7 +89,7 @@ class PredictionProcessorWithCS(PredictionProcessor[PredictionModelT, Prediction
         return cls
 
 PredictionProcessorT = TypeVar("PredictionProcessorT", bound=PredictionProcessor)
-PredictionProcessorWithCST = TypeVar("PredictionProcessorWithCST", bound=PredictionProcessorWithCS)
+PredictionProcessorWithClassesT = TypeVar("PredictionProcessorWithClassesT", bound=PredictionProcessorWithClasses)
 
 class IPredictor(ABC, Generic[PredictionInputT_cls, PredictionModelInputT, PredictionResultT]):
     __slots__: tuple
@@ -142,10 +142,10 @@ class Predictor(IPredictor[PredictionInputT_cls, PredictionModelInputT, Predicti
 
 PredictorT = TypeVar("PredictorT", bound=IPredictor)
 
-class PredictorWithCS(Predictor[PredictionInputT_cls, PredictionModelInputT, PredictionModelOutputT, PredictionResultT]):
+class PredictorWithClasses(Predictor[PredictionInputT_cls, PredictionModelInputT, PredictionModelOutputT, PredictionResultT]):
     __slots__: tuple
 
-    prediction_processor: type[PredictionProcessorWithCS[IPredictionModel[Any, PredictionModelInputT, PredictionModelOutputT], PredictionModelOutputT, PredictionResultT]]
+    prediction_processor: type[PredictionProcessorWithClasses[IPredictionModel[Any, PredictionModelInputT, PredictionModelOutputT], PredictionModelOutputT, PredictionResultT]]
     
     def __init__(self,
             cs: ClassSelector,

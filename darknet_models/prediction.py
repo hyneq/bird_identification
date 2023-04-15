@@ -6,7 +6,7 @@ import os
 import cv2
 import numpy as np
 
-from prediction.models import PredictionModelConfig, ImagePredictionModel, PredictionModelOutputT
+from prediction.models import PredictionModelConfig, PredictionModelWithClassesConfig, PredictionModel, PredictionModelWithClasses, PredictionModelOutputT
 from prediction.image_utils import Image
 
 @dataclass()
@@ -17,12 +17,22 @@ class DarknetPredictionModelConfig(PredictionModelConfig):
     @classmethod
     def from_path(cls, path: str):
         return cls(
+            config_path=os.path.join(path, "model.cfg"),
+            weights_path=os.path.join(path, "model.weights")
+        )
+
+@dataclass()
+class DarknetPredictionModelWithClassesConfig(DarknetPredictionModelConfig, PredictionModelWithClassesConfig):
+
+    @classmethod
+    def from_path(cls, path: str):
+        return cls(
             classes_path=os.path.join(path, "classes.names"),
             config_path=os.path.join(path, "model.cfg"),
             weights_path=os.path.join(path, "model.weights")
         )
 
-class DarknetPredictionModel(ImagePredictionModel[DarknetPredictionModelConfig, PredictionModelOutputT], ABC):
+class DarknetPredictionModel(PredictionModel[DarknetPredictionModelConfig, Image, PredictionModelOutputT], ABC):
     __slots__: tuple
 
     network: any
@@ -60,3 +70,6 @@ class DarknetPredictionModel(ImagePredictionModel[DarknetPredictionModelConfig, 
     @abstractmethod
     def get_output(self, raw_output: np.ndarray, width: int, height: int) -> PredictionModelOutputT:
         pass
+
+class DarknetPredictionModelWithClasses(DarknetPredictionModel, PredictionModelWithClasses[DarknetPredictionModelWithClassesConfig, Image, PredictionModelOutputT]):
+    pass

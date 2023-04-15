@@ -7,7 +7,7 @@ import numpy as np
 from tensorflow import keras
 import cv2
 
-from prediction.models import ImagePredictionModel, PredictionModelConfig, PredictionModelOutputT
+from prediction.models import PredictionModel, PredictionModelWithClasses, PredictionModelConfig, PredictionModelWithClassesConfig, PredictionModelOutputT
 from prediction.image_utils import Image
 
 @dataclass
@@ -16,9 +16,16 @@ class KerasModelConfig(PredictionModelConfig):
 
     @classmethod
     def from_path(cls, path: str):
+        return cls(model_path=os.path.join(path, "model.h5"))
+
+@dataclass
+class KerasModelWithClassesConfig(KerasModelConfig, PredictionModelWithClassesConfig):
+
+    @classmethod
+    def from_path(cls, path: str):
         return cls(model_path=os.path.join(path, "model.h5"), classes_path=os.path.join(path, "classes.csv"))
 
-class KerasPredictionModel(ImagePredictionModel[KerasModelConfig, PredictionModelOutputT], ABC):
+class KerasPredictionModel(PredictionModel[KerasModelConfig, Image, PredictionModelOutputT], ABC):
     __slots__: tuple
 
     model: keras.Model
@@ -42,3 +49,6 @@ class KerasPredictionModel(ImagePredictionModel[KerasModelConfig, PredictionMode
     @abstractmethod
     def get_output(self, predictions: np.ndarray) -> PredictionModelOutputT:
         pass
+
+class KerasPredictionModelWithClasses(KerasPredictionModel, PredictionModelWithClasses[KerasModelWithClassesConfig, Image, PredictionModelOutputT]):
+    pass
