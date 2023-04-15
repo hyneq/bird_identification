@@ -93,7 +93,7 @@ class DetectionProcessor(PredictionProcessorWithCS[DetectionModel, DetectionMode
 
         return self.get_results(filtered)
 
-class ObjectDetector(PredictorWithCS[DetectionModel, DetectionModelConfig, DetectionProcessor, Image, DetectionModelOutput, DetectionResult]):
+class ObjectDetector(PredictorWithCS[Image, DetectionModelOutput, DetectionResult]):
     __slots__: tuple
 
     model_cls = DetectionModel

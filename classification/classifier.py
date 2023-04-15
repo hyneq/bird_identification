@@ -25,7 +25,7 @@ class ClassificationProcessor(PredictionProcessorWithCS[ClassificationModel, Cla
         
         return self.get_results(classes)
 
-class ImageClassifier(PredictorWithCS[ClassificationModel, ClassificationModelConfig, ClassificationProcessor, Image, ClassificationModelOutput, ClassificationResult]):
+class ImageClassifier(PredictorWithCS[Image, ClassificationModelOutput, ClassificationResult]):
     __slots__: tuple
 
     model_cls = ClassificationModel

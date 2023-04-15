@@ -12,7 +12,7 @@ class KerasClassificationModel(KerasPredictionModel[ClassificationModelOutput], 
 class KerasClassificationModelConfig(KerasModelConfig, ClassificationModelConfig):
     pass
 
-KERAS_CLASSIFICATION_MODEL_FACTORY = ClassificationModelFactory[ModelConfigLoaderInputT, KerasClassificationModelConfig](
+KERAS_CLASSIFICATION_MODEL_FACTORY = ClassificationModelFactory[str, KerasClassificationModelConfig](
     name="keras",
     model_cls=KerasClassificationModel,
     model_config_cls=KerasClassificationModelConfig,

@@ -1,4 +1,4 @@
-from typing import Any, Generic, TypeVar, Optional, Union, Callable
+from typing import Any, Generic, TypeVar, Optional, Union, Callable, overload
 from abc import ABC, abstractmethod, abstractclassmethod
 from dataclasses import dataclass
 
@@ -55,22 +55,37 @@ class IImagePredictionModel(IPredictionModel[PredictionModelConfigT, Image, Pred
 class ImagePredictionModel(PredictionModel[PredictionModelConfigT, Image, PredictionModelOutputT], IImagePredictionModel[PredictionModelConfigT, PredictionModelOutputT]):
     pass
 
-class IPredictionModelFactory(ABC, Generic[PredictionModelT, ModelConfigLoaderInputT_cls, PredictionModelConfigT]):
+class IPredictionModelFactory(ABC, Generic[ModelConfigLoaderInputT_cls, PredictionModelConfigT, PredictionModelInputT, PredictionModelOutputT]):
     name: str
 
     @abstractmethod
-    def get_model(self, cfg_input: Optional[Union[ModelConfigLoaderInputT_cls, ModelConfigLoaderInputT_fun]]=None, loader: Optional[ModelConfigLoader[ModelConfigLoaderInputT_fun, PredictionModelConfigT]]=None) -> PredictionModelT:
+    @overload
+    def get_model(self, cfg_input: ModelConfigLoaderInputT_cls):
+        pass
+
+    @abstractmethod
+    @overload
+    def get_model(self, cfg_input: ModelConfigLoaderInputT_fun, cfg_loader: ModelConfigLoader[ModelConfigLoaderInputT_fun, PredictionModelConfigT]):
+        pass
+
+    @abstractmethod
+    def get_model(self,
+            cfg_input: Optional[Union[ModelConfigLoaderInputT_cls, ModelConfigLoaderInputT_fun]]=None,
+            cfg_loader: Optional[ModelConfigLoader[ModelConfigLoaderInputT_fun, PredictionModelConfigT]]=None
+        ) -> IPredictionModel[PredictionModelConfigT, PredictionModelInputT, PredictionModelOutputT]:
         pass
 
 @dataclass(frozen=True)
-class PredictionModelFactory(IPredictionModelFactory[PredictionModelT, ModelConfigLoaderInputT_cls, PredictionModelConfigT]):
+class PredictionModelFactory(IPredictionModelFactory[ModelConfigLoaderInputT_cls, PredictionModelConfigT, PredictionModelInputT, PredictionModelOutputT]):
     name: str
-    model_cls: type[PredictionModelT]
+    model_cls: type[IPredictionModel[PredictionModelConfigT, PredictionModelInputT, PredictionModelOutputT]]
     model_config_cls: type[PredictionModelConfigT]
     model_config_loader: ModelConfigLoader[Any, PredictionModelConfigT] = default_model_config_loader
     default_model_config_input: Optional[Any] = None
 
-    def get_model_cfg(self, cfg_input: Optional[Union[ModelConfigLoaderInputT_cls, ModelConfigLoaderInputT_fun]]=None, cfg_loader: Optional[ModelConfigLoader[ModelConfigLoaderInputT_fun, PredictionModelConfigT]]=None) -> PredictionModelConfigT:
+    def get_model_cfg(self,
+            cfg_input: Optional[Union[ModelConfigLoaderInputT_cls, ModelConfigLoaderInputT_fun]]=None,
+            cfg_loader: Optional[ModelConfigLoader[ModelConfigLoaderInputT_fun, PredictionModelConfigT]]=None) -> PredictionModelConfigT:
         if cfg_input:
             if not cfg_loader:
                 cfg_loader = self.model_config_loader
@@ -81,20 +96,23 @@ class PredictionModelFactory(IPredictionModelFactory[PredictionModelT, ModelConf
         
         return cfg
     
-    def get_model(self, *args, cfg: Optional[PredictionModelConfigT]=None, **kwargs) -> PredictionModelT:
+    def get_model(self, *args, cfg: Optional[PredictionModelConfigT]=None, **kwargs) -> IPredictionModel[PredictionModelConfigT, PredictionModelInputT, PredictionModelOutputT]:
         if not cfg:
             cfg = self.get_model_cfg(*args, **kwargs)
         
         return self.model_cls(cfg)
 
-class MultiPredictionModelFactory(IPredictionModelFactory[PredictionModelT, ModelConfigLoaderInputT_cls, PredictionModelConfigT]):
+class MultiPredictionModelFactory(IPredictionModelFactory[ModelConfigLoaderInputT_cls, PredictionModelConfigT, PredictionModelInputT, PredictionModelOutputT]):
     name: str
 
-    factories: dict[str, IPredictionModelFactory[PredictionModelT, ModelConfigLoaderInputT_cls, PredictionModelConfigT]]
+    factories: dict[str, IPredictionModelFactory[ModelConfigLoaderInputT_cls, PredictionModelConfigT, PredictionModelInputT, PredictionModelOutputT]]
     default_factory: str
 
     def __init__(self,
-                factories: Union[list[IPredictionModelFactory[PredictionModelT, ModelConfigLoaderInputT_cls, PredictionModelConfigT]],dict[str,IPredictionModelFactory[PredictionModelT, ModelConfigLoaderInputT_cls, PredictionModelConfigT]]],
+                factories: Union[
+                    list[IPredictionModelFactory[ModelConfigLoaderInputT_cls, PredictionModelConfigT, PredictionModelInputT, PredictionModelOutputT]],
+                    dict[str,IPredictionModelFactory[ModelConfigLoaderInputT_cls, PredictionModelConfigT, PredictionModelInputT, PredictionModelOutputT]]
+                ],
                 default_factory: str,
                 name="multi"
         ):
@@ -106,7 +124,7 @@ class MultiPredictionModelFactory(IPredictionModelFactory[PredictionModelT, Mode
         self.factories = factories
         self.default_factory = default_factory
     
-    def get_model(self, *args, factory: Optional[str]=None, **kwargs) -> PredictionModelT:
+    def get_model(self, *args, factory: Optional[str]=None, **kwargs) -> IPredictionModel[PredictionModelConfigT, PredictionModelInputT, PredictionModelOutputT]:
         if not factory:
             factory = self.default_factory
         
@@ -115,4 +133,4 @@ class MultiPredictionModelFactory(IPredictionModelFactory[PredictionModelT, Mode
     def get_factory_names(self):
         return list(self.factories.keys())
 
-MultiPathPredictionModelFactory = MultiPredictionModelFactory[PredictionModelT, str, PredictionModelConfigT]
+MultiPathPredictionModelFactory = MultiPredictionModelFactory[str, PredictionModelConfigT, PredictionModelInputT, PredictionModelOutputT]

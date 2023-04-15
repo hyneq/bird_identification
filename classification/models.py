@@ -2,7 +2,8 @@ from typing import TypeVar
 
 import numpy as np
 
-from prediction.models import PredictionModelConfig, ModelConfigLoaderInputT, IImagePredictionModel, PredictionModelFactory, MultiPathPredictionModelFactory
+from prediction.image_utils import Image
+from prediction.models import ModelConfigLoaderInputT_cls, PredictionModelConfig, ModelConfigLoaderInputT, IImagePredictionModel, PredictionModelFactory, MultiPathPredictionModelFactory
 
 class ClassificationModelConfig(PredictionModelConfig):
     pass
@@ -13,11 +14,11 @@ ClassificationModelOutput = np.ndarray
 
 ClassificationModel = IImagePredictionModel[ClassificationModelConfig, ClassificationModelOutput]
 
-ClassificationModelFactory = PredictionModelFactory[ClassificationModel, ModelConfigLoaderInputT, ClassificationModelConfigT]
+ClassificationModelFactory = PredictionModelFactory[ModelConfigLoaderInputT_cls, ClassificationModelConfigT, Image, ClassificationModelOutput]
 
 from defaults.classification import MODEL_FACTORIES, DEFAULT_MODEL_FACTORY
 
-classification_model_factory = MultiPathPredictionModelFactory[ClassificationModel, ClassificationModelConfig](
+classification_model_factory = MultiPathPredictionModelFactory[ClassificationModelConfig, Image, ClassificationModelOutput](
         factories=MODEL_FACTORIES,
         default_factory=DEFAULT_MODEL_FACTORY
     )
