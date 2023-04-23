@@ -1,5 +1,6 @@
 from argparse import ArgumentParser
 from enum_actions import enum_action
+from pprint import pprint
 import cv2
 
 from prediction import predictor, classes
@@ -88,5 +89,5 @@ class PredictionCLI(CLIWithParts):
 
         predictor = self.prediction_cli_part.get_predictor()
 
-        print([predictor.predict(image, input_strategy=image_utils.img_from_file_strategy) for image in self.args.image])
+        pprint([predictor.predict(image, input_strategy=image_utils.img_from_file_strategy) for image in self.args.image])
 
