@@ -5,7 +5,7 @@ import numpy as np
 
 from prediction.predictor import PredictionInputT_cls, PredictorConfig, PredictionProcessorWithClasses, PredictionProcessorWithClassesFactory, PredictorWithClasses, PredictorWithClassesFactory
 from prediction.classes import Scores
-from prediction.image_utils import Image
+from image_utils import Image
 from .models import ClassificationModelConfig, ClassificationModelOutput, ClassificationModel, classification_model_factory
 
 @dataclass

@@ -4,7 +4,7 @@ from collections.abc import Sequence
 
 import numpy as np
 
-from prediction.image_utils import Image
+from image_utils import Image
 from prediction.models import PredictionModelConfig, IPredictionModel, ModelConfigLoaderInputT_cls, PredictionModelFactory, MultiPathPredictionModelFactory
 
 class DetectionModelConfig(PredictionModelConfig):

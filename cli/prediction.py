@@ -4,7 +4,7 @@ from pprint import pprint
 import cv2
 
 from prediction import predictor, classes
-from prediction import image_utils
+import image_utils
 from . import args_required, CLIPart, CLIWithParts
 
 class PredictionCLIPart(CLIPart):

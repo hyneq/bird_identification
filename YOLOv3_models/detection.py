@@ -2,7 +2,7 @@ from abc import abstractmethod
 
 import numpy as np
 
-from prediction.image_utils import Image
+from image_utils import Image
 
 from detection.models import DetectionModelConfig, DetectionModelOutputIter, DetectionModelOutput, DetectionModel
 

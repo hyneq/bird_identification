@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from prediction.classes import Scores
-from prediction.image_utils import Image
+from image_utils import Image
 from detection.detector import ObjectDetector, DetectionResult, DetectionResults, BoundingBox
 from classification.classifier import ImageClassifier, ClassificationResult
 from extraction.detection_extraction import extract_detection

@@ -7,7 +7,7 @@ import cv2
 import numpy as np
 
 from prediction.models import PredictionModelConfig, PredictionModelWithClassesConfig, PredictionModel, PredictionModelWithClasses, PredictionModelOutputT
-from prediction.image_utils import Image
+from image_utils import Image
 
 @dataclass()
 class DarknetPredictionModelConfig(PredictionModelConfig):

@@ -3,7 +3,7 @@ from typing import TypeVar
 import numpy as np
 
 from prediction.classes import Scores
-from prediction.image_utils import Image
+from image_utils import Image
 from prediction.models import ModelConfigLoaderInputT_cls, PredictionModelWithClassesConfig, IPredictionModelWithClasses, PredictionModelFactory, MultiPathPredictionModelFactory
 
 class ClassificationModelConfig(PredictionModelWithClassesConfig):
