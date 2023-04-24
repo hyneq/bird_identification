@@ -3,25 +3,13 @@ from dataclasses import dataclass
 
 import cv2
 import numpy as np
+from image_utils import BoundingBox
 
 from prediction.predictor import PredictionInputT_cls, PredictorConfig, PredictionProcessorWithClasses, PredictionProcessorWithClassesFactory, PredictorWithClasses, PredictorWithClassesFactory
 from image_utils import Image
 from .models import DetectionModelConfig, DetectionModelOutput, DetectionModel, model_factory
 
 from defaults.detection import DEFAULT_NMS_THRESHOLD
-
-@dataclass()
-class BoundingBox:
-    x: int
-    y: int
-    width: int
-    height: int
-
-    def range(self) -> tuple[np.arange, np.arange]:
-        return (
-            np.arange(self.y, self.y + self.height),
-            np.arange(self.x, self.x + self.width)
-        )
 
 @dataclass()
 class DetectionResult:
