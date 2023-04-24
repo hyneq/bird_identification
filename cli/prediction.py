@@ -89,5 +89,5 @@ class PredictionCLI(CLIWithParts):
 
         predictor = self.prediction_cli_part.get_predictor()
 
-        pprint([predictor.predict(image, input_strategy=image_utils.img_from_file_strategy) for image in self.args.image])
+        pprint([predictor.predict(image, input_strategy=image_utils.load_img) for image in self.args.image])
 
