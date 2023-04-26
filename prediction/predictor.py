@@ -3,6 +3,7 @@ from typing_extensions import Self
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
+from image_utils import BoundingBox
 from config import merge_conf
 from .classes import ClassList, ClassNames, ClassSelectorConfig, ClassSelector, ClassificationMode, ClassSelectorFactory, DEFAULT_CLASS_SELECTOR_FACTORY
 from .models import IPredictionModel, IPredictionModelWithClasses, PredictionModelT, PredictionModelConfigT, PredictionModelWithClassesConfigT, PredictionModelInputT, PredictionModelOutputT, MultiPathPredictionModelFactory
@@ -12,6 +13,36 @@ PredictionInputT_cls = TypeVar("PredictionInputT_cls")
 PredictionInputT_fun = TypeVar("PredictionInputT_fun")
 
 PredictionResultT = TypeVar("PredictionResultT")
+
+class IPredictionResultWithClasses(ABC):
+
+    @property
+    @abstractmethod
+    def class_names(self) -> list[str]:
+        pass
+
+    @property
+    @abstractmethod
+    def confidences(self) -> list[float]:
+        pass
+
+    @property
+    def class_name(self) -> Optional[str]:
+        return self.class_names[0] if self.class_names else None
+    
+    @property
+    def confidence(self) -> Optional[float]:
+        return self.confidences[0] if self.confidences else None
+
+class IPredictionResultWithBoundingBoxes(ABC):
+
+    @property
+    @abstractmethod
+    def bounding_box(self) -> BoundingBox:
+        pass
+
+class IPredictionResultWithClassesAndBoundingBoxes(IPredictionResultWithClasses, IPredictionResultWithBoundingBoxes):
+    pass
 
 @dataclass
 class PredictorConfig(Generic[PredictionModelConfigT]):
