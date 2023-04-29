@@ -168,9 +168,9 @@ class CLIPartPrefixWrapper(ICLIPart, Generic[CLIPartT]):
 
 class CLIWithParts(CLI):
 
-    parts: list[CLIPart]
+    parts: list[ICLIPart]
 
-    def __init__(self, *args, parts: Optional[list[CLIPart]]=None, **kwargs):
+    def __init__(self, *args, parts: Optional[list[ICLIPart]]=None, **kwargs):
         if not parts:
             parts = []
         
