@@ -1,3 +1,5 @@
+from abc import ABC, abstractmethod
+
 from argparse import ArgumentParser
 from enum_actions import enum_action
 from pprint import pprint
@@ -5,9 +7,15 @@ import cv2
 
 from prediction import predictor, classes
 import image_utils
-from . import args_required, CLIPart, CLIWithParts
+from . import args_required, ICLIPart, CLIPart, CLIWithParts
 
-class PredictionCLIPart(CLIPart):
+class IPredictionCLIPart(ICLIPart):
+
+    @abstractmethod
+    def get_predictor(self) -> predictor.IPredictor:
+        pass
+
+class PredictionCLIPart(IPredictionCLIPart, CLIPart):
 
     predictor_factory: predictor.IPredictorFactory
 
@@ -72,7 +80,7 @@ class PredictionCLIPart(CLIPart):
 
 class PredictionCLI(CLIWithParts):
 
-    prediction_cli_part: PredictionCLIPart
+    prediction_cli_part: IPredictionCLIPart
 
     def __init__(self, predictor_factory: predictor.IPredictorFactory):
         self.prediction_cli_part = prediction_cli_part = PredictionCLIPart(predictor_factory)
