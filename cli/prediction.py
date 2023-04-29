@@ -78,12 +78,12 @@ class PredictionCLIPart(IPredictionCLIPart, CLIPart):
             classes=self.args.classes
         )
 
-class PredictionCLI(CLIWithParts):
+class ImagePredictionCLI(CLIWithParts):
 
     prediction_cli_part: IPredictionCLIPart
 
-    def __init__(self, predictor_factory: predictor.IPredictorFactory):
-        self.prediction_cli_part = prediction_cli_part = PredictionCLIPart(predictor_factory)
+    def __init__(self, prediction_cli_part: IPredictionCLIPart):
+        self.prediction_cli_part = prediction_cli_part
         super().__init__(parts=[prediction_cli_part])
     
     def init_parser(self):
@@ -99,3 +99,7 @@ class PredictionCLI(CLIWithParts):
 
         pprint([predictor.predict(image, input_strategy=image_utils.load_img) for image in self.args.image])
 
+class FactoryImagePredictionCLI(ImagePredictionCLI):
+
+    def __init__(self, predictor_factory: predictor.IPredictorFactory):
+        super().__init__(PredictionCLIPart(predictor_factory))

@@ -4,10 +4,10 @@ sys.path.remove(os.path.dirname(__file__))
 
 from detection.detector import object_detector_factory
 
-from cli.prediction import PredictionCLI
+from cli.prediction import FactoryImagePredictionCLI
 
 def cli_main():
-    PredictionCLI(object_detector_factory).run()
+    FactoryImagePredictionCLI(object_detector_factory).run()
 
 if __name__ == "__main__":
     cli_main()
