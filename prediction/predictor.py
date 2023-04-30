@@ -16,15 +16,8 @@ PredictionResultT = TypeVar("PredictionResultT")
 
 class IPredictionResultWithClasses(ABC):
 
-    @property
-    @abstractmethod
-    def class_names(self) -> list[str]:
-        pass
-
-    @property
-    @abstractmethod
-    def confidences(self) -> list[float]:
-        pass
+    class_names: list[str]
+    confidences: list[float]
 
     @property
     def class_name(self) -> Optional[str]:
@@ -36,10 +29,7 @@ class IPredictionResultWithClasses(ABC):
 
 class IPredictionResultWithBoundingBoxes(ABC):
 
-    @property
-    @abstractmethod
-    def bounding_box(self) -> BoundingBox:
-        pass
+   bounding_box: BoundingBox
 
 class IPredictionResultWithClassesAndBoundingBoxes(IPredictionResultWithClasses, IPredictionResultWithBoundingBoxes):
     pass
