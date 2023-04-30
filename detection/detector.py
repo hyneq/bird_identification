@@ -5,17 +5,17 @@ import cv2
 import numpy as np
 from image_utils import BoundingBox
 
-from prediction.predictor import PredictionInputT_cls, PredictorConfig, PredictionProcessorWithClasses, PredictionProcessorWithClassesFactory, PredictorWithClasses, PredictorWithClassesFactory
+from prediction.predictor import PredictionInputT_cls,  IPredictionResultWithClasses, IPredictionResultWithBoundingBoxes,PredictorConfig, PredictionProcessorWithClasses, PredictionProcessorWithClassesFactory, PredictorWithClasses, PredictorWithClassesFactory
 from image_utils import Image
 from .models import DetectionModelConfig, DetectionModelOutput, DetectionModel, model_factory
 
 from defaults.detection import DEFAULT_NMS_THRESHOLD
 
 @dataclass()
-class DetectionResult:
+class DetectionResult(IPredictionResultWithClasses, IPredictionResultWithBoundingBoxes):
     bounding_box: BoundingBox
-    labels: list[str]
-    confidences: any
+    class_names: list[str]
+    confidences: list[float]
 
 DetectionResults = list[DetectionResult]
 
