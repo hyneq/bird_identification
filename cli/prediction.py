@@ -12,7 +12,7 @@ from . import args_required, ICLIPart, CLIPart, CLIWithParts
 class IPredictionCLIPart(ICLIPart):
 
     @abstractmethod
-    def get_predictor(self) -> predictor.IPredictor:
+    def get_predictor(self) -> predictor.APredictor:
         pass
 
 class PredictionCLIPart(IPredictionCLIPart, CLIPart):
@@ -69,7 +69,7 @@ class PredictionCLIPart(IPredictionCLIPart, CLIPart):
         )
     
     @args_required
-    def get_predictor(self) -> predictor.IPredictor:
+    def get_predictor(self) -> predictor.APredictor:
         return self.predictor_factory.get_predictor(
             model_path=self.args.model_path,
             model_type=self.args.model_type,

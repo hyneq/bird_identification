@@ -112,24 +112,35 @@ class PredictionProcessorWithClassesFactory(PredictionProcessorFactory[Predictio
         return self.prediction_processor_cls(model_class_names, cs, *args, **kwargs)
 
 
-class IPredictor(ABC, Generic[PredictionInputT_cls, PredictionModelInputT, PredictionResultT]):
+class APredictor(ABC, Generic[PredictionInputT_cls, PredictionModelInputT, PredictionResultT]):
     __slots__: tuple
 
-    @abstractmethod
+    input_strategy: InputStrategy[Any, PredictionModelInputT]
+
+    def __init__(self, input_strategy: InputStrategy[Any, PredictionModelInputT]):
+        self.input_strategy = input_strategy
+
     @overload
     def predict(self, input: PredictionInputT_cls) -> PredictionResultT:
         pass
 
-    @abstractmethod
     @overload
     def predict(self, input: PredictionInputT_fun, input_strategy: InputStrategy[PredictionInputT_fun, PredictionModelInputT]) -> PredictionResultT:
         pass
 
-    @abstractmethod
     def predict(self, input: Union[PredictionInputT_cls, PredictionInputT_fun], input_strategy: Optional[InputStrategy[PredictionInputT_fun, PredictionModelInputT]]=None) -> PredictionResultT:
+        if not input_strategy:
+            input_strategy = self.input_strategy
+
+        model_input = input_strategy(input)
+
+        return self._predict(model_input)
+    
+    @abstractmethod
+    def _predict(self, input: PredictionModelInputT) -> PredictionResultT:
         pass
 
-class Predictor(IPredictor[PredictionInputT_cls, PredictionModelInputT, PredictionResultT], Generic[PredictionInputT_cls, PredictionModelInputT, PredictionModelOutputT, PredictionResultT]):
+class Predictor(APredictor[PredictionInputT_cls, PredictionModelInputT, PredictionResultT], Generic[PredictionInputT_cls, PredictionModelInputT, PredictionModelOutputT, PredictionResultT]):
     __slots__: tuple
     
     model: IPredictionModel[Any, PredictionModelInputT, PredictionModelOutputT]
@@ -144,23 +155,19 @@ class Predictor(IPredictor[PredictionInputT_cls, PredictionModelInputT, Predicti
             input_strategy: InputStrategy[Any, PredictionModelInputT],
         ):
 
-        self.model = model
+        super().__init__(input_strategy)
 
-        self.input_strategy = input_strategy
+        self.model = model
         
         self.prediction_processor = prediction_processor
 
-    def predict(self, input: Union[PredictionInputT_cls, PredictionInputT_fun], input_strategy: Optional[InputStrategy[PredictionInputT_fun, PredictionModelInputT]]=None) -> PredictionResultT:
-        if not input_strategy:
-            input_strategy = self.input_strategy
+    def _predict(self, input: PredictionModelInputT) -> PredictionResultT:
 
-        model_input = input_strategy(input)
-
-        model_output: PredictionModelOutputT = self.model.predict(model_input)
+        model_output: PredictionModelOutputT = self.model.predict(input)
 
         return self.prediction_processor.process(model_output)
 
-PredictorT = TypeVar("PredictorT", bound=IPredictor)
+PredictorT = TypeVar("PredictorT", bound=APredictor)
 
 class PredictorWithClasses(Predictor[PredictionInputT_cls, PredictionModelInputT, PredictionModelOutputT, PredictionResultT]):
     __slots__: tuple
@@ -175,7 +182,7 @@ class IPredictorFactory(Generic[PredictorConfigT, PredictionModelConfigT, Predic
             model_path: Optional[str]=None,
             model_type: Optional[str]=None,
             model: Optional[IPredictionModel[PredictionModelConfigT, PredictionModelInputT, PredictionModelOutputT]]=None,
-            predictor: Optional[type[IPredictor[PredictionInputT_cls, PredictionModelInputT, PredictionResultT]]]=None,
+            predictor: Optional[type[APredictor[PredictionInputT_cls, PredictionModelInputT, PredictionResultT]]]=None,
             input_strategy: Optional[InputStrategy[PredictionInputT_cls, PredictionModelInputT]]=None,
             cs_config: Optional[ClassSelectorConfig]=None,
             cs: Optional[ClassSelector]= None,
@@ -183,7 +190,7 @@ class IPredictorFactory(Generic[PredictorConfigT, PredictionModelConfigT, Predic
             min_confidence: Optional[float]=None,
             min_confidence_pc: Optional[int]=None,
             classes: Optional[ClassList]=None,
-        ) -> IPredictor[PredictionInputT_cls, PredictionModelInputT, PredictionResultT]:
+        ) -> APredictor[PredictionInputT_cls, PredictionModelInputT, PredictionResultT]:
         pass
 
     @abstractmethod
