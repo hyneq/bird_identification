@@ -9,7 +9,7 @@ OutputT = TypeVar("OutputT")
 class IFrameProcessor(Generic[InputT, OutputT], ABC):
 
     @abstractmethod
-    def process(self, InputT) -> OutputT:
+    def process(self, input: InputT) -> OutputT:
         pass
 
 class StreamProcessor(Generic[InputT, OutputT]):
