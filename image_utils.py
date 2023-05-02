@@ -5,6 +5,7 @@ import cv2
 
 Image = np.ndarray
 Point = tuple[int, int]
+Size = tuple[int, int]
 Color = tuple[int, int, int]
 
 def load_img(img: str) -> Image:
