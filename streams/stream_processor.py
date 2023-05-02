@@ -5,12 +5,15 @@ from . import IInStream, IOutStream
 
 InputT = TypeVar("InputT")
 OutputT = TypeVar("OutputT")
+FrameT = TypeVar("FrameT")
 
 class IFrameProcessor(Generic[InputT, OutputT], ABC):
 
     @abstractmethod
     def process(self, input: InputT) -> OutputT:
         pass
+
+ISameTypeFrameProcessor = IFrameProcessor[FrameT, FrameT]
 
 class StreamProcessor(Generic[InputT, OutputT]):
 
@@ -32,3 +35,5 @@ class StreamProcessor(Generic[InputT, OutputT]):
 
     def process(self, input: InputT) -> OutputT:
         return self.frame_processor.process(input)
+
+ISameTypeStreamProcessor = StreamProcessor[FrameT, FrameT]
