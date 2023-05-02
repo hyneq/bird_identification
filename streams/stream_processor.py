@@ -66,4 +66,4 @@ class StreamProcessor(Generic[InputT, OutputT]):
     def process(self, input: InputT) -> OutputT:
         return self.frame_processor.process(input)
 
-ISameTypeStreamProcessor = StreamProcessor[FrameT, FrameT]
+SameTypeStreamProcessor = StreamProcessor[FrameT, FrameT]
