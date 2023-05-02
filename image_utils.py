@@ -17,10 +17,10 @@ class BoundingBox:
     width: int
     height: int
 
-    def range(self) -> tuple[np.arange, np.arange]:
+    def slices(self) -> tuple[slice, slice]:
         return (
-            np.arange(self.y, self.y + self.height),
-            np.arange(self.x, self.x + self.width)
+            slice(self.y, self.y + self.height),
+            slice(self.x, self.x + self.width)
         )
     
     def points(self) -> tuple[Point, Point]:
