@@ -15,6 +15,20 @@ class IFrameProcessor(Generic[InputT, OutputT], ABC):
 
 ISameTypeFrameProcessor = IFrameProcessor[FrameT, FrameT]
 
+class MultiFrameProcessor(ISameTypeFrameProcessor[FrameT]):
+
+    frame_processors: list[ISameTypeFrameProcessor[FrameT]]
+
+    def __init__(self, frame_processors: list[ISameTypeFrameProcessor[FrameT]]):
+        self.frame_processors = frame_processors
+    
+    def process(self, input: FrameT) -> FrameT:
+        frame = input
+        for frame_processor in self.frame_processors:
+            frame = frame_processor.process(frame)
+        
+        return frame
+
 class StreamProcessor(Generic[InputT, OutputT]):
 
     input_stream: IInStream[InputT]
