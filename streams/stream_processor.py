@@ -1,5 +1,6 @@
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, Optional, Callable
 from abc import ABC, abstractmethod
+import copy
 
 from . import IInStream, IOutStream
 
@@ -14,6 +15,21 @@ class IFrameProcessor(Generic[InputT, OutputT], ABC):
         pass
 
 ISameTypeFrameProcessor = IFrameProcessor[FrameT, FrameT]
+
+CopyStrategy = Callable[[FrameT], FrameT]
+class FrameCache(ISameTypeFrameProcessor[FrameT]):
+
+    cached: Optional[FrameT]
+    copy_strategy: CopyStrategy[FrameT]
+
+    def __init__(self, copy_strategy: CopyStrategy[FrameT] = copy.copy):
+        self.cached = None
+        self.copy_strategy = copy_strategy
+    
+    def process(self, input: FrameT) -> FrameT:
+        self.cached = self.copy_strategy(input)
+
+        return input
 
 class MultiFrameProcessor(ISameTypeFrameProcessor[FrameT]):
 
