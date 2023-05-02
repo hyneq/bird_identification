@@ -1,13 +1,13 @@
 from dataclasses import dataclass
 
-from prediction.classes import Scores
+from prediction.predictor import APredictor, IPredictionResultWithClassesAndBoundingBoxes
 from image_utils import BoundingBox, Image
-from detection.detector import ObjectDetector, DetectionResult, DetectionResults
+from detection.detector import ObjectDetector, DetectionResult
 from classification.classifier import ImageClassifier, ClassificationResult
 from extraction.detection_extraction import extract_detection
 
 @dataclass
-class DetectionClassificationResult:
+class DetectionClassificationResult(IPredictionResultWithClassesAndBoundingBoxes):
     detection_result: DetectionResult
     classification_result: ClassificationResult
 
@@ -25,7 +25,7 @@ class DetectionClassificationResult:
 
 DetectionClassificationResults = list[DetectionClassificationResult]
 
-class DetectionClassifier:
+class DetectionClassifier(APredictor[Image, Image, DetectionClassificationResults]):
 
     detector: ObjectDetector
     classifier: ImageClassifier
@@ -34,7 +34,7 @@ class DetectionClassifier:
         self.detector = detector
         self.classifier = classifier
     
-    def predict(self, input: Image) -> list[DetectionClassificationResult]:
+    def _predict(self, input: Image) -> list[DetectionClassificationResult]:
         detection_results = self.detector.predict(input)
 
         results: DetectionClassificationResults = []
