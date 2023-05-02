@@ -74,7 +74,7 @@ class OptionPrefixerParser(ArgumentParserModifier):
         flags: list[str] = []
         for flag in name_or_flags:
             if re.match(r"^[" + self.parser.prefix_chars + r"]{2}.+", flag):
-                flag = flag[0:2] + self.prefix + "-" + flag[3:]
+                flag = flag[0:2] + self.prefix + "-" + flag[2:]
 
                 flags.append(flag)
         
