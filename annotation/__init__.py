@@ -61,26 +61,24 @@ class TextWithBackgroundAnnotation(IAnnotation):
     text: TextAnnotation
     background: RectangleAnnotation
 
-    def __init__(self, text: str, origin: Point, background_color: Color, color: Color=(255,255,255), padding: int = 10, up: bool=False, left: bool=False):
+    def __init__(self, text: str, origin: Point, background_color: Color, color: Color=(0,0,0)):
+
         self.text = TextAnnotation(text, origin, color)
 
-        self.text_size = text_size = cv2.getTextSize(text, DEFAULT_FONT, 1, DEFAULT_TEXT_THICKNESS)
-        origin = (origin[0]-padding, origin[1]-padding)
-        text_size = (text_size[0]+padding*2, text_size[1]+padding*2)
+        (rect_width, rect_height), _ = cv2.getTextSize(text, DEFAULT_FONT, 1, DEFAULT_TEXT_THICKNESS)
 
-        if up:
-            origin = (origin[0], origin[1]-text_size[1])
-        
-        if left:
-            origin = (origin[0]-text_size[1], origin[1])
+        rect_origin = (origin[0], origin[1]-rect_height)
 
         self.background = RectangleAnnotation(
             BoundingBox(
-                origin[0],
-                origin[1],
-                text_size[0],
-                text_size[1]
-            ), background_color, -1)
+                rect_origin[0],
+                rect_origin[1],
+                rect_width,
+                rect_height
+            ),
+            background_color,
+            -1
+        )
     
     def annotate(self, img: Image):
         self.background.annotate(img)
@@ -93,7 +91,7 @@ class RectangleWithTextAnnotation(IAnnotation):
 
     def __init__(self, bounding_box: BoundingBox, text: str, color: Color, thickness: int=10):
         self.rect = RectangleAnnotation(bounding_box, color, thickness)
-        self.text = TextWithBackgroundAnnotation(text, bounding_box.points()[0], color, up=True)
+        self.text = TextWithBackgroundAnnotation(text, bounding_box.points()[0], color)
     
     def annotate(self, img: Image):
         self.rect.annotate(img)
