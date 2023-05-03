@@ -1,0 +1,16 @@
+from typing import Callable
+
+from streams import FileVideoInStreamFactory, FileVideoOutStreamFactory
+import opencv_streams
+
+DEFAULT_FILE_IN_STREAM_FACTORY: FileVideoInStreamFactory
+DEFAULT_FILE_OUT_STREAM_FACTORY: FileVideoOutStreamFactory
+
+DEFAULT_FILE_IN_STREAM_PATH: str
+DEFAULT_FILE_OUT_STREAM_PATH: str
+
+DEFAULT_FILE_IN_STREAM_FACTORY = opencv_streams.get_file_video_in_stream
+DEFAULT_FILE_OUT_STREAM_FACTORY = opencv_streams.get_file_video_out_stream
+
+DEFAULT_FILE_IN_STREAM_PATH = "-"
+DEFAULT_FILE_OUT_STREAM_PATH = "-"

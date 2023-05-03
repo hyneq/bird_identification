@@ -1,6 +1,7 @@
 from typing import Generic, TypeVar, Optional, Callable
 from abc import ABC, abstractmethod
 import copy
+import time
 
 from . import IInStream, IOutStream
 
@@ -9,6 +10,7 @@ OutputT = TypeVar("OutputT")
 FrameT = TypeVar("FrameT")
 
 class IFrameProcessor(Generic[InputT, OutputT], ABC):
+    __slots__: tuple
 
     @abstractmethod
     def process(self, input: InputT) -> OutputT:
@@ -18,6 +20,7 @@ ISameTypeFrameProcessor = IFrameProcessor[FrameT, FrameT]
 
 CopyStrategy = Callable[[FrameT], FrameT]
 class FrameCache(ISameTypeFrameProcessor[FrameT]):
+    __slots__: tuple
 
     cached: Optional[FrameT]
     copy_strategy: CopyStrategy[FrameT]
@@ -32,6 +35,7 @@ class FrameCache(ISameTypeFrameProcessor[FrameT]):
         return input
 
 class MultiFrameProcessor(ISameTypeFrameProcessor[FrameT]):
+    __slots__: tuple
 
     frame_processors: list[ISameTypeFrameProcessor[FrameT]]
 
@@ -46,6 +50,7 @@ class MultiFrameProcessor(ISameTypeFrameProcessor[FrameT]):
         return frame
 
 class StreamProcessor(Generic[InputT, OutputT]):
+    __slots__: tuple
 
     input_stream: IInStream[InputT]
     output_stream: IOutStream[OutputT]
@@ -57,6 +62,13 @@ class StreamProcessor(Generic[InputT, OutputT]):
         self.output_stream = output_stream
 
         self.frame_processor = frame_processor
+    
+    def run(self):
+        try:
+            self.loop()
+        finally:
+            self.input_stream.close()
+            self.output_stream.close()
     
     def loop(self):
         for input in self.input_stream:
