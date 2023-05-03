@@ -33,6 +33,8 @@ class DetectionClassifier(APredictor[Image, Image, DetectionClassificationResult
     def __init__(self, detector: ObjectDetector, classifier: ImageClassifier):
         self.detector = detector
         self.classifier = classifier
+
+        super().__init__()
     
     def _predict(self, input: Image) -> list[DetectionClassificationResult]:
         detection_results = self.detector.predict(input)
