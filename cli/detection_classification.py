@@ -1,6 +1,7 @@
-import os,sys
-sys.path.append(os.path.realpath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
-sys.path.remove(os.path.dirname(__file__))
+if __name__ == "__main__":
+    import os,sys
+    sys.path.append(os.path.realpath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
+    sys.path.remove(os.path.dirname(__file__))
 
 from cli import ArgumentParser, CLIPart, CLIPartPrefixWrapper, Namespace, args_required
 from cli.prediction import IPredictionCLIPart, PredictionCLIPart, ImagePredictionCLI
