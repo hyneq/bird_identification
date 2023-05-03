@@ -117,8 +117,11 @@ class APredictor(ABC, Generic[PredictionInputT_cls, PredictionModelInputT, Predi
 
     input_strategy: InputStrategy[Any, PredictionModelInputT]
 
-    def __init__(self, input_strategy: InputStrategy[Any, PredictionModelInputT]):
-        self.input_strategy = input_strategy
+    def __init__(self, input_strategy: Optional[InputStrategy[Any, PredictionModelInputT]]=None):
+        if input_strategy:
+            self.input_strategy = input_strategy
+        else:
+            self.input_strategy = default_input_strategy
 
     @overload
     def predict(self, input: PredictionInputT_cls) -> PredictionResultT:
