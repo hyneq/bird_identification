@@ -31,7 +31,7 @@ class RectangleAnnotation(IAnnotation):
     color: Color
     thickness: int
 
-    def __init__(self, bounding_box: BoundingBox, color: Color, thickness: int=10, filled: bool=False):
+    def __init__(self, bounding_box: BoundingBox, color: Color, thickness: int=3, filled: bool=False):
         self.start_point, self.end_point = bounding_box.points()
         self.color = color
         if filled:
@@ -89,7 +89,7 @@ class RectangleWithTextAnnotation(IAnnotation):
     rect: RectangleAnnotation
     text: TextWithBackgroundAnnotation
 
-    def __init__(self, bounding_box: BoundingBox, text: str, color: Color, thickness: int=10):
+    def __init__(self, bounding_box: BoundingBox, text: str, color: Color, thickness: int=3):
         self.rect = RectangleAnnotation(bounding_box, color, thickness)
         self.text = TextWithBackgroundAnnotation(text, bounding_box.points()[0], color)
     
