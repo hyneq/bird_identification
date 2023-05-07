@@ -4,15 +4,6 @@ batch="$1"
 
 project_root="$(dirname $0)"
 images=$project_root/images
-classes_path=$project_root/models/czbirds/classes.csv
 log=$project_root/logs/extract_birds_cam_trap-$batch-$(date -Iminutes)
 
-source_path=$images/'cam_trap/'$batch'/*/*.JPG'
-target_path_base=$images/'cam_trap_extracted_classes'
-target_path=$target_path_base'/$c/$i.jpg'
-
-mkdir -p $target_path
-$project_root/create_class_dirs.sh $classes_path $target_path_base
-mkdir $target_path_base/__not_recognized__
-
-python3 -u $project_root/detection_extract.py $images/'cam_trap/'$batch'/*/*.JPG' 'bird' $target_path | tee $log
+python3 -u $project_root/cli/detection_classification_file_extractor.py --detection-class=bird $images/cam_trap/$batch  $images/cam_trap_extracted_classes/$batch | tee $log
