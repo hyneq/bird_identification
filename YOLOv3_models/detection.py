@@ -65,8 +65,10 @@ class YOLOv3DetectionModelOutput(DetectionModelOutput[YOLOv3DetectionObj, YOLOv3
         # From YOLO data format, we can get top left corner coordinates
         # that are x_min and y_min
         x_center, y_center, box_width, box_height = box
-        x_min = int(x_center - (box_width / 2))
-        y_min = int(y_center - (box_height / 2))
+        x_min = max(int(x_center - (box_width / 2)),0)
+        y_min = max(int(y_center - (box_height / 2)),0)
+        if x_min + box_width >= self.width: box_width = self.width-x_min
+        if y_min + box_height >= self.height: box_height = self.width-y_min
 
         return (x_min, y_min, int(box_width), int(box_height))
     
