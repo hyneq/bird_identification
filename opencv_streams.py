@@ -82,9 +82,9 @@ def get_file_video_in_stream(path: str) -> OpenCVVideoInStream:
 
 # inspired by https://www.geeksforgeeks.org/saving-a-video-using-opencv/
 def get_file_video_out_stream(path: str, fps: float, size: tuple[int, int]) -> OpenCVVideoOutStream:
-    return RealTimeOpenCVVideoOutStream(cv2.VideoWriter(
+    return OpenCVVideoOutStream(cv2.VideoWriter(
         path,
-        cv2.VideoWriter_fourcc(*'MJPG'),
+        cv2.VideoWriter_fourcc(*'H264'),
         fps,
         (size[0], size[1])
     ), fps=fps, size=size)
