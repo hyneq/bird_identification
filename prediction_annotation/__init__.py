@@ -16,7 +16,7 @@ def get_prediction_annotation(results: list[IPredictionResultWithClassesAndBound
         for result in results:
             annotations.append(RectangleWithTextAnnotation(
                 result.bounding_box,
-                "{} {}%".format(result.class_name, result.confidence*100) if result.class_name is not None else "not recognized",
+                "{} {:.2f}%".format(result.class_name, result.confidence*100) if result.class_name is not None else "not recognized",
                 (3, 186, 252)
             ))
         
