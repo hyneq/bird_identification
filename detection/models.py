@@ -60,4 +60,4 @@ model_factory = MultiPathPredictionModelFactory[DetectionModelConfig, Image, Det
         default_factory=DEFAULT_MODEL_FACTORY
     )
 
-get_detection_model = model_factory.get_model
+get_detection_model = model_factory

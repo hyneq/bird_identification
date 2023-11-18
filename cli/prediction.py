@@ -64,7 +64,7 @@ class PredictionCLIPart(IPredictionCLIPart, CLIPart):
             "--model-type",
             dest="model_type",
             default=self.predictor_factory.get_model_factory().default_factory,
-            choices=self.predictor_factory.get_model_factory().get_factory_names(),
+            choices=self.predictor_factory.get_model_factory().factory_names,
             help="model types that can be used"
         )
     

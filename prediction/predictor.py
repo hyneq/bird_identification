@@ -233,7 +233,7 @@ class PredictorWithClassesFactory(IPredictorFactory[PredictorConfigT, Prediction
             input_strategy = self.input_strategy
 
         if not model:
-            model = self.model_factory.get_model(
+            model = self.model_factory(
                 factory=model_type,
                 cfg_input=model_path,
                 cfg=model_config

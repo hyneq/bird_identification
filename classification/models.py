@@ -24,4 +24,4 @@ classification_model_factory = MultiPathPredictionModelFactory[ClassificationMod
         default_factory=DEFAULT_MODEL_FACTORY
     )
 
-get_classification_model = classification_model_factory.get_model
+get_classification_model = classification_model_factory
