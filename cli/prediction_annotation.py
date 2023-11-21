@@ -1,7 +1,7 @@
 from typing import Optional
 
 from cli import CLIWithParts
-from cli.streams import IStreamPairCLIPart, FileStreamPairCLIPart
+from cli.streams import IStreamPairCLIPart, MultiPathVideoStreamPairCLIPart
 from cli.prediction import IPredictionCLIPart
 
 from prediction_annotation import ImagePredictionStreamRunner
@@ -17,7 +17,7 @@ class StreamPredictionAnnotationCLI(CLIWithParts):
         ):
 
         if not stream_cli_part:
-            stream_cli_part = FileStreamPairCLIPart()
+            stream_cli_part = MultiPathVideoStreamPairCLIPart()
 
         self.stream_cli_part = stream_cli_part
         self.prediction_cli_part = prediction_cli_part

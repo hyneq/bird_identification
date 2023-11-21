@@ -1,16 +1,27 @@
-from typing import Callable
+from typing import Callable, Mapping
 
-from streams import FileVideoInStreamFactory, FileVideoOutStreamFactory
+from streams import IPathVideoInStreamFactory, IPathVideoOutStreamFactory
 import opencv_streams
 
-DEFAULT_FILE_IN_STREAM_FACTORY: FileVideoInStreamFactory
-DEFAULT_FILE_OUT_STREAM_FACTORY: FileVideoOutStreamFactory
+DEFAULT_PATH_IN_STREAM_FACTORY: str
+DEFAULT_PATH_OUT_STREAM_FACTORY: str
 
-DEFAULT_FILE_IN_STREAM_PATH: str
-DEFAULT_FILE_OUT_STREAM_PATH: str
+DEFAULT_PATH_IN_STREAM_PATH: str
+DEFAULT_PATH_OUT_STREAM_PATH: str
 
-DEFAULT_FILE_IN_STREAM_FACTORY = opencv_streams.get_file_video_in_stream
-DEFAULT_FILE_OUT_STREAM_FACTORY = opencv_streams.get_file_video_out_stream
+PATH_IN_STREAM_FACTORIES: Mapping[str, IPathVideoInStreamFactory]
+PATH_OUT_STREAM_FACTORIES: Mapping[str, IPathVideoOutStreamFactory]
 
-DEFAULT_FILE_IN_STREAM_PATH = "-"
-DEFAULT_FILE_OUT_STREAM_PATH = "-"
+DEFAULT_PATH_IN_STREAM_FACTORY = "opencv"
+DEFAULT_PATH_OUT_STREAM_FACTORY = "opencv"
+
+DEFAULT_PATH_IN_STREAM_PATH = "-"
+DEFAULT_PATH_OUT_STREAM_PATH = "-"
+
+PATH_IN_STREAM_FACTORIES = {
+    "opencv": opencv_streams.get_file_video_in_stream
+}
+
+PATH_OUT_STREAM_FACTORIES = {
+    "opencv": opencv_streams.get_file_video_out_stream
+}

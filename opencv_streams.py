@@ -77,11 +77,11 @@ class RealTimeOpenCVVideoOutStream(OpenCVVideoOutStream):
         super().write(frame)
         self.last_write_time = time.time()
 
-def get_file_video_in_stream(path: str) -> OpenCVVideoInStream:
+def get_file_video_in_stream(path: str, *_, **__) -> OpenCVVideoInStream:
     return OpenCVVideoInStream(cv2.VideoCapture(path))
 
 # inspired by https://www.geeksforgeeks.org/saving-a-video-using-opencv/
-def get_file_video_out_stream(path: str, fps: float, size: tuple[int, int]) -> OpenCVVideoOutStream:
+def get_file_video_out_stream(path: str, fps: float, size: tuple[int, int], *_, **__) -> OpenCVVideoOutStream:
     return OpenCVVideoOutStream(cv2.VideoWriter(
         path,
         cv2.VideoWriter_fourcc(*'H264'),
