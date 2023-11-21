@@ -3,8 +3,8 @@ from threading import Thread
 from abc import ABC, abstractmethod
 
 from image_utils import Image
-from streams import IInStream, IOutStream
-from streams.stream_processor import MultiFrameProcessor, FrameCache, SameTypeStreamProcessor
+from streams import IVideoInStream, IVideoOutStream
+from streams.stream_processor import MultiFrameProcessor, FrameCache, VideoStreamProcessor
 from prediction.predictor import APredictor, IPredictionResultWithClassesAndBoundingBoxes
 from annotation import IAnnotation, MultiAnnotation, RectangleWithTextAnnotation
 from annotation.stream_annotator import StreamAnnotator
@@ -74,15 +74,15 @@ class ImagePredictionStreamRunner:
 
     prediction_stream_processor: ImagePredictionStreamProcessor
     prediction_runner: PredictionRunner
-    stream_processor: SameTypeStreamProcessor[Image]
+    stream_processor: VideoStreamProcessor
 
     stream_thread: Thread
     prediction_thread: Thread
 
     def __init__(self,
                  predictor: ImageClassAndBoundingBoxPredictor,
-                 in_stream: IInStream[Image],
-                 out_stream: IOutStream[Image],
+                 in_stream: IVideoInStream,
+                 out_stream: IVideoOutStream,
                  prediction_runner: PredictionRunner=DEFAULT_PREDICTION_RUNNER
         ):
         self.prediction_stream_processor = prediction_stream_processor = ImagePredictionStreamProcessor(predictor)
@@ -90,7 +90,7 @@ class ImagePredictionStreamRunner:
         prediction_runner.prediction_stream_processor = prediction_stream_processor
         self.prediction_runner = prediction_runner
         
-        self.stream_processor = SameTypeStreamProcessor[Image](in_stream, out_stream, prediction_stream_processor.frame_processor)
+        self.stream_processor = VideoStreamProcessor(in_stream, out_stream, prediction_stream_processor.frame_processor)
 
     def run(self):
         self.start()

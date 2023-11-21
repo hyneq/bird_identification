@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 import copy
 import time
 
+from image_utils import Image
 from . import IInStream, IOutStream
 
 InputT = TypeVar("InputT")
@@ -79,3 +80,5 @@ class StreamProcessor(Generic[InputT, OutputT]):
         return self.frame_processor.process(input)
 
 SameTypeStreamProcessor = StreamProcessor[FrameT, FrameT]
+
+VideoStreamProcessor = StreamProcessor[Optional[Image], Image]
