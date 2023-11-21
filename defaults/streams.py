@@ -23,5 +23,6 @@ PATH_IN_STREAM_FACTORIES = {
 }
 
 PATH_OUT_STREAM_FACTORIES = {
-    "opencv": opencv_streams.get_file_video_out_stream
+    "opencv": opencv_streams.get_file_video_out_stream,
+    "opencv_gstreamer": opencv_streams.get_file_video_out_stream_gstreamer
 }
