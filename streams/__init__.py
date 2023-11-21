@@ -95,7 +95,7 @@ class IVideoStream(IStream):
     size: Size
     fps: float
 
-class IVideoInStream(IVideoStream, IInStream[Image]):
+class IVideoInStream(IVideoStream, IInStream[Optional[Image]]):
     pass
 
 class IVideoOutStream(IVideoStream, IOutStream[Image]):
