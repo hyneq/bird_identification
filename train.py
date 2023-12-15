@@ -2,7 +2,7 @@
 
 # This code is heavily based on https://keras.io/examples/vision/image_classification_efficientnet_fine_tuning/
 
-import os
+import os, sys
 import argparse
 from dataclasses import dataclass
 
@@ -12,6 +12,8 @@ from keras import layers
 from keras.models import Sequential
 from keras.applications import EfficientNetB0
 import matplotlib.pyplot as plt
+
+sys.path.append(os.path.join(os.path.dirname(__file__), "lib", "bird_identification"))
 
 from classification import load_classes
 

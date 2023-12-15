@@ -3,6 +3,8 @@
 import sys, os, glob
 import cv2
 
+sys.path.append(os.path.join(os.path.dirname(__file__), "lib", "bird_identification"))
+
 from image_utils import load_img
 
 from classification.classifier import ImageClassifier, get_image_classifier
