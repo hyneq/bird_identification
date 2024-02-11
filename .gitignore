@@ -5,4 +5,4 @@ models/*
 !models/jizbirds*
 images
 logs
-env
+venv

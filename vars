@@ -1,0 +1,9 @@
+project_root="$(dirname "${BASH_SOURCE[0]:-${(%):-%x}}")"
+
+venv="$project_root/venv"
+
+if [ -n "$PYTHONPATH" ]; then
+    export PYTHONPATH=$project_root/lib/bird_identification:$PYTHONPATH
+else
+    export PYTHONPATH=$project_root/lib/bird_identification
+fi
