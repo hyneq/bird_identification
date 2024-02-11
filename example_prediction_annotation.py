@@ -1,15 +1,17 @@
 #!/usr/bin/python3
 
-import os
+import sys,os
 
 import cv2
 
-from image_utils import load_img
-from classification.classifier import get_image_classifier
-from detection.detector import get_object_detector
-from detection_classification import DetectionClassificationResult
-from extraction.detection_extraction import extract_detection
-from prediction_annotation import get_prediction_annotation
+sys.path.append(os.path.join(os.path.dirname(__file__), "lib"))
+
+from bird_identification.image_utils import load_img
+from bird_identification.classification.classifier import get_image_classifier
+from bird_identification.detection.detector import get_object_detector
+from bird_identification.detection_classification import DetectionClassificationResult
+from bird_identification.extraction.detection_extraction import extract_detection
+from bird_identification.prediction_annotation import get_prediction_annotation
 
 BASE_DIR = os.path.join(os.path.dirname(__file__), "images/example_prediction_annotation")
 

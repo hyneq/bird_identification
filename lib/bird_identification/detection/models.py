@@ -4,8 +4,8 @@ from collections.abc import Sequence
 
 import numpy as np
 
-from image_utils import Image
-from prediction.models import PredictionModelConfig, IPredictionModel, ModelConfigLoaderInputT_cls, PredictionModelFactory, MultiPathPredictionModelFactory
+from ..image_utils import Image
+from ..prediction.models import PredictionModelConfig, IPredictionModel, ModelConfigLoaderInputT_cls, PredictionModelFactory, MultiPathPredictionModelFactory
 
 class DetectionModelConfig(PredictionModelConfig):
     pass
@@ -53,7 +53,7 @@ DetectionModel = IPredictionModel[DetectionModelConfig, Image, DetectionModelOut
 
 DetectionModelFactory = PredictionModelFactory[ModelConfigLoaderInputT_cls, DetectionModelConfigT, Image, DetectionModelOutput]
 
-from defaults.detection import MODEL_FACTORIES, DEFAULT_MODEL_FACTORY
+from ..defaults.detection import MODEL_FACTORIES, DEFAULT_MODEL_FACTORY
 
 model_factory = MultiPathPredictionModelFactory[DetectionModelConfig, Image, DetectionModelOutput](
         factories=MODEL_FACTORIES,

@@ -1,7 +1,7 @@
 import os
 
-from file_extractor import FileExtractor
-from prediction.predictor import IPredictionResultWithClassesAndBoundingBoxes
+from ..file_extractor import FileExtractor
+from ..prediction.predictor import IPredictionResultWithClassesAndBoundingBoxes
 
 class FileDetectionClassificationExtractor(FileExtractor[IPredictionResultWithClassesAndBoundingBoxes]):
 

@@ -2,10 +2,10 @@
 
 import os, sys, cv2
 
-sys.path.append(os.path.join(os.path.dirname(__file__), "lib", "bird_identification"))
+sys.path.append(os.path.join(os.path.dirname(__file__), "lib"))
 
-from image_utils import Image, BoundingBox
-import annotation
+from bird_identification.image_utils import Image, BoundingBox
+from bird_identification import annotation
 
 BASE_DIR: str = os.path.join(os.path.dirname(__file__), "images", "annotation_example")
 

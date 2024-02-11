@@ -5,7 +5,7 @@ from  typing_extensions import Self
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-from config import merge_conf
+from ..config import merge_conf
 
 DEFAULT_MIN_CONFIDENCE = 0.5
 

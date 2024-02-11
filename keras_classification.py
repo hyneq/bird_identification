@@ -1,5 +1,5 @@
 import numpy as np
-from keras_classification import KerasPredictionModel
+from keras_prediction import KerasPredictionModel
 
 class KerasClassificationModel(KerasPredictionModel[np.ndarray]):
     __slots__: tuple

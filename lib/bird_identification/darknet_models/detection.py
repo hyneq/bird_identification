@@ -1,9 +1,9 @@
 import numpy as np
 import os
 
-from detection.models import DetectionModelConfig, DetectionModelFactory
+from ..detection.models import DetectionModelConfig, DetectionModelFactory
 from .prediction import DarknetPredictionModelWithClasses, DarknetPredictionModelWithClassesConfig
-from YOLOv3_models.detection import YOLOv3DetectionModel, YOLOv3DetectionModelConfig, YOLOv3DetectionModelOutput, YOLOv3DetectionModelRawOutput
+from ..YOLOv3_models.detection import YOLOv3DetectionModel, YOLOv3DetectionModelConfig, YOLOv3DetectionModelOutput, YOLOv3DetectionModelRawOutput
 
 class DarknetYOLOv3DetectionModel(DarknetPredictionModelWithClasses[YOLOv3DetectionModelOutput], YOLOv3DetectionModel):
     

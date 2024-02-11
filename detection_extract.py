@@ -1,11 +1,13 @@
 #!/usr/bin/python3
-import sys,glob,re
+import sys,os,glob,re
 
 import cv2
 import numpy as np
 
-from detection.detector import get_object_detector, detect_objects
-from classification.classifier import get_image_classifier, classify_images
+sys.path.append(os.path.join(os.path.dirname(__file__), "lib"))
+
+from bird_identification.detection.detector import get_object_detector, detect_objects
+from bird_identification.classification.classifier import get_image_classifier, classify_images
 
 def extract_detected(images, label, box_expand=[0.1, 0.1], model=None, save_path=None, i=None, confidence=0.55, i_placeholder="$i", class_placeholder="$c", i_padding=5, return_array=False, verbose=True, classify=None, classification_model=None, classification_confidence=0.85):
     if type(images) is str:

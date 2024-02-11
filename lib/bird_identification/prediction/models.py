@@ -3,8 +3,8 @@ from abc import ABC, abstractmethod, abstractclassmethod
 from dataclasses import dataclass
 
 from .classes import ClassNames
-from image_utils import Image
-from factories import IFactory, MultiFactory
+from ..image_utils import Image
+from ..factories import IFactory, MultiFactory
 
 PredictionModelInputT = TypeVar("PredictionModelInputT")
 PredictionModelOutputT = TypeVar("PredictionModelOutputT")

@@ -2,9 +2,9 @@ from abc import abstractmethod
 
 import numpy as np
 
-from image_utils import Image
+from ..image_utils import Image
 
-from detection.models import DetectionModelConfig, DetectionModelOutputIter, DetectionModelOutput, DetectionModel
+from ..detection.models import DetectionModelConfig, DetectionModelOutputIter, DetectionModelOutput, DetectionModel
 
 class YOLOv3DetectionModelConfig(DetectionModelConfig):
     pass

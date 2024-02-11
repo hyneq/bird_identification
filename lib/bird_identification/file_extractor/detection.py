@@ -1,7 +1,7 @@
 import os
 
 from . import FileExtractor
-from prediction.predictor import IPredictionResultWithBoundingBoxes
+from ..prediction.predictor import IPredictionResultWithBoundingBoxes
 
 class FileDetectionExtractor(FileExtractor[IPredictionResultWithBoundingBoxes]):
 

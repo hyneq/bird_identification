@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
 from typing import Generic
 
-from cli import ArgumentParser, ICLIPart, CLIPart, Namespace, args_required
+from bird_identification.cli import ArgumentParser, ICLIPart, CLIPart, Namespace, args_required
 
-from streams import InStreamT, OutStreamT, IVideoInStream, IVideoOutStream, MultiPathVideoStreamPairFactory, get_path_video_stream_pair
+from bird_identification.streams import InStreamT, OutStreamT, IVideoInStream, IVideoOutStream, MultiPathVideoStreamPairFactory, get_path_video_stream_pair
 
 class IStreamPairCLIPart(ICLIPart, ABC, Generic[InStreamT, OutStreamT]):
     @args_required

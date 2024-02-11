@@ -1,7 +1,7 @@
-from cli import CLIWithParts
-from cli.prediction import IPredictionCLIPart
+from bird_identification.cli import CLIWithParts
+from bird_identification.cli.prediction import IPredictionCLIPart
 
-from file_extractor import FileExtractor
+from bird_identification.file_extractor import FileExtractor
 
 class FileExtractionCLI(CLIWithParts):
 

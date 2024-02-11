@@ -5,9 +5,9 @@ from enum_actions import enum_action
 from pprint import pprint
 import cv2
 
-from prediction import predictor, classes
-import image_utils
-from . import args_required, ICLIPart, CLIPart, CLIWithParts
+from bird_identification.prediction import predictor, classes
+from bird_identification import image_utils
+from bird_identification.cli import args_required, ICLIPart, CLIPart, CLIWithParts
 
 class IPredictionCLIPart(ICLIPart):
 

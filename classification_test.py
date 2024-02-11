@@ -3,11 +3,11 @@
 import sys, os, glob
 import cv2
 
-sys.path.append(os.path.join(os.path.dirname(__file__), "lib", "bird_identification"))
+sys.path.append(os.path.join(os.path.dirname(__file__), "lib"))
 
-from image_utils import load_img
+from bird_identification.image_utils import load_img
 
-from classification.classifier import ImageClassifier, get_image_classifier
+from bird_identification.classification.classifier import ImageClassifier, get_image_classifier
 
 classifier: ImageClassifier = get_image_classifier(input_strategy=load_img)
 

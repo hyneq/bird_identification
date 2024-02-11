@@ -1,7 +1,7 @@
 import numpy as np
 
 from .prediction import KerasPredictionModelWithClasses, KerasModelWithClassesConfig
-from classification.models import ClassificationModel, ClassificationModelConfig, ClassificationModelOutput, ClassificationModelFactory
+from ..classification.models import ClassificationModel, ClassificationModelConfig, ClassificationModelOutput, ClassificationModelFactory
 
 class KerasClassificationModel(KerasPredictionModelWithClasses[ClassificationModelOutput], ClassificationModel):
     __slots__: tuple

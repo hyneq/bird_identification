@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 import copy
 import time
 
-from image_utils import Image
+from ..image_utils import Image
 from . import IInStream, IOutStream
 
 InputT = TypeVar("InputT")

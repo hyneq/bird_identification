@@ -1,7 +1,7 @@
 from typing import Callable, Mapping
 
-from streams import IPathVideoInStreamFactory, IPathVideoOutStreamFactory
-import opencv_streams
+from ..streams import IPathVideoInStreamFactory, IPathVideoOutStreamFactory
+from .. import opencv_streams
 
 DEFAULT_PATH_IN_STREAM_FACTORY: str
 DEFAULT_PATH_OUT_STREAM_FACTORY: str

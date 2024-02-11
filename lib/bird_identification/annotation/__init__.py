@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 import cv2
 
-from image_utils import Image, Point, Color, BoundingBox
+from ..image_utils import Image, Point, Color, BoundingBox
 
 DEFAULT_FONT = cv2.FONT_HERSHEY_SIMPLEX
 DEFAULT_TEXT_THICKNESS = 2

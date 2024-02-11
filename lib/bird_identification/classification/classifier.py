@@ -3,9 +3,9 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from prediction.predictor import PredictionInputT_cls, PredictorConfig, IPredictionResultWithClasses, PredictionProcessorWithClasses, PredictionProcessorWithClassesFactory, PredictorWithClasses, PredictorWithClassesFactory
-from prediction.classes import Scores
-from image_utils import Image
+from ..prediction.predictor import PredictionInputT_cls, PredictorConfig, IPredictionResultWithClasses, PredictionProcessorWithClasses, PredictionProcessorWithClassesFactory, PredictorWithClasses, PredictorWithClassesFactory
+from ..prediction.classes import Scores
+from ..image_utils import Image
 from .models import ClassificationModelConfig, ClassificationModelOutput, ClassificationModel, classification_model_factory
 
 @dataclass

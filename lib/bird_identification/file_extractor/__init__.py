@@ -5,10 +5,10 @@ from dataclasses import dataclass
 
 import cv2
 
-from image_utils import Image
+from ..image_utils import Image
 
-from prediction.predictor import APredictor, IPredictionResultWithBoundingBoxes
-from extraction.detection_extraction import extract_detection
+from ..prediction.predictor import APredictor, IPredictionResultWithBoundingBoxes
+from ..extraction.detection_extraction import extract_detection
 
 PredictionResultT = TypeVar("PredictionResultT", bound=IPredictionResultWithBoundingBoxes)
 

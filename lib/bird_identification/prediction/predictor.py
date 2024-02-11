@@ -3,8 +3,8 @@ from typing_extensions import Self
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-from image_utils import BoundingBox
-from config import merge_conf
+from ..image_utils import BoundingBox
+from ..config import merge_conf
 from .classes import ClassList, ClassNames, ClassSelectorConfig, ClassSelector, ClassificationMode, ClassSelectorFactory, DEFAULT_CLASS_SELECTOR_FACTORY
 from .models import IPredictionModel, IPredictionModelWithClasses, PredictionModelT, PredictionModelConfigT, PredictionModelWithClassesConfigT, PredictionModelInputT, PredictionModelOutputT, MultiPathPredictionModelFactory
 

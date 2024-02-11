@@ -1,4 +1,4 @@
-from keras_models.classification import KERAS_CLASSIFICATION_MODEL_FACTORY
+from ..keras_models.classification import KERAS_CLASSIFICATION_MODEL_FACTORY
 
 MODEL_FACTORIES = [
     KERAS_CLASSIFICATION_MODEL_FACTORY

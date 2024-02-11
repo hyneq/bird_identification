@@ -7,7 +7,9 @@ import numpy as np
 from tensorflow import keras
 import cv2
 
-import prediction
+sys.path.append(os.path.join(os.path.dirname(__file__), "lib"))
+
+from bird_identification import prediction
 
 @dataclass
 class KerasModelConfig(prediction.PredictionModelConfig):

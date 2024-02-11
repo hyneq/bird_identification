@@ -13,9 +13,9 @@ from keras.models import Sequential
 from keras.applications import EfficientNetB0
 import matplotlib.pyplot as plt
 
-sys.path.append(os.path.join(os.path.dirname(__file__), "lib", "bird_identification"))
+sys.path.append(os.path.join(os.path.dirname(__file__), "lib"))
 
-from classification import load_classes
+from bird_identification.classification import load_classes
 
 SEED = 13579
 IMG_SIZE = 224 # for EfficientNetB0

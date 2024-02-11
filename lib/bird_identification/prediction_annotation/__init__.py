@@ -2,12 +2,12 @@ from typing import Optional, Callable
 from threading import Thread
 from abc import ABC, abstractmethod
 
-from image_utils import Image
-from streams import IVideoInStream, IVideoOutStream
-from streams.stream_processor import MultiFrameProcessor, FrameCache, VideoStreamProcessor
-from prediction.predictor import APredictor, IPredictionResultWithClassesAndBoundingBoxes
-from annotation import IAnnotation, MultiAnnotation, RectangleWithTextAnnotation
-from annotation.stream_annotator import StreamAnnotator
+from ..image_utils import Image
+from ..streams import IVideoInStream, IVideoOutStream
+from ..streams.stream_processor import MultiFrameProcessor, FrameCache, VideoStreamProcessor
+from ..prediction.predictor import APredictor, IPredictionResultWithClassesAndBoundingBoxes
+from ..annotation import IAnnotation, MultiAnnotation, RectangleWithTextAnnotation
+from ..annotation.stream_annotator import StreamAnnotator
 
 ImageClassAndBoundingBoxPredictor = APredictor[Image, Image, list[IPredictionResultWithClassesAndBoundingBoxes]]
 

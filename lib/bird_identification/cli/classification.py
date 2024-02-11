@@ -1,10 +1,10 @@
 import os,sys
-sys.path.append(os.path.realpath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
+sys.path.append(os.path.join(os.path.realpath(os.path.dirname(__file__)), os.path.pardir, os.path.pardir))
 sys.path.remove(os.path.dirname(__file__))
 
-from classification.classifier import image_classifier_factory
+from bird_identification.classification.classifier import image_classifier_factory
 
-from cli.prediction import FactoryImagePredictionCLI
+from bird_identification.cli.prediction import FactoryImagePredictionCLI
 
 def cli_main():
     FactoryImagePredictionCLI(image_classifier_factory).run()

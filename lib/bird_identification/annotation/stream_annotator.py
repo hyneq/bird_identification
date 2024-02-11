@@ -1,7 +1,7 @@
 from typing import Optional
 
-from streams.stream_processor import IFrameProcessor
-from image_utils import Image
+from ..streams.stream_processor import IFrameProcessor
+from ..image_utils import Image
 from . import IAnnotation
 
 class StreamAnnotator(IFrameProcessor[Image, Image]):

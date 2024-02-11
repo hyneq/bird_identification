@@ -3,10 +3,10 @@ import time
 
 import cv2
 
-from image_utils import Image, Size
-from time_utils import sleep_interval
+from .image_utils import Image, Size
+from .time_utils import sleep_interval
 
-from streams import IVideoInStream, IVideoOutStream, StreamError
+from .streams import IVideoInStream, IVideoOutStream, StreamError
 
 class OpenCVVideoInStream(IVideoInStream):
     __slots__: tuple

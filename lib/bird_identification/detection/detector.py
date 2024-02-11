@@ -3,13 +3,13 @@ from dataclasses import dataclass
 
 import cv2
 import numpy as np
-from image_utils import BoundingBox
+from ..image_utils import BoundingBox
 
-from prediction.predictor import PredictionInputT_cls,  IPredictionResultWithClasses, IPredictionResultWithBoundingBoxes,PredictorConfig, PredictionProcessorWithClasses, PredictionProcessorWithClassesFactory, PredictorWithClasses, PredictorWithClassesFactory
-from image_utils import Image
+from ..prediction.predictor import PredictionInputT_cls,  IPredictionResultWithClasses, IPredictionResultWithBoundingBoxes,PredictorConfig, PredictionProcessorWithClasses, PredictionProcessorWithClassesFactory, PredictorWithClasses, PredictorWithClassesFactory
+from ..image_utils import Image
 from .models import DetectionModelConfig, DetectionModelOutput, DetectionModel, model_factory
 
-from defaults.detection import DEFAULT_NMS_THRESHOLD
+from ..defaults.detection import DEFAULT_NMS_THRESHOLD
 
 @dataclass()
 class DetectionResult(IPredictionResultWithClasses, IPredictionResultWithBoundingBoxes):

@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 
-from prediction.predictor import APredictor, IPredictionResultWithClassesAndBoundingBoxes
-from image_utils import BoundingBox, Image
-from detection.detector import ObjectDetector, DetectionResult
-from classification.classifier import ImageClassifier, ClassificationResult
-from extraction.detection_extraction import extract_detection
+from ..prediction.predictor import APredictor, IPredictionResultWithClassesAndBoundingBoxes
+from ..image_utils import BoundingBox, Image
+from ..detection.detector import ObjectDetector, DetectionResult
+from ..classification.classifier import ImageClassifier, ClassificationResult
+from ..extraction.detection_extraction import extract_detection
 
 @dataclass
 class DetectionClassificationResult(IPredictionResultWithClassesAndBoundingBoxes):

@@ -1,5 +1,5 @@
 import time
-from time_utils import sleep_interval
+from ..time_utils import sleep_interval
 
 from . import PredictionRunner
 

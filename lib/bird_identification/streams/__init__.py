@@ -4,8 +4,8 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 import time
 
-from image_utils import Image, Size
-from factories import MultiFactory
+from ..image_utils import Image, Size
+from ..factories import MultiFactory
 
 StreamInputT = TypeVar("StreamInputT")
 StreamOutputT = TypeVar("StreamOutputT")
@@ -143,7 +143,7 @@ class IPathVideoOutStreamFactory(IPathVideoStreamFactory[VideoOutStreamT], IVide
     def __call__(self, path: str, fps: float, size: Size, *args, **kwargs) -> VideoOutStreamT:
         pass
 
-from defaults import streams as stream_defaults
+from ..defaults import streams as stream_defaults
 
 @dataclass(frozen=True)
 class AStreamPairFactory(IStreamPairFactory[InStreamT, OutStreamT], ABC):

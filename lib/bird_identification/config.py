@@ -3,7 +3,7 @@ from dataclasses import fields, is_dataclass
 
 from dacite import from_dict
 
-from defaults.config import DEFAULT_CONFIG_FILE_LOADER
+from .defaults.config import DEFAULT_CONFIG_FILE_LOADER
 
 def merge_conf(cfg_cls: type):
 
