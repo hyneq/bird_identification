@@ -1,14 +1,9 @@
-if __name__ == "__main__":
-    import os,sys
-    sys.path.append(os.path.join(os.path.realpath(os.path.dirname(__file__)), os.path.pardir, os.path.pardir))
-    sys.path.remove(os.path.dirname(__file__))
-
-from bird_identification.cli import ArgumentParser, CLIPart, CLIPartPrefixWrapper, Namespace, args_required
-from bird_identification.cli.prediction import IPredictionCLIPart, PredictionCLIPart, ImagePredictionCLI
-from bird_identification.prediction.predictor import IPredictorFactory
-from bird_identification.classification.classifier import image_classifier_factory
-from bird_identification.detection.detector import object_detector_factory
-from bird_identification.detection_classification import DetectionClassifier
+from . import ArgumentParser, CLIPart, CLIPartPrefixWrapper, Namespace, args_required
+from .prediction import IPredictionCLIPart, PredictionCLIPart, ImagePredictionCLI
+from ..prediction.predictor import IPredictorFactory
+from ..classification.classifier import image_classifier_factory
+from ..detection.detector import object_detector_factory
+from ..detection_classification import DetectionClassifier
 
 class DetectionClassificationCLIPart(CLIPart, IPredictionCLIPart):
 

@@ -1,15 +1,11 @@
-import os,sys
-sys.path.append(os.path.join(os.path.realpath(os.path.dirname(__file__)), os.path.pardir, os.path.pardir))
-if os.path.realpath(os.path.dirname(__file__)) in sys.path: sys.path.remove(os.path.realpath(os.path.dirname(__file__)))
+from . import Optional
 
-from bird_identification.cli import Optional
+from .prediction import IPredictionCLIPart, PredictionCLIPart
+from .file_extractor import FileExtractionCLI
 
-from bird_identification.cli.prediction import IPredictionCLIPart, PredictionCLIPart
-from bird_identification.cli.file_extractor import FileExtractionCLI
+from ..detection.detector import object_detector_factory
 
-from bird_identification.detection.detector import object_detector_factory
-
-from bird_identification.file_extractor.detection import FileDetectionExtractor
+from ..file_extractor.detection import FileDetectionExtractor
 
 class FileDetectionExtractionCLI(FileExtractionCLI):
 

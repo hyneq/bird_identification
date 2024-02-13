@@ -1,10 +1,10 @@
 from typing import Optional
 
-from bird_identification.cli import CLIWithParts
-from bird_identification.cli.streams import IStreamPairCLIPart, MultiPathVideoStreamPairCLIPart
-from bird_identification.cli.prediction import IPredictionCLIPart
+from . import CLIWithParts
+from .streams import IStreamPairCLIPart, MultiPathVideoStreamPairCLIPart
+from .prediction import IPredictionCLIPart
 
-from bird_identification.prediction_annotation import ImagePredictionStreamRunner
+from ..prediction_annotation import ImagePredictionStreamRunner
 
 class StreamPredictionAnnotationCLI(CLIWithParts):
 
