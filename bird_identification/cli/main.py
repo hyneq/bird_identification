@@ -21,7 +21,6 @@ def add_to_path():
     package_path = os.path.realpath(
         os.path.join(os.path.dirname(os.path.realpath(__file__)), os.path.pardir, os.path.pardir)
     )
-    #print(package_path)
 
     if package_path not in sys.path:
         sys.path.append(package_path)

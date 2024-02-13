@@ -1,1 +1,1 @@
-../lib/bird_identification/cli/main.py
+../bird_identification/cli/main.py
