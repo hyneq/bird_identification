@@ -6,8 +6,15 @@ import os
 import cv2
 import numpy as np
 
-from ..prediction.models import PredictionModelConfig, PredictionModelWithClassesConfig, PredictionModel, PredictionModelWithClasses, PredictionModelOutputT
+from ..prediction.models import (
+    PredictionModelConfig,
+    PredictionModelWithClassesConfig,
+    PredictionModel,
+    PredictionModelWithClasses,
+    PredictionModelOutputT,
+)
 from ..image_utils import Image
+
 
 @dataclass()
 class DarknetPredictionModelConfig(PredictionModelConfig):
@@ -18,21 +25,26 @@ class DarknetPredictionModelConfig(PredictionModelConfig):
     def from_path(cls, path: str):
         return cls(
             config_path=os.path.join(path, "model.cfg"),
-            weights_path=os.path.join(path, "model.weights")
+            weights_path=os.path.join(path, "model.weights"),
         )
 
-@dataclass()
-class DarknetPredictionModelWithClassesConfig(DarknetPredictionModelConfig, PredictionModelWithClassesConfig):
 
+@dataclass()
+class DarknetPredictionModelWithClassesConfig(
+    DarknetPredictionModelConfig, PredictionModelWithClassesConfig
+):
     @classmethod
     def from_path(cls, path: str):
         return cls(
             classes_path=os.path.join(path, "classes.names"),
             config_path=os.path.join(path, "model.cfg"),
-            weights_path=os.path.join(path, "model.weights")
+            weights_path=os.path.join(path, "model.weights"),
         )
 
-class DarknetPredictionModel(PredictionModel[DarknetPredictionModelConfig, Image, PredictionModelOutputT], ABC):
+
+class DarknetPredictionModel(
+    PredictionModel[DarknetPredictionModelConfig, Image, PredictionModelOutputT], ABC
+):
     __slots__: tuple
 
     network: any
@@ -42,34 +54,48 @@ class DarknetPredictionModel(PredictionModel[DarknetPredictionModelConfig, Image
     def __init__(self, cfg: DarknetPredictionModelConfig):
         self.lock = Lock()
 
-        self.network = network = cv2.dnn.readNetFromDarknet(cfg.config_path, cfg.weights_path)
+        self.network = network = cv2.dnn.readNetFromDarknet(
+            cfg.config_path, cfg.weights_path
+        )
 
         # Getting list with names of all layers from YOLO v3 network
         layers_names_all = network.getLayerNames()
 
         # Getting only output layers' names that we need from YOLO v3 algorithm
         # with function that returns indexes of layers with unconnected outputs
-        self.layers_names_output = \
-            [layers_names_all[i - 1] for i in network.getUnconnectedOutLayers()]
+        self.layers_names_output = [
+            layers_names_all[i - 1] for i in network.getUnconnectedOutLayers()
+        ]
 
         super().__init__(cfg)
-    
+
     def predict(self, input: Image) -> PredictionModelOutputT:
         height, width = input.shape[0:2]
 
         # blob from image
-        blob = cv2.dnn.blobFromImage(input, 1 / 255.0, (416, 416),
-                                    swapRB=True, crop=False)
-        
+        blob = cv2.dnn.blobFromImage(
+            input, 1 / 255.0, (416, 416), swapRB=True, crop=False
+        )
+
         with self.lock:
             self.network.setInput(blob)
             raw_output = self.network.forward(self.layers_names_output)
 
-        return self.get_output(raw_output, width, height) # TODO: width, height generalize
+        return self.get_output(
+            raw_output, width, height
+        )  # TODO: width, height generalize
 
     @abstractmethod
-    def get_output(self, raw_output: np.ndarray, width: int, height: int) -> PredictionModelOutputT:
+    def get_output(
+        self, raw_output: np.ndarray, width: int, height: int
+    ) -> PredictionModelOutputT:
         pass
 
-class DarknetPredictionModelWithClasses(DarknetPredictionModel, PredictionModelWithClasses[DarknetPredictionModelWithClassesConfig, Image, PredictionModelOutputT]):
+
+class DarknetPredictionModelWithClasses(
+    DarknetPredictionModel,
+    PredictionModelWithClasses[
+        DarknetPredictionModelWithClassesConfig, Image, PredictionModelOutputT
+    ],
+):
     pass

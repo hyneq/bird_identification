@@ -8,8 +8,10 @@ Point = tuple[int, int]
 Size = tuple[int, int]
 Color = tuple[int, int, int]
 
+
 def load_img(img: str) -> Image:
     return cv2.imread(img)
+
 
 @dataclass()
 class BoundingBox:
@@ -19,13 +21,7 @@ class BoundingBox:
     height: int
 
     def slices(self) -> tuple[slice, slice]:
-        return (
-            slice(self.y, self.y + self.height),
-            slice(self.x, self.x + self.width)
-        )
-    
+        return (slice(self.y, self.y + self.height), slice(self.x, self.x + self.width))
+
     def points(self) -> tuple[Point, Point]:
-        return (
-            (self.x, self.y),
-            (self.x+self.width, self.y+self.height)
-        )
+        return ((self.x, self.y), (self.x + self.width, self.y + self.height))

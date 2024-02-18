@@ -13,17 +13,21 @@ import os
 import sys
 import importlib
 
+
 def add_to_path():
     """
     Adds the parent package's path to sys.path, if not already present
     """
 
     package_path = os.path.realpath(
-        os.path.join(os.path.dirname(os.path.realpath(__file__)), os.path.pardir, os.path.pardir)
+        os.path.join(
+            os.path.dirname(os.path.realpath(__file__)), os.path.pardir, os.path.pardir
+        )
     )
 
     if package_path not in sys.path:
         sys.path.append(package_path)
+
 
 def dispatch():
     """
@@ -36,6 +40,7 @@ def dispatch():
     cli = importlib.import_module("bird_identification.cli." + name)
 
     cli.cli_main()
+
 
 if __name__ == "__main__":
     add_to_path()

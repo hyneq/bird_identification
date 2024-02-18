@@ -3,6 +3,7 @@ from typing import TypeVar, Generic, Union, Optional, Protocol, Sequence
 
 ProductT = TypeVar("ProductT", covariant=True)
 
+
 class IFactory(Protocol[ProductT]):
     name: str
 
@@ -10,7 +11,9 @@ class IFactory(Protocol[ProductT]):
     def __call__(self, *args, **kwargs) -> ProductT:
         pass
 
+
 FactoryT = TypeVar("FactoryT", bound=IFactory)
+
 
 class MultiFactory(IFactory[ProductT]):
     name: str
@@ -18,15 +21,12 @@ class MultiFactory(IFactory[ProductT]):
     factories: dict[str, IFactory[ProductT]]
     default_factory: str
 
-    def __init__(self,
-                factories: Union[
-                    Sequence[IFactory[ProductT]],
-                    dict[str,IFactory[ProductT]]
-                ],
-                default_factory: str,
-                name="multi"
-        ):
-
+    def __init__(
+        self,
+        factories: Union[Sequence[IFactory[ProductT]], dict[str, IFactory[ProductT]]],
+        default_factory: str,
+        name="multi",
+    ):
         if isinstance(factories, list):
             factories = {f.name: f for f in factories}
 
@@ -34,12 +34,12 @@ class MultiFactory(IFactory[ProductT]):
         self.factories = factories
         self.default_factory = default_factory
 
-    def __call__(self, *args, factory: Optional[str]=None, **kwargs) -> ProductT:
+    def __call__(self, *args, factory: Optional[str] = None, **kwargs) -> ProductT:
         if not factory:
             factory = self.default_factory
 
         return self.factories[factory](*args, **kwargs)
-    
+
     @property
     def factory_names(self) -> list[str]:
         return list(self.factories.keys())
