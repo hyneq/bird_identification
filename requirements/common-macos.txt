@@ -1,0 +1,2 @@
+tensorflow==2.14
+tensorflow-metal==1.1.0
