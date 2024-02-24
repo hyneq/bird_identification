@@ -13,6 +13,7 @@ from ..prediction.models import (
     MultiPathPredictionModelFactory,
 )
 
+from ..factories import search_factories
 
 class DetectionModelConfig(PredictionModelConfig):
     pass
@@ -69,10 +70,10 @@ DetectionModelFactory = PredictionModelFactory[
     ModelConfigLoaderInputT_cls, DetectionModelConfigT, Image, DetectionModelOutput
 ]
 
-from ..defaults.detection import MODEL_FACTORIES, DEFAULT_MODEL_FACTORY
+from ..defaults.detection import DEFAULT_MODEL_FACTORY
 
 model_factory = MultiPathPredictionModelFactory[
     DetectionModelConfig, Image, DetectionModelOutput
-](factories=MODEL_FACTORIES, default_factory=DEFAULT_MODEL_FACTORY)
+](factories=search_factories(prefix='detection_models_'), default_factory=DEFAULT_MODEL_FACTORY)
 
 get_detection_model = model_factory
