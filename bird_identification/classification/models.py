@@ -12,6 +12,7 @@ from ..prediction.models import (
     MultiPathPredictionModelFactory,
 )
 
+from ..factories import search_factories
 
 class ClassificationModelConfig(PredictionModelWithClassesConfig):
     pass
@@ -34,10 +35,10 @@ ClassificationModelFactory = PredictionModelFactory[
     ClassificationModelOutput,
 ]
 
-from ..defaults.classification import MODEL_FACTORIES, DEFAULT_MODEL_FACTORY
+from ..defaults.classification import DEFAULT_MODEL_FACTORY
 
 classification_model_factory = MultiPathPredictionModelFactory[
     ClassificationModelConfig, Image, ClassificationModelOutput
-](factories=MODEL_FACTORIES, default_factory=DEFAULT_MODEL_FACTORY)
+](factories=search_factories(prefix='classification_models_'), default_factory=DEFAULT_MODEL_FACTORY)
 
 get_classification_model = classification_model_factory
