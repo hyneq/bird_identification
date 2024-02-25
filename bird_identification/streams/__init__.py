@@ -5,7 +5,7 @@ from dataclasses import dataclass
 import time
 
 from ..image_utils import Image, Size
-from ..factories import MultiFactory
+from ..factories import IFactory, MultiFactory
 
 StreamInputT = TypeVar("StreamInputT")
 StreamOutputT = TypeVar("StreamOutputT")
@@ -54,7 +54,7 @@ InStreamT = TypeVar("InStreamT", bound=IInStream, covariant=True)
 OutStreamT = TypeVar("OutStreamT", bound=IOutStream, covariant=True)
 
 
-class IStreamFactory(Protocol[StreamT]):
+class IStreamFactory(IFactory[StreamT]):
     @abstractmethod
     def __call__(self, *args, **kwargs) -> StreamT:
         pass
@@ -237,7 +237,8 @@ class AVideoStreamPairFactory(
 
 
 class MultiPathVideoStreamFactory(
-    MultiFactory[VideoStreamT], IPathVideoStreamFactory[VideoStreamT]
+    MultiFactory[VideoStreamT],
+    IPathVideoStreamFactory[VideoStreamT]
 ):
     pass
 
