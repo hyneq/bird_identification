@@ -24,7 +24,7 @@ class KerasClassificationModelConfig(
     pass
 
 
-KERAS_CLASSIFICATION_MODEL_FACTORY = ClassificationModelFactory[
+factory = ClassificationModelFactory[
     str, KerasClassificationModelConfig
 ](
     name="keras",
