@@ -2,9 +2,7 @@ from abc import abstractmethod
 from typing import TypeVar, Union, Optional, Protocol, Sequence
 from types import ModuleType
 from importlib import import_module
-from pkgutil import iter_modules
-
-from . import __name__ as _parent_name
+from pkgutil import walk_packages
 
 ProductT = TypeVar("ProductT", covariant=True)
 
@@ -84,11 +82,17 @@ class LazyImportFactory(IFactory[ProductT]):
 
 PARENT_MODULE = import_module(__package__)
 
+
+def get_module_basename(name: str):
+    return name.rsplit('.', 1)[-1]
+
+
 def search_factories(
     parent: Optional[ModuleType]=PARENT_MODULE,
     path: Optional[Sequence[str]]=None,
     prefix: str='',
-    factory_attr='factory'
+    factory_attr='factory',
+    search_strategy=walk_packages
 ) -> list[LazyImportFactory]:
     """
     Searches for relevant modules and creates a list of corresponding LazyImportFactories
@@ -101,20 +105,18 @@ def search_factories(
     to treat them as submodules of the parent.
     """
 
-    prepend_prefix = ''
+    parent_prefix = ''
 
     if parent:
         path = parent.__path__
-        prepend_prefix = parent.__name__ + '.'
-
-    prefix = prepend_prefix + prefix
+        parent_prefix = parent.__name__ + '.'
 
     modules = filter(
-        lambda m: m.name.startswith(prefix),
-        iter_modules(path=path, prefix=prepend_prefix)
+        lambda m: get_module_basename(m.name).startswith(prefix),
+        search_strategy(path=path, prefix=parent_prefix)
     )
 
     return [
-        LazyImportFactory(module.name, factory_attr, module.name.removeprefix(prefix))
-        for module in modules
+        LazyImportFactory(m.name, factory_attr, get_module_basename(m.name).removeprefix(prefix))
+        for m in modules
     ]
