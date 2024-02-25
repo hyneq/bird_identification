@@ -36,7 +36,7 @@ class DarknetYOLOv3DetectionModelConfig(
             weights_path=os.path.join(path, "yolov3.weights"),
         )
 
-DARKNET_YOLOV3_DETECTION_MODEL_FACTORY = DetectionModelFactory[
+factory = DetectionModelFactory[
     DarknetYOLOv3DetectionModel, DarknetYOLOv3DetectionModelConfig
 ](
     name="darknet-YOLOv3",
