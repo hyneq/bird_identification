@@ -85,7 +85,7 @@ def get_file_video_in_stream(path: str, *_, **__) -> OpenCVVideoInStream:
 
 
 # inspired by https://www.geeksforgeeks.org/saving-a-video-using-opencv/
-def get_file_video_out_stream(
+def get_file_video_out_stream_h264(
     path: str, fps: float, size: tuple[int, int], *_, **__
 ) -> OpenCVVideoOutStream:
     return OpenCVVideoOutStream(
@@ -95,7 +95,7 @@ def get_file_video_out_stream(
     )
 
 
-def get_file_video_out_stream_gstreamer(
+def get_file_video_out_stream_h264_gstreamer(
     path: str, fps: float, size: Size
 ) -> OpenCVVideoOutStream:
     pipeline = f"appsrc ! videoconvert ! v4l2h264enc min-force-key-unit-interval=10000000000 ! video/x-h264,profile=(string)main,level=(string)4 ! h264parse ! filesink location={path}"
@@ -104,6 +104,15 @@ def get_file_video_out_stream_gstreamer(
         cv2.VideoWriter(
             pipeline, cv2.CAP_GSTREAMER, cv2.VideoWriter_fourcc(*"H264"), fps, size
         ),
+        fps=fps,
+        size=size,
+    )
+
+def get_file_video_out_stream_mjpg(
+    path: str, fps: float, size: tuple[int, int], *_, **__
+) -> OpenCVVideoOutStream:
+    return OpenCVVideoOutStream(
+        cv2.VideoWriter(path, cv2.VideoWriter_fourcc(*"MJPG"), fps, (size[0], size[1])),
         fps=fps,
         size=size,
     )
