@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Generic
 
-from bird_identification.cli import (
+from . import (
     ArgumentParser,
     ICLIPart,
     CLIPart,
@@ -9,7 +9,7 @@ from bird_identification.cli import (
     args_required,
 )
 
-from bird_identification.streams import (
+from ..streams import (
     InStreamT,
     OutStreamT,
     IVideoInStream,
