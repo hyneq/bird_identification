@@ -61,3 +61,5 @@ def get_camera_video_in_stream(*_, fps: Optional[float]=None, size: Optional[Siz
     picam2.configure("video")
 
     return Picamera2VideoInStream(picam2)
+
+factory = get_camera_video_in_stream

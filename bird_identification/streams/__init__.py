@@ -5,7 +5,7 @@ from dataclasses import dataclass
 import time
 
 from ..image_utils import Image, Size
-from ..factories import IFactory, MultiFactory
+from ..factories import IFactory, MultiFactory, search_factories
 
 StreamInputT = TypeVar("StreamInputT")
 StreamOutputT = TypeVar("StreamOutputT")
@@ -258,12 +258,12 @@ class MultiPathVideoOutStreamFactory(
 
 
 STREAM_IN_FACTORY = MultiPathVideoInStreamFactory(
-    stream_defaults.PATH_IN_STREAM_FACTORIES,
+    search_factories(prefix='streams_in_'),
     stream_defaults.DEFAULT_PATH_IN_STREAM_FACTORY,
 )
 
 STREAM_OUT_FACTORY = MultiPathVideoOutStreamFactory(
-    stream_defaults.PATH_OUT_STREAM_FACTORIES,
+    search_factories(prefix='streams_out_'),
     stream_defaults.DEFAULT_PATH_OUT_STREAM_FACTORY,
 )
 
