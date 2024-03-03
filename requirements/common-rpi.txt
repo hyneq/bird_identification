@@ -1,2 +1,1 @@
-picamera2==0.3.17
 tensorflow==2.15.0

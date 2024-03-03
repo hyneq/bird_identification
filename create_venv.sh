@@ -3,7 +3,7 @@
 source "$(dirname "$0")/vars"
 
 # Create the Python virtual environment and activate
-test -z "$SETUP_NO_CREATE_VENV" && python3 -m venv "$venv" && source "$project_root/activate" || exit $?
+test -z "$SETUP_NO_CREATE_VENV" && python3 -m venv --system-site-packages "$venv" && source "$project_root/activate" || exit $?
 
 # Install Python packages
 if [[ -z "$SETUP_NO_INSTALL_PACKAGES" ]]; then
