@@ -6,8 +6,8 @@ import numpy as np
 
 from ..image_utils import Image
 from ..prediction.models import (
-    PredictionModelConfig,
-    IPredictionModel,
+    PredictionModelWithClassesConfig,
+    IPredictionModelWithClasses,
     ModelConfigLoaderInputT_cls,
     PredictionModelFactory,
     MultiPathPredictionModelFactory,
@@ -15,7 +15,7 @@ from ..prediction.models import (
 
 from ..factories import search_factories
 
-class DetectionModelConfig(PredictionModelConfig):
+class DetectionModelConfig(PredictionModelWithClassesConfig):
     pass
 
 
@@ -64,7 +64,7 @@ class DetectionModelOutput(
         return self.iter_cls(self.raw_output)
 
 
-DetectionModel = IPredictionModel[DetectionModelConfig, Image, DetectionModelOutput]
+DetectionModel = IPredictionModelWithClasses[DetectionModelConfig, Image, DetectionModelOutput]
 
 DetectionModelFactory = PredictionModelFactory[
     ModelConfigLoaderInputT_cls, DetectionModelConfigT, Image, DetectionModelOutput
