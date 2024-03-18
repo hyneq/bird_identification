@@ -1,0 +1,3 @@
+[submodule "keras-YOLOv3-model-set"]
+	path = keras-YOLOv3-model-set
+	url = ../keras-YOLOv3-model-set
