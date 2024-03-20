@@ -1,19 +1,9 @@
-from abc import abstractmethod
-
 import numpy as np
 
-from ..image_utils import Image
-
 from ..detection.models import (
-    DetectionModelConfig,
     DetectionModelOutputIter,
-    DetectionModelOutput,
-    DetectionModel,
+    DetectionModelOutput
 )
-
-
-class YOLOv3DetectionModelConfig(DetectionModelConfig):
-    pass
 
 
 YOLOv3DetectionObj = np.ndarray
@@ -93,11 +83,3 @@ class YOLOv3DetectionModelOutput(
 
     def get_scores(self, obj: YOLOv3DetectionObj) -> np.ndarray:
         return obj[5:]
-
-
-class YOLOv3DetectionModel(DetectionModel):
-    __slots__: tuple
-
-    @abstractmethod
-    def predict(self, input: Image) -> YOLOv3DetectionModelOutput:
-        pass

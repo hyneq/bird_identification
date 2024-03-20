@@ -1,6 +1,6 @@
-import numpy as np
 import os
 
+from typing import Any
 from dataclasses import dataclass
 from threading import Lock
 
@@ -11,17 +11,15 @@ from ..image_utils import Image
 
 from ..prediction.models import PredictionModelWithClasses
 
-from ..detection.models import DetectionModel, DetectionModelFactory
+from ..detection.models import DetectionModelConfig, DetectionModel, DetectionModelFactory
 
-from ..YOLOv3_models.detection import (
-    YOLOv3DetectionModel,
-    YOLOv3DetectionModelConfig,
+from .yolo import (
     YOLOv3DetectionModelOutput,
-    YOLOv3DetectionModelRawOutput,
+    YOLOv3DetectionModelRawOutput
 )
 
 @dataclass()
-class DarknetYOLOv3DetectionModelConfig(YOLOv3DetectionModelConfig):
+class DarknetYOLOv3DetectionModelConfig(DetectionModelConfig):
     config_path: str
     weights_path: str
 
@@ -34,11 +32,11 @@ class DarknetYOLOv3DetectionModelConfig(YOLOv3DetectionModelConfig):
         )
 
 
-class DarknetYOLOv3DetectionModel(PredictionModelWithClasses, YOLOv3DetectionModel):
+class DarknetYOLOv3DetectionModel(PredictionModelWithClasses, DetectionModel):
     __slots__: tuple
 
-    network: any
-    layer_names_output: any
+    network: Any
+    layer_names_output: Any
     lock: Lock
 
     def __init__(self, cfg: DarknetYOLOv3DetectionModelConfig):
@@ -73,7 +71,7 @@ class DarknetYOLOv3DetectionModel(PredictionModelWithClasses, YOLOv3DetectionMod
 
         return self.get_output(
             raw_output, width, height
-        )  # TODO: width, height generalize
+        )
 
     def get_output(
         self, raw_output: YOLOv3DetectionModelRawOutput, width: int, height: int
