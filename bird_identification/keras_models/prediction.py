@@ -32,7 +32,7 @@ class KerasModelWithClassesConfig(KerasModelConfig, PredictionModelWithClassesCo
     def from_path(cls, path: str):
         return cls(
             model_path=os.path.join(path, "model.h5"),
-            classes_path=os.path.join(path, "classes.csv"),
+            classes_path=os.path.join(path, "classes.txt"),
         )
 
 

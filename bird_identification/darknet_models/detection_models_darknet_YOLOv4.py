@@ -9,7 +9,7 @@ class DarknetYOLOv4DetectionModelConfig(DarknetYOLOv3DetectionModelConfig):
     @classmethod
     def from_path(cls, path: str):
         return cls(
-            classes_path=os.path.join(path, "coco.names"),
+            classes_path=os.path.join(path, "classes.txt"),
             config_path=os.path.join(path, "yolov4.cfg"),
             weights_path=os.path.join(path, "yolov4.weights"),
         )
