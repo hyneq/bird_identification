@@ -10,6 +10,7 @@ from ..prediction.predictor import (
     IPredictionResultWithClasses,
     IPredictionResultWithBoundingBoxes,
     PredictorConfig,
+    Kwargs,
     PredictionProcessorWithClasses,
     PredictionProcessorWithClassesFactory,
     PredictorWithClasses,
@@ -127,13 +128,21 @@ class DetectionProcessorFactory(
         super().__init__(DetectionProcessor)
 
     def get_prediction_processor(
-        self, *args, NMS_threshold: Optional[float] = None, **kwargs
+        self,
+        *args,
+        NMS_threshold: Optional[float] = None,
+        p_kwargs: Optional[Kwargs] = None,
+        **kwargs
     ) -> DetectionProcessor:
         if not NMS_threshold:
             NMS_threshold = self.NMS_threshold
+        
+        p_kwargs = p_kwargs or {}
+        p_kwargs["NMS_threshold"] = NMS_threshold
 
         return super().get_prediction_processor(
-            *args, NMS_threshold=NMS_threshold, **kwargs
+            *args, **kwargs,
+            p_kwargs=p_kwargs
         )
 
 
