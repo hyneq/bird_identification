@@ -1,4 +1,4 @@
-#!/bin/env python3
+#!/usr/bin/env python3
 """
 A generic entry point to the bird_identification package's command-line interfaces.
 
