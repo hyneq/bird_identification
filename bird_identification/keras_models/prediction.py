@@ -50,16 +50,16 @@ class KerasPredictionModel(
         super().__init__(cfg)
 
     def predict(self, input: Image) -> PredictionModelOutputT:
-        blob: np.ndarray = cv2.dnn.blobFromImage(input, size=(224, 224), swapRB=True)
-
-        blob = np.moveaxis(
-            blob, (1, 2, 3), (3, 1, 2)
-        )  # Making the color channel the last dimension instead of the first, in order to match model input shape
+        input = self.get_input(input)
 
         with self.model_lock:
-            predictions = self.model.predict(blob)
+            predictions = self.model.predict(input)
 
         return self.get_output(predictions)
+
+    @abstractmethod
+    def get_input(self, input: Image) -> np.ndarray:
+        pass
 
     @abstractmethod
     def get_output(self, predictions: np.ndarray) -> PredictionModelOutputT:
