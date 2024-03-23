@@ -117,11 +117,19 @@ class PredictionProcessorFactory(
     def get_prediction_processor(
         self,
         model: IPredictionModel[Any, Any, PredictionModelOutputT],
+        prediction_processor_cls: Optional[
+            type[
+                PredictionProcessor[PredictionModelOutputT, PredictionResultT]
+            ]
+        ] = None,
         p_kwargs: Optional[Kwargs]=None
     ) -> PredictionProcessor[PredictionModelOutputT, PredictionResultT]:
         p_kwargs = p_kwargs or {}
 
-        return self.prediction_processor_cls(**p_kwargs)
+        if not prediction_processor_cls:
+            prediction_processor_cls = self.prediction_processor_cls
+
+        return prediction_processor_cls(**p_kwargs)
 
 
 @dataclass()
@@ -137,6 +145,11 @@ class PredictionProcessorWithClassesFactory(
     def get_prediction_processor(
         self,
         model: IPredictionModelWithClasses[Any, Any, PredictionModelOutputT],
+        prediction_processor_cls: Optional[
+            type[
+                PredictionProcessorWithClasses[PredictionModelOutputT, PredictionResultT]
+            ]
+        ] = None,
         *args,
         cs_config: Optional[ClassSelectorConfig] = None,
         cs: Optional[ClassSelector] = None,
@@ -164,7 +177,12 @@ class PredictionProcessorWithClassesFactory(
         p_kwargs["class_names"] = model_class_names
         p_kwargs["cs"] = cs
 
-        return super().get_prediction_processor(model, *args, **kwargs, p_kwargs=p_kwargs)
+        return super().get_prediction_processor(
+            model,
+            *args, **kwargs,
+            prediction_processor_cls = prediction_processor_cls,
+            p_kwargs=p_kwargs
+        )
 
 
 class APredictor(
