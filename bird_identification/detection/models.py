@@ -64,7 +64,11 @@ class DetectionModelOutput(
         return self.iter_cls(self.raw_output)
 
 
-DetectionModel = IPredictionModelWithClasses[DetectionModelConfig, Image, DetectionModelOutput]
+class DetectionModel(
+    IPredictionModelWithClasses[DetectionModelConfig, Image, DetectionModelOutput]
+):
+    external_NMS: bool = True
+
 
 DetectionModelFactory = PredictionModelFactory[
     ModelConfigLoaderInputT_cls, DetectionModelConfigT, Image, DetectionModelOutput

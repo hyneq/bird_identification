@@ -1,4 +1,4 @@
-from typing import Optional, Union
+from typing import Optional, Union, Sequence
 from dataclasses import dataclass
 
 import cv2
@@ -37,26 +37,11 @@ class DetectionResult(IPredictionResultWithClasses, IPredictionResultWithBoundin
 DetectionResults = list[DetectionResult]
 
 
-class DetectionProcessor(
-    PredictionProcessorWithClasses[DetectionModelOutput, DetectionResults]
-):
-    __slots__: tuple
-
-    NMS_threshold: float
-
-    def __init__(self, *args, NMS_threshold: float, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.NMS_threshold = NMS_threshold
-
-    def process(self, output: DetectionModelOutput) -> DetectionResults:
-        return DetectionProcessorInstance(self, output).process()
-
-
 class DetectionProcessorInstance:
-    processor: DetectionProcessor
+    processor: "DetectionProcessor"
     output: DetectionModelOutput
 
-    def __init__(self, processor: DetectionProcessor, output: DetectionModelOutput):
+    def __init__(self, processor: "DetectionProcessor", output: DetectionModelOutput):
         self.processor = processor
         self.output = output
 
@@ -82,7 +67,51 @@ class DetectionProcessorInstance:
             # Adding results into prepared lists
             self.add_detected_object(box, scores[classes], classes)
 
-    def NMSBoxes(self):
+
+    def get_results(self, filtered: Sequence[int]) -> DetectionResults:
+        return [
+            DetectionResult(
+                BoundingBox(*self.bounding_boxes[i]),
+                self.processor.class_names.get_names(self.classes[i]),
+                list(self.confidences[i]),
+            )
+            for i in filtered
+        ]
+
+
+    def get_filtered(self) -> Sequence[int]:
+        return range(len(self.bounding_boxes))
+
+
+    def process(self) -> DetectionResults:
+        self.bounding_boxes = []
+        self.confidences = []
+        self.classes = []
+
+        for obj in self.output:
+            self.process_object(obj)
+
+        filtered = self.get_filtered()
+
+        return self.get_results(filtered)
+
+
+class DetectionProcessor(
+    PredictionProcessorWithClasses[DetectionModelOutput, DetectionResults]
+):
+    __slots__: tuple
+
+    instance_cls: type[DetectionProcessorInstance] = DetectionProcessorInstance
+
+    def process(self, output: DetectionModelOutput) -> DetectionResults:
+        return self.instance_cls(self, output).process()
+
+
+class DetectionProcessorWithNMSInstance(DetectionProcessorInstance):
+
+    processor: "DetectionProcessorWithNMS"
+
+    def get_filtered(self) -> Sequence[int]:
         # Implementing non-maximum suppression of given bounding boxes
         # With this technique we exclude some of bounding boxes if their
         # corresponding confidences are low or there is another
@@ -95,27 +124,17 @@ class DetectionProcessorInstance:
             self.processor.NMS_threshold,
         )
 
-    def get_results(self, filtered) -> DetectionResults:
-        return [
-            DetectionResult(
-                BoundingBox(*self.bounding_boxes[i]),
-                self.processor.class_names.get_names(self.classes[i]),
-                list(self.confidences[i]),
-            )
-            for i in filtered
-        ]
 
-    def process(self) -> DetectionResults:
-        self.bounding_boxes = []
-        self.confidences = []
-        self.classes = []
+class DetectionProcessorWithNMS(DetectionProcessor):
+    __slots__: tuple
 
-        for obj in self.output:
-            self.process_object(obj)
+    instance_cls = DetectionProcessorWithNMSInstance
 
-        filtered = self.NMSBoxes()
+    NMS_threshold: float
 
-        return self.get_results(filtered)
+    def __init__(self, *args, NMS_threshold: float, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.NMS_threshold = NMS_threshold
 
 
 @dataclass
@@ -129,19 +148,33 @@ class DetectionProcessorFactory(
 
     def get_prediction_processor(
         self,
+        model: DetectionModel,
         *args,
+        prediction_processor_cls: Optional[
+            type[
+                PredictionProcessorWithClasses[DetectionModelOutput, DetectionResults]
+            ]
+        ] = None,
         NMS_threshold: Optional[float] = None,
         p_kwargs: Optional[Kwargs] = None,
         **kwargs
     ) -> DetectionProcessor:
-        if not NMS_threshold:
-            NMS_threshold = self.NMS_threshold
-        
-        p_kwargs = p_kwargs or {}
-        p_kwargs["NMS_threshold"] = NMS_threshold
+
+        if model.external_NMS:
+            if not NMS_threshold:
+                NMS_threshold = self.NMS_threshold
+
+            p_kwargs = p_kwargs or {}
+            p_kwargs["NMS_threshold"] = NMS_threshold
+
+            prediction_processor_cls = prediction_processor_cls or DetectionProcessorWithNMS
+        else:
+            prediction_processor_cls = prediction_processor_cls or DetectionProcessor
 
         return super().get_prediction_processor(
+            model,
             *args, **kwargs,
+            prediction_processor_cls=prediction_processor_cls,
             p_kwargs=p_kwargs
         )
 
