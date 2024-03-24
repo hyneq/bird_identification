@@ -52,6 +52,23 @@ class VectorScores(Scores):
         return np.argsort(self.arr)
 
 
+class DictScores(Scores, UserDict[int, float]):
+
+    def __getitem__(self, key: Union[int, list[int]]):
+        if np.issubdtype(type(key), np.integer):
+            return self.data[key]
+
+        return [self.data[k] for k in key]
+
+
+    def argmax(self) -> int:
+        return max(self.data, key=self.data.get)
+
+
+    def argsort(self) -> Sequence[int]:
+        return sorted(self.data, key=self.data.get)
+
+
 class ClassSelector(ABC):
     __slots__: tuple
 
