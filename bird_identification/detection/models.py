@@ -5,6 +5,7 @@ from collections.abc import Sequence
 import numpy as np
 
 from ..image_utils import Image
+from ..prediction.classes import Scores
 from ..prediction.models import (
     PredictionModelWithClassesConfig,
     IPredictionModelWithClasses,
@@ -57,7 +58,7 @@ class DetectionModelOutput(
         pass
 
     @abstractmethod
-    def get_scores(self, obj: DetectionObjT) -> np.ndarray:
+    def get_scores(self, obj: DetectionObjT) -> Scores:
         pass
 
     def __iter__(self) -> DetectionModelOutputIterT:

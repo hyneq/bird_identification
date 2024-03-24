@@ -3,6 +3,8 @@ import cv2
 
 from ..image_utils import Image
 
+from ..prediction.classes import VectorScores
+
 from .prediction import KerasPredictionModelWithClasses, KerasModelWithClassesConfig
 from ..classification.models import (
     ClassificationModel,
@@ -27,7 +29,7 @@ class KerasClassificationModel(
         return blob
 
     def get_output(self, predictions: np.ndarray) -> ClassificationModelOutput:
-        return predictions[0]
+        return VectorScores(predictions[0])
 
 
 class KerasClassificationModelConfig(

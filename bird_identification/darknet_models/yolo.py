@@ -1,5 +1,7 @@
 import numpy as np
 
+from ..prediction.classes import VectorScores
+
 from ..detection.models import (
     DetectionModelOutputIter,
     DetectionModelOutput
@@ -81,5 +83,5 @@ class YOLOv3DetectionModelOutput(
 
         return (x_min, y_min, int(box_width), int(box_height))
 
-    def get_scores(self, obj: YOLOv3DetectionObj) -> np.ndarray:
-        return obj[5:]
+    def get_scores(self, obj: YOLOv3DetectionObj) -> VectorScores:
+        return VectorScores(obj[5:])

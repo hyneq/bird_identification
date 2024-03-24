@@ -1,16 +1,55 @@
 from enum import Enum
 import numpy as np
-from typing import Optional, Union
+from typing import Optional, Union, Mapping, Sequence
 from typing_extensions import Self
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from collections import UserDict
 
 from ..config import merge_conf
 
 DEFAULT_MIN_CONFIDENCE = 0.5
 
 ClassList = Union[list[int], list[str], str, int]
-Scores = np.ndarray
+
+class Scores(ABC, Mapping[int, float]):
+    
+    @abstractmethod
+    def argmax(self) -> int:
+        pass
+
+
+    @abstractmethod
+    def argsort(self) -> Sequence[int]:
+        pass
+
+
+class VectorScores(Scores):
+
+    arr: np.ndarray
+
+    def __init__(self, arr: np.ndarray):
+        self.arr = arr
+
+
+    def __getitem__(self, key: Union[int, list[int]]):
+        return self.arr[key]
+    
+
+    def __len__(self):
+        return len(self.arr)
+    
+
+    def __iter__(self):
+        return iter(self.arr)
+    
+
+    def argmax(self) -> int:
+        return np.argmax(self.arr)
+    
+
+    def argsort(self) -> Sequence[int]:
+        return np.argsort(self.arr)
 
 
 class ClassSelector(ABC):
@@ -25,13 +64,14 @@ class ClassSelector(ABC):
         self.min_confidence = min_confidence
 
     @abstractmethod
-    def get_classes(self, scores: Scores) -> list:
+    def get_classes(self, scores: Scores) -> Sequence[int]:
         pass
 
-    def get_filtered_classes(self, scores: Scores) -> list:
+    def get_filtered_classes(self, scores: Scores) -> Sequence[int]:
         classes_filtered = []
         for class_ in self.get_classes(scores):
-            if scores[class_] > self.min_confidence:
+            score = scores[class_]
+            if score is not None and score > self.min_confidence:
                 classes_filtered.append(class_)
 
         return classes_filtered
@@ -46,22 +86,22 @@ class FixedClassSelector(ClassSelector):
         super().__init__(*args, **kwargs)
         self.classes = classes
 
-    def get_classes(self, scores: Scores) -> list:
+    def get_classes(self, scores: Scores) -> Sequence[int]:
         return self.classes
 
 
 class MaxClassSelector(ClassSelector):
     __slots__: tuple
 
-    def get_classes(self, scores: Scores) -> list:
-        return [np.argmax(scores)]
+    def get_classes(self, scores: Scores) -> Sequence[int]:
+        return [scores.argmax()]
 
 
 class SortClassSelector(ClassSelector):
     __slots__: tuple
 
-    def get_classes(self, scores: Scores) -> list:
-        return list(np.argsort(scores)[::-1])
+    def get_classes(self, scores: Scores) -> Sequence[int]:
+        return scores.argsort()
 
 
 class ClassificationMode(Enum):
