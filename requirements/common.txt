@@ -1,5 +1,6 @@
 opencv-python==4.9.0.80
 numpy==1.26.4
+matplotlib==3.8.3
 keras-cv==0.8.2
 typing-extensions==4.9.0
 enum-actions==0.1.2
