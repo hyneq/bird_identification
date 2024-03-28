@@ -6,3 +6,4 @@ typing-extensions==4.9.0
 enum-actions==0.1.2
 PyYAML==6.0.1
 dacite==1.8.1
+pycocotools==2.0.7
