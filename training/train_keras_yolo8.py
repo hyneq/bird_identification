@@ -241,7 +241,6 @@ def prepare_input_data(dataset: Dataset, take=None, show_data=False):
             class_names=class_names
         )
 
-    val_ds = val_ds.shuffle(BATCH_SIZE * 4)
     val_ds = val_ds.ragged_batch(BATCH_SIZE, drop_remainder=True)
     if show_data:
         visualize_dataset(val_ds, class_names=class_names)
@@ -289,14 +288,15 @@ def get_optimizer():
     )
 
 
-def get_coco_metrics(val_ds):
-    """
-    Returns a PyCOCOCallback
-    """
+# # Currently does not work
+# def get_coco_metrics(val_ds):
+#     """
+#     Returns a PyCOCOCallback
+#     """
 
-    return keras_cv.callbacks.PyCOCOCallback(
-        val_ds, bounding_box_format=BOUNDING_BOX_FORMAT
-    )
+#     return keras_cv.callbacks.PyCOCOCallback(
+#         val_ds, bounding_box_format=BOUNDING_BOX_FORMAT
+#     )
 
 def train_model(
     model,
@@ -313,7 +313,8 @@ def train_model(
 
     optimizer = optimizer or get_optimizer()
 
-    callbacks = callbacks or [get_coco_metrics(val_ds)]
+    #callbacks = callbacks or [get_coco_metrics(val_ds)] # evaluation does not work
+    callbacks = callbacks or []
 
     # Compile model for training
     model.compile(
