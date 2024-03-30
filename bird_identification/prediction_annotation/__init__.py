@@ -1,6 +1,7 @@
-from typing import Optional, Callable
+from typing import Optional, Protocol
 from threading import Thread
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 
 from ..image_utils import Image
 from ..streams import IVideoInStream, IVideoOutStream
@@ -39,6 +40,12 @@ def get_prediction_annotation(
     return MultiAnnotation(annotations)
 
 
+class PredictionCallback(Protocol):
+
+    def __call__(self, results: list[IPredictionResultWithClassesAndBoundingBoxes]):
+        pass
+
+
 class ImagePredictionStreamProcessor:
     __slots__: tuple
 
@@ -46,24 +53,42 @@ class ImagePredictionStreamProcessor:
     annotator: StreamAnnotator
     cache: FrameCache[Image]
     frame_processor: MultiFrameProcessor
+    callbacks: list[PredictionCallback]
 
     def __init__(
         self,
         predictor: ImageClassAndBoundingBoxPredictor,
+        callbacks: Optional[list[PredictionCallback]]=None,
     ):
         self.predictor = predictor
         self.annotator = StreamAnnotator()
         self.cache = FrameCache()
         self.frame_processor = MultiFrameProcessor([self.cache, self.annotator])
+        self.callbacks = callbacks or []
+
 
     def predict(self):
-        if self.cache.cached is not None:
-            self.set_annotations(self.predictor.predict(self.cache.cached))
+        if self.cache.cached is None:
+            return
+
+        results = self.predictor.predict(self.cache.cached)
+
+        self.set_annotations(results)
+
+        self.run_callbacks(results)
+
 
     def set_annotations(
         self, results: list[IPredictionResultWithClassesAndBoundingBoxes]
     ):
         self.annotator.set_annotation(get_prediction_annotation(results))
+
+
+    def run_callbacks(
+        self, results: list[IPredictionResultWithClassesAndBoundingBoxes]
+    ):
+        for callback in self.callbacks:
+            callback(results)
 
 
 class PredictionRunner(ABC):
