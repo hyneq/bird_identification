@@ -10,4 +10,4 @@ else
     export PYTHONPATH=$workdir
 fi
 
-exec python3 $workdir/cli/detection_classification_annotation.py --detection-class="bird" --detection-min-confidence=60 --classification-min-confidence=60 -i $file_in -o $file_out
+exec python3 $workdir/cli/detection_classification_annotation.py --in-type=opencv --out-type=opencv_mjpg --detection-class="bird" --detection-min-confidence=60 --classification-min-confidence=60 -i $file_in -o $file_out
