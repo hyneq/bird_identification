@@ -7,11 +7,14 @@ from dataclasses import dataclass
 from abc import abstractmethod
 from threading import Lock
 
-from typing import Any
+from typing import Any, Optional
 
-import numpy as np
-import cv2
-from tensorflow import lite as tflite
+try:
+    from tflite_runtime import interpreter as tflite
+    load_delegate = tflite.load_delegate
+except ImportError:
+    from tensorflow import lite as tflite
+    load_delegate = tflite.experimental.load_delegate
 
 from ..prediction.models import (
     PredictionModel,
@@ -27,6 +30,7 @@ from ..image_utils import Image, Size
 @dataclass
 class TFLiteModelConfig(PredictionModelConfig):
     model_path: str
+    delegate: Optional[str] = None
 
     @classmethod
     def from_path(cls, path: str):
@@ -57,11 +61,18 @@ class TFLitePredictionModel(
         super().__init__(cfg)
 
         self.lock = Lock()
-        self.interpreter = interpreter = tflite.Interpreter(model_path=cfg.model_path)
+        self.interpreter = interpreter = self.get_interpreter(cfg)
+        self.interpreter.allocate_tensors()
         self.input_details = interpreter.get_input_details()
         self.output_details = interpreter.get_output_details()
 
-        self.interpreter.allocate_tensors()
+
+    def get_interpreter(self, cfg: TFLiteModelConfig) -> tflite.Interpreter:
+        if cfg.delegate:
+            delegate = load_delegate(cfg.delegate)
+            return tflite.Interpreter(model_path=cfg.model_path, experimental_delegates=[delegate])
+        
+        return tflite.Interpreter(model_path=cfg.model_path)
 
 
     def predict(self, input: PredictionModelInputT) -> PredictionModelOutputT:
