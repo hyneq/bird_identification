@@ -6,6 +6,12 @@ import argparse
 
 import tensorflow as tf
 
+# Load keras_cv, if possible, to register their custom objects
+try:
+    import keras_cv
+except ImportError:
+    pass
+
 def convert(in_path: str, out_path: str, *args, optimization: Optional[str]=None, **kwargs):
     """
     Converts a Keras model to a TF Lite model
