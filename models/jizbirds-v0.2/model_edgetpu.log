@@ -1,0 +1,18 @@
+Edge TPU Compiler version 15.0.340273435
+Input: scripts/../models/jizbirds-v0.2/model.tflite
+Output: scripts/../models/jizbirds-v0.2/model_edgetpu.tflite
+
+Operator                       Count      Status
+
+SUB                            1          Mapped to Edge TPU
+DEQUANTIZE                     1          Operation is working on an unsupported data type
+QUANTIZE                       1          Operation is otherwise supported, but not mapped due to some unspecified limitation
+MEAN                           17         Mapped to Edge TPU
+SOFTMAX                        1          Mapped to Edge TPU
+ADD                            9          Mapped to Edge TPU
+PAD                            5          Mapped to Edge TPU
+LOGISTIC                       65         Mapped to Edge TPU
+FULLY_CONNECTED                1          Mapped to Edge TPU
+DEPTHWISE_CONV_2D              16         Mapped to Edge TPU
+MUL                            68         Mapped to Edge TPU
+CONV_2D                        65         Mapped to Edge TPU
