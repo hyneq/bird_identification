@@ -1,0 +1,7 @@
+#!/bin/bash
+
+source "$(dirname "$0")/../activate"
+
+
+mkdir -p "$project_root/ultralytics" && cd "$project_root/ultralytics" || exit $?
+exec "yolo" "$@"

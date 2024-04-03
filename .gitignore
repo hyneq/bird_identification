@@ -6,4 +6,5 @@ models/*
 images
 logs
 edgetpu_compiler
+ultralytics
 venv
