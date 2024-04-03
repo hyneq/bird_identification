@@ -20,10 +20,9 @@ def convert(in_path: str, out_path: str, *args, optimization: Optional[str]=None
     keras_model = tf.keras.models.load_model(in_path)
 
     converter = tf.lite.TFLiteConverter.from_keras_model(keras_model)
-    converter.experimental_new_quantizer = True
 
     if optimization:
-        OPTIMIZATIONS[optimization](converter, *args, **kwargs)
+        OPTIMIZATIONS[optimization](converter, keras_model, *args, **kwargs)
 
     tflite_model = converter.convert()
 
@@ -31,32 +30,35 @@ def convert(in_path: str, out_path: str, *args, optimization: Optional[str]=None
         f.write(tflite_model)
 
 
-def optimization_dynamic_range_quant(converter: tf.lite.TFLiteConverter, *_, **__):
+def optimization_dynamic_range_quant(converter: tf.lite.TFLiteConverter, keras_model: tf.keras.Model, *_, **__):
 
     # from https://www.tensorflow.org/lite/performance/post_training_quant
     converter.optimizations = [tf.lite.Optimize.DEFAULT]
 
 
-def optimization_float_fallback_quant(converter: tf.lite.TFLiteConverter, representative_data_path: str, *_, **__):
+def optimization_float_fallback_quant(converter: tf.lite.TFLiteConverter, keras_model: tf.keras.Model, representative_data_path: str, *args, **kwargs):
 
     # from https://www.tensorflow.org/lite/performance/post_training_integer_quant
 
-    optimization_dynamic_range_quant(converter)
+    optimization_dynamic_range_quant(converter, keras_model, *args, **kwargs)
 
+    image_size = keras_model.input.shape[1:3]
     def representative_data_gen():
         for input_value in (
-            tf.keras.preprocessing.image_dataset_from_directory(representative_data_path, labels=None, batch_size=1).take(100)
+            tf.keras.preprocessing.image_dataset_from_directory(
+                representative_data_path, labels=None, batch_size=1, image_size=image_size
+            ).take(100)
         ):
-            yield [input_value[0]]
+            yield [input_value]
 
     converter.representative_dataset = representative_data_gen
 
 
-def optimization_integer_only_quant(converter: tf.lite.TFLiteConverter, representative_data_path: str, *_, **__):
+def optimization_integer_only_quant(converter: tf.lite.TFLiteConverter, *args, **kwargs):
 
     # from https://www.tensorflow.org/lite/performance/post_training_integer_quant
 
-    optimization_float_fallback_quant(converter, representative_data_path)
+    optimization_float_fallback_quant(converter, *args, **kwargs)
 
     converter.target_spec.supported_ops = [tf.lite.OpsSet.TFLITE_BUILTINS_INT8]
     converter.inference_input_type = tf.uint8
