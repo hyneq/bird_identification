@@ -6,5 +6,6 @@ models/*
 images
 logs
 edgetpu_compiler
-ultralytics
+ultralytics/*
+!ultralytics/settings.yml
 venv
