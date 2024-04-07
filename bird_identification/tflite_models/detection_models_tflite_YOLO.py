@@ -17,9 +17,10 @@ class TFLiteYOLODetectionModel(
 
     def set_input(self, input: Image):
         input_shape = self.input_details[0]['shape'][1:3]
+        input_dtype = self.input_details[0]['dtype']
         blob = cv2.dnn.blobFromImage(
             input, 1 / 255.0, size=input_shape, swapRB=True, crop=False
-        )
+        ).astype(input_dtype)
         blob = np.moveaxis(blob, 1, 3)
         self.interpreter.set_tensor(self.input_details[0]['index'], blob)
 
