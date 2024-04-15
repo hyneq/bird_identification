@@ -6,7 +6,8 @@ from collections import Counter
 
 from ..prediction.predictor import IPredictionResultWithClasses
 
-from .tracker import ILoggingTrackingLogic, ILoggingTrackingLogicFactory
+from .logger import ClassLoggedObject
+from .tracking_logic import ILoggingTrackingLogic, ILoggingTrackingLogicFactory
 
 DEFAULT_IDLE_INTERVAL: float = 15.0
 
@@ -21,20 +22,13 @@ class TrackedObject:
     parent: Optional[Self] = None
 
 
-@dataclass(frozen=True)
-class LoggedObject:
-    class_name: Optional[str]
-    start_time: float
-    end_time: float
-
-
-class IntervalTrackingLogic(ILoggingTrackingLogic[list[IPredictionResultWithClasses], LoggedObject]):
+class IntervalTrackingLogic(ILoggingTrackingLogic[list[IPredictionResultWithClasses], ClassLoggedObject]):
     __slots__: tuple
 
     idle_interval: float
 
     tracked_objects: dict[Optional[str], TrackedObject]
-    logged_objects: list[LoggedObject]
+    logged_objects: list[ClassLoggedObject]
     now: float
 
     def __init__(self, idle_interval: float):
@@ -135,7 +129,7 @@ class IntervalTrackingLogic(ILoggingTrackingLogic[list[IPredictionResultWithClas
 
 
     def _log_object(self, obj: TrackedObject):
-        logged_obj = LoggedObject(
+        logged_obj = ClassLoggedObject(
             obj.class_name,
             obj.start_time,
             obj.end_time
@@ -151,7 +145,7 @@ class IntervalTrackingLogic(ILoggingTrackingLogic[list[IPredictionResultWithClas
 
 
 @dataclass(frozen=True)
-class IntervalTrackingLogicFactory(ILoggingTrackingLogicFactory[list[IPredictionResultWithClasses], LoggedObject]):
+class IntervalTrackingLogicFactory(ILoggingTrackingLogicFactory[list[IPredictionResultWithClasses], ClassLoggedObject]):
 
     name = "interval"
     default_idle_interval: float = DEFAULT_IDLE_INTERVAL
@@ -159,7 +153,7 @@ class IntervalTrackingLogicFactory(ILoggingTrackingLogicFactory[list[IPrediction
     def __call__(self,
         idle_interval: Optional[float] = None,
         *_, **__
-    ) -> ILoggingTrackingLogic[list[IPredictionResultWithClasses], LoggedObject]:
+    ) -> ILoggingTrackingLogic[list[IPredictionResultWithClasses], ClassLoggedObject]:
         idle_interval = idle_interval or self.default_idle_interval
 
         return IntervalTrackingLogic(idle_interval=idle_interval)

@@ -1,5 +1,6 @@
 from typing import TypeVar, Generic
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 
 from ..factories import IFactory
 
@@ -33,3 +34,10 @@ class ListObjectLogger(IObjectLogger[LoggedObjectT]):
 
     def add(self, obj: LoggedObjectT):
         self.objects.append(obj)
+
+
+@dataclass(frozen=True)
+class ClassLoggedObject:
+    class_name: Optional[str]
+    start_time: float
+    end_time: float
