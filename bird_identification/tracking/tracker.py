@@ -10,9 +10,15 @@ from .tracking_logic import (
     TrackingLogicInputT,
     ITrackingLogicFactory,
     ILoggingTrackingLogic,
-    ILoggingTrackingLogicFactory
+    ILoggingTrackingLogicFactory,
+    MultiLoggingTrackingLogicFactory
 )
-from .logger import IObjectLogger, LoggedObjectT, IObjectLoggerFactory
+from .logger import (
+    IObjectLogger,
+    LoggedObjectT,
+    IObjectLoggerFactory,
+    MultiLoggerFactory
+)
 
 class ITracker(ABC, Generic[PredictionResultT]):
     __slots__: tuple
@@ -111,19 +117,70 @@ class LoggingTrackerFactory(TrackerFactory[PredictionResultT, TrackingLogicInput
     logger_factory: IObjectLoggerFactory[LoggedObjectT]
 
     def __call__(self,
-        *args,
+        *_,
+        logic_args: tuple = tuple(),
+        logic_kwargs: dict[str, Any] = {},
+        logger_args: tuple = tuple(),
+        logger_kwargs: dict[str, Any] = {},
         logic: Optional[ILoggingTrackingLogic[TrackingLogicInputT, LoggedObjectT]] = None,
         logger: Optional[IObjectLogger[LoggedObjectT]] = None,
         prediction_parser: Optional[IPredictionParser[PredictionResultT, TrackingLogicInputT]] = None,
-        **kwargs
+        **__
     ) -> LoggingTracker[PredictionResultT, TrackingLogicInputT, LoggedObjectT]:
         if not logic:
-            logic = self.logic_factory(*args, **kwargs)
-        
+            logic = self.logic_factory(*logic_args, **logic_kwargs)
+
         if not logger:
-            logger = self.logger_factory()
+            logger = self.logger_factory(*logger_args, **logger_kwargs)
 
         if not prediction_parser:
             prediction_parser = self.default_prediction_parser
-        
+
         return LoggingTracker(logic, logger, prediction_parser)
+
+
+@dataclass(frozen=True)
+class MultiLoggingTrackerFactory(LoggingTrackerFactory[PredictionResultT, TrackingLogicInputT, LoggedObjectT]):
+    
+    name: str = "multi"
+    logic_factory: MultiLoggingTrackingLogicFactory[TrackingLogicInputT, LoggedObjectT]
+    logger_factory: MultiLoggerFactory[LoggedObjectT]
+    
+    def __call__(self,
+        *_,
+        logic_type: Optional[str] = None,
+        logger_type: Optional[str] = None,
+        logic_args: tuple = tuple(),
+        logic_kwargs: dict[str, Any] = {},
+        logger_args: tuple = tuple(),
+        logger_kwargs: dict[str, Any] = {},
+        logic: Optional[ILoggingTrackingLogic[TrackingLogicInputT, LoggedObjectT]] = None,
+        logger: Optional[IObjectLogger[LoggedObjectT]] = None,
+        prediction_parser: Optional[IPredictionParser[PredictionResultT, TrackingLogicInputT]] = None,
+        **__
+    ) -> LoggingTracker[PredictionResultT, TrackingLogicInputT, LoggedObjectT]:
+        return super().__call__(
+            logic_args=logic_args,
+            logic_kwargs={"factory": logic_type, **logic_kwargs},
+            logger_args=logger_args,
+            logger_kwargs={"factory": logger_type,  **logger_kwargs},
+            logic=logic,
+            logger=logger,
+            prediction_parser=prediction_parser
+        )
+
+
+from ..prediction.predictor import IPredictionResultWithClassesAndBoundingBoxes
+
+from .tracking_logic import tracking_logic_factory
+from .logger import ClassLoggedObject, object_logger_factory
+
+tracker_factory = MultiLoggingTrackerFactory[
+    IPredictionResultWithClassesAndBoundingBoxes,
+    IPredictionResultWithClassesAndBoundingBoxes,
+    ClassLoggedObject
+](
+    logic_factory=tracking_logic_factory,
+    logger_factory=object_logger_factory,
+    default_prediction_parser=DEFAULT_PREDICTION_PARSER,
+)

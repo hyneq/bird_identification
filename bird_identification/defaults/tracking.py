@@ -1,0 +1,3 @@
+DEFAULT_TRACKING_LOGIC_FACTORY = "interval"
+
+DEFAULT_LOGGER = "file"

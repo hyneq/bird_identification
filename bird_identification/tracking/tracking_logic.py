@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 from ..factories import IFactory, MultiFactory
 
-from .logger import IObjectLogger, LoggedObjectT
+from .logger import IObjectLogger, LoggedObjectT, ClassLoggedObject
 
 
 TrackingLogicInputT = TypeVar("TrackingLogicInputT")
@@ -39,3 +39,14 @@ class MultiLoggingTrackingLogicFactory(
     ILoggingTrackingLogicFactory[TrackingLogicInputT, LoggedObjectT]
 ):
     pass
+
+
+from ..prediction.predictor import IPredictionResultWithClassesAndBoundingBoxes
+from ..factories import search_factories
+
+from ..defaults.tracking import DEFAULT_TRACKING_LOGIC_FACTORY
+
+tracking_logic_factory = MultiLoggingTrackingLogicFactory[
+    IPredictionResultWithClassesAndBoundingBoxes,
+    ClassLoggedObject
+](factories=search_factories(prefix='tracking_logic_'), default_factory=DEFAULT_TRACKING_LOGIC_FACTORY)

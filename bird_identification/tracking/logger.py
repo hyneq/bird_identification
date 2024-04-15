@@ -1,8 +1,8 @@
-from typing import TypeVar, Generic
+from typing import TypeVar, Generic, Optional
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-from ..factories import IFactory
+from ..factories import IFactory, MultiFactory
 
 LoggedObjectT = TypeVar("LoggedObjectT")
 
@@ -41,3 +41,21 @@ class ClassLoggedObject:
     class_name: Optional[str]
     start_time: float
     end_time: float
+
+
+class MultiLoggerFactory(
+    MultiFactory[
+        IObjectLogger[LoggedObjectT]
+    ],
+    IObjectLoggerFactory[LoggedObjectT]
+):
+    pass
+
+
+from ..factories import search_factories
+
+from ..defaults.tracking import DEFAULT_LOGGER
+
+object_logger_factory = MultiLoggerFactory[
+    ClassLoggedObject
+](factories=search_factories(prefix='logger_'), default_factory=DEFAULT_LOGGER)
