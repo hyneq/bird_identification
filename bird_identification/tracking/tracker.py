@@ -5,6 +5,13 @@ from dataclasses import dataclass
 from ..prediction.predictor import PredictionResultT
 from ..factories import IFactory
 
+from .tracking_logic import (
+    ITrackingLogic,
+    TrackingLogicInputT,
+    ITrackingLogicFactory,
+    ILoggingTrackingLogic,
+    ILoggingTrackingLogicFactory
+)
 from .logger import IObjectLogger, LoggedObjectT, IObjectLoggerFactory
 
 class ITracker(ABC, Generic[PredictionResultT]):
@@ -21,29 +28,12 @@ class ITrackerFactory(IFactory[ITracker[PredictionResultT]]):
     __slots__: tuple
 
 
-TrackingLogicInputT = TypeVar("TrackingLogicInputT")
-
-class ITrackingLogic(ABC, Generic[TrackingLogicInputT]):
-    __slots__: tuple
-
-    tracker: "Tracker[Any, TrackingLogicInputT]"
-
-    @abstractmethod
-    def update(self,
-        result: TrackingLogicInputT
-    ):
-        pass
-
-
-class ITrackingLogicFactory(IFactory[ITrackingLogic[TrackingLogicInputT]]):
-    __slots__: tuple
-
-
 class IPredictionParser(Protocol, Generic[PredictionResultT, TrackingLogicInputT]):
 
     @abstractmethod
     def __call__(self, result: PredictionResultT) -> TrackingLogicInputT:
         pass
+
 
 DEFAULT_PREDICTION_PARSER: IPredictionParser = lambda result: result
 
@@ -60,8 +50,6 @@ class Tracker(ITracker[PredictionResultT], Generic[PredictionResultT, TrackingLo
     ):
         self.logic = logic
         self.prediction_parser = prediction_parser
-
-        logic.tracker = self
 
 
     def _parse(self, result: PredictionResultT) -> TrackingLogicInputT:
@@ -95,19 +83,6 @@ class TrackerFactory(IFactory[Tracker[PredictionResultT, TrackingLogicInputT]]):
         return Tracker(logic, prediction_parser)
 
 
-class ILoggingTrackingLogic(ITrackingLogic[TrackingLogicInputT], Generic[TrackingLogicInputT, LoggedObjectT]):
-    __slots__: tuple
-
-    tracker: "LoggingTracker[Any, TrackingLogicInputT, LoggedObjectT]"
-
-    def log(self, objects: list[LoggedObjectT]):
-        self.tracker.log(objects)
-
-
-class ILoggingTrackingLogicFactory(IFactory[ILoggingTrackingLogic[TrackingLogicInputT, LoggedObjectT]]):
-    pass
-
-
 class LoggingTracker(Tracker[PredictionResultT, TrackingLogicInputT], Generic[PredictionResultT, TrackingLogicInputT, LoggedObjectT]):
     __slots__: tuple
 
@@ -122,9 +97,11 @@ class LoggingTracker(Tracker[PredictionResultT, TrackingLogicInputT], Generic[Pr
         super().__init__(logic, prediction_parser)
 
         self.logger = logger
+        logic.logger = logger
 
-    def log(self, objects: list[LoggedObjectT]):
-        self.logger.log(objects)
+
+    def log(self):
+        self.logger.log()
 
 
 @dataclass(frozen=True)

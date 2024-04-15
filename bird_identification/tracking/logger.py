@@ -9,9 +9,27 @@ class IObjectLogger(ABC, Generic[LoggedObjectT]):
     __slots__: tuple
 
     @abstractmethod
-    def log(self, objects: list[LoggedObjectT]):
+    def add(self, obj: LoggedObjectT):
+        pass
+
+
+    @abstractmethod
+    def log(self):
+        pass
+
+
+    def close(self):
         pass
 
 
 class IObjectLoggerFactory(IFactory[IObjectLogger[LoggedObjectT]]):
-    pass
+    __slots__: tuple
+
+
+class ListObjectLogger(IObjectLogger[LoggedObjectT]):
+    __slots__: tuple
+
+    objects: list[LoggedObjectT]
+
+    def add(self, obj: LoggedObjectT):
+        self.objects.append(obj)
