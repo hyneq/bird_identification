@@ -133,11 +133,12 @@ class ImagePredictionStreamRunner:
         predictor: ImageClassAndBoundingBoxPredictor,
         in_stream: IVideoInStream,
         out_stream: IVideoOutStream,
+        callbacks: list[PredictionCallback] = [],
         prediction_runner: PredictionRunner = DEFAULT_PREDICTION_RUNNER,
     ):
         self.prediction_stream_processor = (
             prediction_stream_processor
-        ) = ImagePredictionStreamProcessor(predictor)
+        ) = ImagePredictionStreamProcessor(predictor, callbacks)
 
         prediction_runner.prediction_stream_processor = prediction_stream_processor
         self.prediction_runner = prediction_runner
