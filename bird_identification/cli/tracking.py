@@ -42,6 +42,7 @@ class MultiLoggingTrackingLogicCLIPart(CLIPart, ITrackerCLIPart[PredictionResult
             "--logic-type",
             dest="logic_type",
             default=self.factory.logic_factory.default_factory,
+            choices=self.factory.logic_factory.factory_names
         )
         parser.add_argument(
             "--idle-interval",
@@ -52,6 +53,7 @@ class MultiLoggingTrackingLogicCLIPart(CLIPart, ITrackerCLIPart[PredictionResult
             "--logger-type",
             dest="logger_type",
             default=self.factory.logger_factory.default_factory,
+            choices=self.factory.logger_factory.factory_names
         )
         parser.add_argument(
             "--log-path",
