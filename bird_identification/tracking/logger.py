@@ -32,6 +32,10 @@ class ListObjectLogger(IObjectLogger[LoggedObjectT]):
 
     objects: list[LoggedObjectT]
 
+    def __init__(self):
+        self.objects = []
+
+
     def add(self, obj: LoggedObjectT):
         self.objects.append(obj)
 

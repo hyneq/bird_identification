@@ -15,6 +15,8 @@ class FileLogger(ListObjectLogger[Any]):
     needs_close: bool
 
     def __init__(self, printer: pprint.PrettyPrinter, needs_close: bool = False):
+        super().__init__()
+
         self.printer = printer
         self.needs_close = needs_close
 
