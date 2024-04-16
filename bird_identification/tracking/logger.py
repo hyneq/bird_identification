@@ -41,8 +41,9 @@ class ListObjectLogger(IObjectLogger[LoggedObjectT]):
 
 
     def log(self):
-        self._log()
-        self.objects.clear()
+        if self.objects:
+            self._log()
+            self.objects.clear()
 
 
     @abstractmethod
