@@ -1,4 +1,4 @@
-from typing import Optional, Protocol
+from typing import Optional, Protocol, Sequence
 from threading import Thread
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
@@ -53,12 +53,12 @@ class ImagePredictionStreamProcessor:
     annotator: StreamAnnotator
     cache: FrameCache[Image]
     frame_processor: MultiFrameProcessor
-    callbacks: list[PredictionCallback]
+    callbacks: Sequence[PredictionCallback]
 
     def __init__(
         self,
         predictor: ImageClassAndBoundingBoxPredictor,
-        callbacks: Optional[list[PredictionCallback]]=None,
+        callbacks: Optional[Sequence[PredictionCallback]]=None,
     ):
         self.predictor = predictor
         self.annotator = StreamAnnotator()
@@ -133,7 +133,7 @@ class ImagePredictionStreamRunner:
         predictor: ImageClassAndBoundingBoxPredictor,
         in_stream: IVideoInStream,
         out_stream: IVideoOutStream,
-        callbacks: list[PredictionCallback] = [],
+        callbacks: Sequence[PredictionCallback] = [],
         prediction_runner: PredictionRunner = DEFAULT_PREDICTION_RUNNER,
     ):
         self.prediction_stream_processor = (
