@@ -106,7 +106,9 @@ class LoggingTracker(Tracker[PredictionResultT, TrackingLogicInputT], Generic[Pr
         logic.logger = logger
 
 
-    def log(self):
+    def update(self, result: PredictionResultT):
+        super().update(result)
+
         self.logger.log()
 
 
