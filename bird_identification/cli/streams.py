@@ -46,11 +46,13 @@ class MultiPathVideoStreamPairCLIPart(CLIPart, IStreamPairCLIPart):
             "--in-type",
             dest="in_type",
             default=self.stream_pair_factory.stream_in_factory.default_factory,
+            choices=self.stream_pair_factory.stream_in_factory.factory_names
         )
         parser.add_argument(
             "--out-type",
             dest="out_type",
             default=self.stream_pair_factory.stream_out_factory.default_factory,
+            choices=self.stream_pair_factory.stream_out_factory.factory_names
         )
         parser.add_argument(
             "--fps", "--framerate",
