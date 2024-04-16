@@ -19,7 +19,7 @@ class FileLogger(ListObjectLogger[Any]):
         self.needs_close = needs_close
 
 
-    def log(self):
+    def _log(self):
         self.printer.pprint(self.objects)
 
 

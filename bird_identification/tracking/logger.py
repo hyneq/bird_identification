@@ -36,6 +36,16 @@ class ListObjectLogger(IObjectLogger[LoggedObjectT]):
         self.objects.append(obj)
 
 
+    def log(self):
+        self._log()
+        self.objects.clear()
+
+
+    @abstractmethod
+    def _log(self):
+        pass
+
+
 @dataclass(frozen=True)
 class ClassLoggedObject:
     class_name: Optional[str]
