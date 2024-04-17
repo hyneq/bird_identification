@@ -47,7 +47,7 @@ class MultiLoggingTrackingLogicCLIPart(CLIPart, ITrackerCLIPart[PredictionResult
         parser.add_argument(
             "--idle-interval",
             dest="idle_interval",
-            required=False
+            type=float
         )
         parser.add_argument(
             "--logger-type",
