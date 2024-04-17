@@ -100,7 +100,7 @@ class IntervalTrackingLogic(ILoggingTrackingLogic[list[IPredictionResultWithClas
 
 
     def check_interval(self):
-        for class_name in self.tracked_objects.keys():
+        for class_name in list(self.tracked_objects.keys()):
             self._check_interval_class(class_name)
     
 
@@ -112,11 +112,11 @@ class IntervalTrackingLogic(ILoggingTrackingLogic[list[IPredictionResultWithClas
 
 
     def _check_interval_obj(self, obj: TrackedObject):
-        if not self._obj_is_active(obj):
+        if self._obj_is_idle(obj):
             self._log_and_remove(obj)
 
 
-    def _obj_is_active(self, obj: TrackedObject):
+    def _obj_is_idle(self, obj: TrackedObject):
         return self.now - obj.last_seen > self.idle_interval * obj.level
 
 
@@ -134,7 +134,7 @@ class IntervalTrackingLogic(ILoggingTrackingLogic[list[IPredictionResultWithClas
             obj.start_time,
             obj.end_time
         )
-        self.logged_objects.append(logged_obj)
+        self.logger.add(logged_obj)
 
     
     def _remove_object(self, obj: TrackedObject):
