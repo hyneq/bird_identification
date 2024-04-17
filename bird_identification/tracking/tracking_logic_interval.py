@@ -3,6 +3,7 @@ from typing_extensions import Self
 from dataclasses import dataclass
 import time
 from collections import Counter
+from datetime import datetime
 
 from ..prediction.predictor import IPredictionResultWithClasses
 
@@ -131,8 +132,8 @@ class IntervalTrackingLogic(ILoggingTrackingLogic[list[IPredictionResultWithClas
     def _log_object(self, obj: TrackedObject):
         logged_obj = ClassLoggedObject(
             obj.class_name,
-            obj.start_time,
-            obj.end_time
+            datetime.fromtimestamp(obj.start_time),
+            datetime.fromtimestamp(obj.end_time)
         )
         self.logger.add(logged_obj)
 

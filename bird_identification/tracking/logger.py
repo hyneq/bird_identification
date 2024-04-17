@@ -1,6 +1,7 @@
 from typing import TypeVar, Generic, Optional
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+import datetime
 
 from ..factories import IFactory, MultiFactory
 
@@ -54,8 +55,8 @@ class ListObjectLogger(IObjectLogger[LoggedObjectT]):
 @dataclass(frozen=True)
 class ClassLoggedObject:
     class_name: Optional[str]
-    start_time: float
-    end_time: float
+    start_time: datetime.datetime
+    end_time: datetime.datetime
 
 
 class MultiLoggerFactory(
