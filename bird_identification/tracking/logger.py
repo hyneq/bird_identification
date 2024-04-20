@@ -59,6 +59,10 @@ class ClassLoggedObject:
     end_time: datetime.datetime
 
 
+ClassLogger = IObjectLogger[ClassLoggedObject]
+
+ClassLoggerFactory = IObjectLoggerFactory[ClassLoggedObject]
+
 class MultiLoggerFactory(
     MultiFactory[
         IObjectLogger[LoggedObjectT]
@@ -67,6 +71,8 @@ class MultiLoggerFactory(
 ):
     pass
 
+
+MultiClassLoggerFactory = MultiLoggerFactory
 
 from ..factories import search_factories
 
