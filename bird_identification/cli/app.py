@@ -4,14 +4,13 @@ The CLI representing the bird identification application
 
 from typing import Optional
 
+from ..app import App
+
 from . import CLIWithParts
 from .streams import IStreamPairCLIPart, MultiPathVideoStreamPairCLIPart
 from .prediction import IPredictionCLIPart
 from .detection_classification import DetectionClassificationCLIPart
 from .tracking import ITrackerCLIPart, MultiLoggingTrackerCLIPart
-
-from ..prediction_annotation import ImagePredictionStreamRunner
-from ..tracking.prediction_callback import TrackerPredictionCallback
 
 class AppCLI(CLIWithParts):
     prediction_cli_part: IPredictionCLIPart
@@ -34,23 +33,26 @@ class AppCLI(CLIWithParts):
             self.tracking_cli_part
         ])
 
-    def get_runner(self):
-        (in_stream, out_stream) = self.stream_cli_part.get_stream_pair()
-
+    def get_app(self):
         predictor = self.prediction_cli_part.get_predictor()
 
-        callbacks = [TrackerPredictionCallback(self.tracking_cli_part.get_tracker())]
+        (in_stream, out_stream) = self.stream_cli_part.get_stream_pair()
 
-        return ImagePredictionStreamRunner(
-            predictor=predictor, in_stream=in_stream, out_stream=out_stream, callbacks=callbacks
+        tracker = self.tracking_cli_part.get_tracker()
+
+        return App(
+            predictor,
+            in_stream,
+            out_stream,
+            tracker
         )
 
     def run(self):
         super().run()
 
-        runner = self.get_runner()
+        app = self.get_app()
 
-        runner.run()
+        app.run()
 
 def cli_main():
     AppCLI().run()
