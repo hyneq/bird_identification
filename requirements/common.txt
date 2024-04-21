@@ -8,4 +8,4 @@ PyYAML==6.0.1
 dacite==1.8.1
 pycocotools==2.0.7
 tensorflow==2.13.1
-    
+SQLAlchemy==2.0.24
