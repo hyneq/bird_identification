@@ -9,7 +9,7 @@ from . import (
 )
 
 from ..tracking.tracker import (
-    ITracker,
+    LoggingTracker,
     MultiLoggingTrackerFactory,
     PredictionResultT,
     TrackingLogicInputT,
@@ -18,18 +18,18 @@ from ..tracking.tracker import (
 )
 
 
-class ITrackerCLIPart(ICLIPart, ABC, Generic[PredictionResultT]):
+class ITrackerCLIPart(ICLIPart, ABC, Generic[PredictionResultT, TrackingLogicInputT, LoggedObjectT]):
     @args_required
     @abstractmethod
-    def get_tracker(self) -> ITracker[PredictionResultT]:
+    def get_tracker(self) -> LoggingTracker[PredictionResultT, TrackingLogicInputT, LoggedObjectT]:
         pass
 
 
-class MultiLoggingTrackerCLIPart(CLIPart, ITrackerCLIPart[PredictionResultT], Generic[PredictionResultT, TrackingLogicInputT, LoggedObjectT]):
+class MultiLoggingTrackerCLIPart(CLIPart, ITrackerCLIPart[PredictionResultT, TrackingLogicInputT, LoggedObjectT]):
     factory: MultiLoggingTrackerFactory
 
     def __init__(self,
-        factory: MultiLoggingTrackerFactory = tracker_factory,
+        factory: MultiLoggingTrackerFactory[PredictionResultT, TrackingLogicInputT, LoggedObjectT] = tracker_factory,
         *args,
         **kwargs
     ):
@@ -63,7 +63,7 @@ class MultiLoggingTrackerCLIPart(CLIPart, ITrackerCLIPart[PredictionResultT], Ge
 
 
     @args_required
-    def get_tracker(self) -> ITracker[PredictionResultT]:
+    def get_tracker(self) -> LoggingTracker[PredictionResultT, TrackingLogicInputT, LoggedObjectT]:
         logic_kwargs = {
             "idle_interval": self.args.idle_interval
         }
