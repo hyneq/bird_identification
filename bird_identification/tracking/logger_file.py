@@ -26,7 +26,8 @@ class FileLogger(ListObjectLogger[Any]):
 
 
     def close(self):
-        self.printer._stream.close()
+        if self.needs_close:
+            self.printer._stream.close()
 
 
 @dataclass(frozen=True)
