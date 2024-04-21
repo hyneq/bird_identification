@@ -8,7 +8,7 @@ from . import CLIWithParts
 from .streams import IStreamPairCLIPart, MultiPathVideoStreamPairCLIPart
 from .prediction import IPredictionCLIPart
 from .detection_classification import DetectionClassificationCLIPart
-from .tracking import ITrackerCLIPart, MultiLoggingTrackingLogicCLIPart
+from .tracking import ITrackerCLIPart, MultiLoggingTrackerCLIPart
 
 from ..prediction_annotation import ImagePredictionStreamRunner
 from ..tracking.prediction_callback import TrackerPredictionCallback
@@ -26,7 +26,7 @@ class AppCLI(CLIWithParts):
     ):
         self.stream_cli_part = stream_cli_part or MultiPathVideoStreamPairCLIPart()
         self.prediction_cli_part = prediction_cli_part or DetectionClassificationCLIPart()
-        self.tracking_cli_part = tracking_cli_part or MultiLoggingTrackingLogicCLIPart()
+        self.tracking_cli_part = tracking_cli_part or MultiLoggingTrackerCLIPart()
 
         super().__init__(parts=[
             self.stream_cli_part,

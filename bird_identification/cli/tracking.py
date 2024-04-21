@@ -25,7 +25,7 @@ class ITrackerCLIPart(ICLIPart, ABC, Generic[PredictionResultT]):
         pass
 
 
-class MultiLoggingTrackingLogicCLIPart(CLIPart, ITrackerCLIPart[PredictionResultT], Generic[PredictionResultT, TrackingLogicInputT, LoggedObjectT]):
+class MultiLoggingTrackerCLIPart(CLIPart, ITrackerCLIPart[PredictionResultT], Generic[PredictionResultT, TrackingLogicInputT, LoggedObjectT]):
     factory: MultiLoggingTrackerFactory
 
     def __init__(self,
