@@ -72,6 +72,10 @@ class Tracker(ITracker[PredictionResultT], Generic[PredictionResultT, TrackingLo
         self.logic.update(self._parse(result))
 
 
+    def close(self):
+        self.logic.close()
+
+
 @dataclass(frozen=True)
 class TrackerFactory(IFactory[Tracker[PredictionResultT, TrackingLogicInputT]]):
 
@@ -117,6 +121,7 @@ class LoggingTracker(Tracker[PredictionResultT, TrackingLogicInputT], Generic[Pr
 
 
     def close(self):
+        super().close()
         self.logger.close()
 
 

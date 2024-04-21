@@ -18,6 +18,10 @@ class ITrackingLogic(ABC, Generic[TrackingLogicInputT]):
         pass
 
 
+    def close(self):
+        pass
+
+
 class ITrackingLogicFactory(IFactory[ITrackingLogic[TrackingLogicInputT]]):
     __slots__: tuple
 
