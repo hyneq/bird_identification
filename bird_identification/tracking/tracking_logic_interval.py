@@ -137,12 +137,17 @@ class IntervalTrackingLogic(ILoggingTrackingLogic[list[IPredictionResultWithClas
         )
         self.logger.add(logged_obj)
 
-    
+
     def _remove_object(self, obj: TrackedObject):
         if obj.parent:
             obj.parent.child = None
         else:
             del self.tracked_objects[obj.class_name]
+
+
+    def close(self):
+        for obj in list(self.tracked_objects.values()):
+            self._log_and_remove(obj)
 
 
 @dataclass(frozen=True)
