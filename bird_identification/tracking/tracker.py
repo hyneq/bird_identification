@@ -30,6 +30,10 @@ class ITracker(ABC, Generic[PredictionResultT]):
         pass
 
 
+    def close(self):
+        pass
+
+
 class ITrackerFactory(IFactory[ITracker[PredictionResultT]]):
     __slots__: tuple
 
@@ -110,6 +114,10 @@ class LoggingTracker(Tracker[PredictionResultT, TrackingLogicInputT], Generic[Pr
         super().update(result)
 
         self.logger.log()
+
+
+    def close(self):
+        self.logger.close()
 
 
 @dataclass(frozen=True)
