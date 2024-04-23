@@ -43,7 +43,7 @@ class IntervalTrackingLogic(ILoggingTrackingLogic[list[IPredictionResultWithClas
         self.now = time.time()
         self.update_classes(result)
         self.check_interval()
-    
+
 
     def update_classes(self, result: list[IPredictionResultWithClasses]):    
         class_counts = self._get_class_counts(result)
@@ -123,7 +123,7 @@ class IntervalTrackingLogic(ILoggingTrackingLogic[list[IPredictionResultWithClas
 
     def _log_and_remove(self, obj: Optional[TrackedObject]):
         while obj:
-            obj.end_time = self.now
+            obj.end_time = obj.last_seen
             self._log_object(obj)
             self._remove_object(obj)
             obj = obj.child
