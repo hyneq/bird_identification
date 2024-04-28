@@ -9,3 +9,4 @@ edgetpu_compiler
 ultralytics/*
 !ultralytics/settings.yml
 venv
+vars*.local

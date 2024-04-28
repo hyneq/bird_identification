@@ -9,3 +9,26 @@ if [ -n "$PYTHONPATH" ]; then
 else
     export PYTHONPATH=$project_root/lib/bird_identification
 fi
+
+function load_vars() {
+    local source_path="$project_root/$1"
+
+    test -f "$source_path" && source "$source_path"
+}
+
+load_vars "vars.local"
+
+if [[ -n "$SETUP_MODE" ]]; then
+    load_vars "vars.$SETUP_MODE"
+    load_vars "vars.$SETUP_MODE.local"
+fi
+
+if [[ -n "$SETUP_PLATFORM" ]]; then
+    load_vars "vars.$SETUP_PLATFORM"
+    load_vars "vars.$SETUP_PLATFORM.local"
+fi
+
+if [[ -n "$SETUP_MODE" ]] && [[ -n "$SETUP_PLATFORM" ]]; then
+    load_vars "vars.$SETUP_MODE.$SETUP_PLATFORM"
+    load_vars "vars.$SETUP_MODE.$SETUP_PLATFORM.local"
+fi
