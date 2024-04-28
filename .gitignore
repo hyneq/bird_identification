@@ -10,3 +10,4 @@ ultralytics/*
 !ultralytics/settings.yml
 venv
 vars*.local
+mediamtx
