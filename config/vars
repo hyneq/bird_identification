@@ -1,0 +1,28 @@
+# The vars file for shell wrappers of CLI
+
+config_path="$(dirname "${BASH_SOURCE[0]:-${(%):-%x}}")"
+
+stream_pipe_in="$project_root/stream_in.h264"
+stream_pipe_out="$project_root/stream_out.h264"
+
+camera_width=1600
+camera_height=900
+
+rtsp_port=8554
+
+app_args_file="$config_path/app_args"
+
+db_path="sqlite:///$project_root/detected.sqlite"
+
+function load_vars() {
+    local source_path="$(dirname "${BASH_SOURCE[0]:-${(%):-%x}}")/$1"
+
+    test -f "$source_path" && source "$source_path"
+}
+
+load_vars "vars.local"
+
+if [[ -n "$SETUP_MODE" ]]; then
+    load_vars "vars.$SETUP_MODE"
+    load_vars "vars.$SETUP_MODE.local"
+fi

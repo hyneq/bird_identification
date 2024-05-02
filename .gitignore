@@ -10,4 +10,6 @@ ultralytics/*
 !ultralytics/settings.yml
 venv
 vars*.local
+*args*.local
 mediamtx
+detected.sqlite
