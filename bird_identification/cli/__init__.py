@@ -98,7 +98,7 @@ class CLI(ABC):
 
     @abstractmethod
     def init_parser(self):
-        self.parser = argparse.ArgumentParser()
+        self.parser = argparse.ArgumentParser(fromfile_prefix_chars="@")
 
     def parse(self):
         self.init_parser()
