@@ -155,6 +155,8 @@ class ImagePredictionStreamRunner:
         try:
             self.start()
             self.wait()
+        except KeyboardInterrupt:
+            self.stop()
         finally:
             self.finish()
 
