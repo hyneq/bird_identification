@@ -184,6 +184,4 @@ class ImagePredictionStreamRunner:
     
     def stop(self):
         self.stream_processor.stop()
-
-        self.prediction_thread.join()
-        self.stream_thread.join()
+        self.prediction_runner.stop()
