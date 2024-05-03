@@ -39,5 +39,7 @@ class App:
 
 
     def run(self):
-        self.prediction_stream_runner.run()
-        self.tracker.close()
+        try:
+            self.prediction_stream_runner.run()
+        finally:
+            self.tracker.close()
