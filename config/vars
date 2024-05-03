@@ -15,7 +15,7 @@ app_args_file="$config_path/app_args"
 db_path="sqlite:///$project_root/detected.sqlite"
 
 function load_vars() {
-    local source_path="$(dirname "${BASH_SOURCE[0]:-${(%):-%x}}")/$1"
+    local source_path="$(dirname "$config_path")/$1"
 
     test -f "$source_path" && source "$source_path"
 }
