@@ -70,25 +70,47 @@ class StreamProcessor(Generic[InputT, OutputT]):
         output_stream: IOutStream[OutputT],
         frame_processor: IFrameProcessor[InputT, OutputT],
     ):
+        self.running = False
+
         self.input_stream = input_stream
         self.output_stream = output_stream
 
         self.frame_processor = frame_processor
 
     def run(self):
+        if self.running:
+            raise ValueError("Stream processor already running")
+
+        self.running = True
+
         try:
             self.loop()
         finally:
-            self.input_stream.close()
-            self.output_stream.close()
+            self.finish()
 
     def loop(self):
-        for input in self.input_stream:
+        while self.running:
+            input = self.input_stream.read()
+            if input is None:
+                self.runnning = False
+                break
+
             output = self.process(input)
+
             self.output_stream.write(output)
+
 
     def process(self, input: InputT) -> OutputT:
         return self.frame_processor.process(input)
+
+
+    def finish(self):
+        self.input_stream.close()
+        self.output_stream.close()
+
+
+    def stop(self):
+        self.running = False
 
 
 SameTypeStreamProcessor = StreamProcessor[FrameT, FrameT]
