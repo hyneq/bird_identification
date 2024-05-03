@@ -2,6 +2,10 @@
 
 config_path="$(dirname "${BASH_SOURCE[0]:-${(%):-%x}}")"
 
+pid_file="/tmp/$app_name.pid"
+
+logs_dir="$project_root/logs"
+
 stream_pipe_in="$project_root/stream_in.h264"
 stream_pipe_out="$project_root/stream_out.h264"
 
