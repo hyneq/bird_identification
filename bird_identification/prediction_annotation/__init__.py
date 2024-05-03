@@ -107,7 +107,11 @@ class PredictionRunner(ABC):
             )
 
         self.running = True
-        self._run()
+        try:
+            self._run()
+        finally:
+            self.running = False
+
 
     @abstractmethod
     def _run(self):
@@ -148,9 +152,11 @@ class ImagePredictionStreamRunner:
         )
 
     def run(self):
-        self.start()
-        self.wait()
-        self.stop()
+        try:
+            self.start()
+            self.wait()
+        finally:
+            self.finish()
 
     def start(self):
         self.start_stream_processor()
@@ -166,6 +172,16 @@ class ImagePredictionStreamRunner:
 
     def wait(self):
         self.stream_thread.join()
-
-    def stop(self):
+    
+    def finish(self):
+        self.finish_prediction()
+    
+    def finish_prediction(self):
         self.prediction_runner.stop()
+        self.prediction_thread.join()
+    
+    def stop(self):
+        self.stream_processor.stop()
+
+        self.prediction_thread.join()
+        self.stream_thread.join()
