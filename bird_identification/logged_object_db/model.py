@@ -23,6 +23,8 @@ class ClassLoggedObjectModel(Base):
     start_time: Mapped[datetime]
     end_time: Mapped[datetime]
 
+    remote_id: Mapped[int] = mapped_column(nullable=True)
+
 
 def get_engine(url: str) -> Engine:
     engine = create_engine(url)
