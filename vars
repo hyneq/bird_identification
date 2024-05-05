@@ -1,6 +1,6 @@
 app_name="bird_identification"
 
-project_root="$(dirname "${BASH_SOURCE[0]:-${(%):-%x}}")"
+project_root="$(realpath "$(dirname "${BASH_SOURCE[0]:-${(%):-%x}}")")"
 
 venv="$project_root/venv"
 
