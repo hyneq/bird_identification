@@ -28,12 +28,8 @@ class LoggedObjectsUpload(CLI):
             remote_api_password=self.args.password
         )
 
-        try:
-            uploaded_n = uploader.upload()
-            print(f"Uploaded {uploaded_n} logged objects to {self.args.remote_api_url}")
-        except requests.HTTPError as e:
-            print("HTTP Error detail: " + e.response.json()["detail"])
-            raise
+        uploaded_n = uploader.upload()
+        (f"Uploaded {uploaded_n} logged objects to {self.args.remote_api_url}")
 
 
 def cli_main():
