@@ -18,6 +18,8 @@ app_args_file="$config_path/app_args"
 
 db_path="sqlite:///$project_root/detected.sqlite"
 
+remote_api_credentials="$config_path/remote_api_credentials"
+
 function load_vars() {
     local source_path="$(dirname "$config_path")/$1"
 
