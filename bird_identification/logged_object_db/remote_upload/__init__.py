@@ -16,7 +16,7 @@ class RemoteUploader:
             objects = self.local_db.get_not_synced()
 
             if len(objects) == 0:
-                return
+                return 0
 
             ids = self.remote_api.upload(objects)
 
