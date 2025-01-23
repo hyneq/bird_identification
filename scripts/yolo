@@ -4,4 +4,4 @@ source "$(dirname "$0")/../activate"
 
 
 mkdir -p "$project_root/ultralytics" && cd "$project_root/ultralytics" || exit $?
-exec yolo cfg="settings.yml" "$@"
+exec yolo cfg="$project_root/ultralytics_settings.yml" "$@"
